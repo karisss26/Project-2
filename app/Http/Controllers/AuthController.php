@@ -75,4 +75,18 @@ class AuthController extends Controller
     public function register(Request $request) {
         // Logika register di sini
     }
+
+    // Tampilkan Halaman Register
+    public function showRegister() {
+        if (Auth::check()) {
+            $role = Auth::user()->role;
+            if ($role == 'owner' || $role == 'admin') return redirect()->route('dashboard.admin');
+            if ($role == 'kasir' || $role == 'staff') return redirect()->route('dashboard.staff');
+            if ($role == 'dokter') return redirect()->route('dashboard.dokter');
+            if ($role == 'pelanggan') return redirect()->route('dashboard.pelanggan');
+        }
+
+        // Pastikan kamu udah bikin file resources/views/auth/register.blade.php ya!
+        return view('auth.register');
+    }
 }
