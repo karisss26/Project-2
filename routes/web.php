@@ -73,4 +73,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/data-hewan/update/{id}', [DashboardController::class, 'updateHewan'])->name('hewan.update');
     Route::delete('/data-hewan/delete/{id}', [DashboardController::class, 'hapusHewan'])->name('hewan.hapus');
 
+    // Tambahkan di dalam routes/web.php
+    Route::get('/layanan', function () {
+    return view('layanan');
+});
+
 });

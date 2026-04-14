@@ -5,800 +5,253 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paw Center - D&F Pet Shop</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        /* === RESET & GLOBAL VARIABLES === */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background-color: #FFFFFF;
-            color: #333333;
-            line-height: 1.6;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        ul {
-            list-style: none;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 5%;
-        }
-
-        section {
-            padding: 80px 0;
-        }
-
-        /* === BUTTONS === */
-        .btn {
-            padding: 10px 24px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-
-        .btn-dark {
-            background-color: #333333;
-            color: #FFFFFF;
-        }
-
-        .btn-dark:hover {
-            background-color: #555555;
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid #333333;
-            color: #333333;
-        }
-
-        /* === HEADER / NAVBAR === */
-        header {
-            padding: 15px 0;
-            border-bottom: 1px solid #EAEAEA;
-            background-color: #FFFFFF;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        header .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .auth-btns {
-            display: flex;
-            gap: 10px;
-        }
-
-        /* === HERO SECTION === */
-        .hero {
-            background-color: #F4F4F4;
-        }
-
-        .hero .container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 40px;
-        }
-
-        .hero-text {
-            flex: 1;
-            max-width: 500px;
-        }
-
-        .hero-tag {
-            display: inline-block;
-            background-color: #E0E0E0;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        .hero-title {
-            font-size: 32px;
-            font-weight: 700;
-            line-height: 1.3;
-            margin-bottom: 15px;
-        }
-
-        .hero-desc {
-            font-size: 14px;
-            color: #666666;
-            margin-bottom: 30px;
-        }
-
-        /* Placeholder kotak abu-abu di wireframe */
-        .img-placeholder {
-            background-color: #444444;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #888;
-        }
-
-        .hero-img {
-            flex: 1;
-            height: 350px;
-        }
-
-        /* === PROFIL SECTION === */
-        .profil .container {
-            display: flex;
-            align-items: center;
-            gap: 50px;
-        }
-
-        .profil-img {
-            flex: 1;
-            height: 300px;
-        }
-
-        .profil-text {
-            flex: 1;
-        }
-
-        .profil-text h2 {
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-
-        .profil-text p {
-            font-size: 14px;
-            color: #666666;
-            margin-bottom: 20px;
-        }
-
-        .profil-text ul li {
-            font-size: 14px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #444;
-        }
-
-        .profil-text ul li i {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background-color: #333;
-            color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 20px;
-            font-size: 10px;
-            font-style: normal;
-        }
-
-        /* === LOKASI SECTION === */
-        .lokasi {
-            text-align: center;
-            padding-top: 0;
-        }
-
-        .lokasi h2 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .lokasi p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 40px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .maps-grid {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-        }
-
-        .map-card {
-            width: 45%;
-            position: relative;
-        }
-
-        .map-img {
-            height: 200px;
-            background-color: #E0E0E0;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        .map-label {
-            background-color: #FFFFFF;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            text-align: left;
-            position: absolute;
-            bottom: -20px;
-            left: 5%;
-            right: 5%;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        /* === LAYANAN SECTION === */
-        .layanan {
-            background-color: #F4F4F4;
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .layanan h2 {
-            font-size: 24px;
-            margin-bottom: 40px;
-        }
-
-        .layanan-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .layanan-card {
-            background-color: #FFFFFF;
-            border-radius: 8px;
-            overflow: hidden;
-            text-align: left;
-            border: 1px solid #EAEAEA;
-        }
-
-        .layanan-img {
-            height: 140px;
-            background-color: #555555;
-        }
-
-        .layanan-info {
-            padding: 20px;
-            display: flex;
-            gap: 15px;
-        }
-
-        .icon-circle {
-            width: 40px;
-            height: 40px;
-            background-color: #F0F0F0;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-weight: bold;
-        }
-
-        .layanan-text h3 {
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .layanan-text p {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .btn-center {
-            margin-top: 40px;
-        }
-
-        /* === PRODUK SECTION === */
-        .produk {
-            text-align: center;
-        }
-
-        .produk h2 {
-            font-size: 24px;
-            margin-bottom: 40px;
-        }
-
-        .produk-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .produk-card {
-            text-align: left;
-            border: 1px solid #EAEAEA;
-            border-radius: 8px;
-            padding-bottom: 15px;
-        }
-
-        .produk-img {
-            height: 220px;
-            background-color: #C4C4C4;
-            border-radius: 8px 8px 0 0;
-            margin-bottom: 15px;
-        }
-
-        .produk-info {
-            padding: 0 15px;
-        }
-
-        .produk-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .produk-price-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .produk-price {
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .produk-cart {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .page-item {
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #F4F4F4;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .page-item.active {
-            background-color: #333;
-            color: white;
-        }
-
-        /* === DOKTER SECTION === */
-        .dokter .container {
-            max-width: 800px;
-        }
-
-        .dokter h2 {
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 50px;
-        }
-
-        .dokter-row {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .dokter-row.reverse {
-            flex-direction: row-reverse;
-            text-align: right;
-        }
-
-        .dokter-img {
-            width: 140px;
-            height: 140px;
-            background-color: #333333;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .dokter-info h3 {
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-
-        .dokter-info span {
-            font-size: 14px;
-            color: #666;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .dokter-info p {
-            font-size: 14px;
-        }
-
-        /* === FAQ SECTION === */
-        .faq {
-            background-color: #F4F4F4;
-        }
-
-        .faq .container {
-            max-width: 700px;
-        }
-
-        .faq h2 {
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 30px;
-        }
-
-        details {
-            background-color: #FFFFFF;
-            margin-bottom: 10px;
-            border-radius: 4px;
-        }
-
-        summary {
-            padding: 15px 20px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        summary::-webkit-details-marker {
-            display: none;
-        }
-
-        summary::after {
-            content: '⌄';
-            font-size: 18px;
-        }
-
-        details[open] summary::after {
-            content: '⌃';
-        }
-
-        .faq-content {
-            padding: 0 20px 20px;
-            font-size: 13px;
-            color: #666;
-        }
-
-        /* === CONTACT SECTION === */
-        .contact {
-            text-align: center;
-            padding: 60px 0;
-        }
-
-        .contact h2 {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-
-        .contact p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .btn-light {
-            background-color: #EAEAEA;
-            color: #333;
-            font-weight: 600;
-        }
-
-        /* === FOOTER === */
-        footer {
-            background-color: #1A1A1A;
-            color: #FFFFFF;
-            padding: 60px 0 20px;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-col h4 {
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-
-        .footer-col p, .footer-col ul li {
-            font-size: 13px;
-            color: #AAAAAA;
-            margin-bottom: 12px;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid #333333;
-            font-size: 12px;
-            color: #888;
-        }
-
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
-<body>
+<body class="welcome-page">
 
-    <header>
+    <header class="welcome-header">
         <div class="container">
-            <div class="logo-area">
-                <span>🐾 D&F Pet Shop</span>
-            </div>
+            <div class="logo-area">🐾 Paw Center</div>
             <nav>
                 <ul class="nav-links">
                     <li><a href="#beranda">Beranda</a></li>
-                    <li><a href="#">Tentang Kami</a></li>
-                    <li><a href="#">Layanan</a></li>
-                    <li><a href="#">Belanja</a></li>
-                    <li><a href="#">Dokter</a></li>
-                    <li><a href="#">Kontak</a></li>
+                    <li><a href="#tentang">Tentang Kami</a></li>
+                    <li><a href="#layanan">Layanan</a></li>
+                    <li><a href="#belanja">Belanja</a></li>
+                    <li><a href="#dokter">Dokter</a></li>
+                    <li><a href="#kontak">Kontak</a></li>
                 </ul>
             </nav>
-        <div class="auth-btns">
-            <a href="/login" class="btn btn-dark">Masuk</a>
-            <a href="/register" class="btn btn-outline">Daftar</a>
-        </div>
+            <div class="auth-btns">
+                <a href="{{ url('/login') }}" class="btn btn-dark" style="border-radius: 25px; padding: 8px 20px;">Masuk</a>
+                <a href="{{ url('/register') }}" class="btn btn-outline" style="border-radius: 25px; padding: 8px 20px;">Daftar</a>
+            </div>
         </div>
     </header>
 
-    <section class="hero">
+    <section class="hero" id="beranda">
         <div class="container">
             <div class="hero-text">
                 <div class="hero-tag">Layanan Kesehatan Hewan Terbaik</div>
                 <h1 class="hero-title">Jadwalkan Kunjungan & Penuhi Kebutuhan Hewan Peliharaan Kesayangan Anda di D&F Pet</h1>
-                <p class="hero-desc">Sistem terpadu layanan reservasi, rekam medis, dan e-commerce terlengkap di Subang.</p>
-                <a href="#layanan" class="btn btn-dark">Lihat Selengkapnya</a>
+                <p class="hero-desc">Sistem terpadu layanan reservasi klinik, rekam medis, pet hotel, dan e-commerce terlengkap di Subang.</p>
+                <a href="#layanan" class="btn btn-dark" style="border-radius: 25px;">Lihat Selengkapnya</a>
             </div>
-            <div class="hero-img img-placeholder">
-                [ Area Gambar Hero ]
-            </div>
+            <div class="hero-img-container" style="background-image: url('https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=800&auto=format&fit=crop');"></div>
         </div>
     </section>
 
     <section class="profil" id="tentang">
         <div class="container">
-            <div class="profil-img img-placeholder">
-                [ Gambar Pet Shop ]
-            </div>
-            <div class="profil-text">
-                <h2>Profil D&F Petshop</h2>
-                <p>Kami memahami bahwa hewan peliharaan adalah bagian dari keluarga Anda. Oleh karena itu, kami berkomitmen untuk memberikan perawatan medis dengan penuh kasih sayang dan profesional.</p>
-                <ul>
-                    <li><i>✓</i> Dokter Hewan Berpengalaman</li>
-                    <li><i>✓</i> Fasilitas Medis Modern</li>
-                    <li><i>✓</i> Pet Shop Terlengkap</li>
-                </ul>
+            <h2 class="section-title">Profil D&F Petshop</h2>
+            <div class="profil-content">
+                <div class="profil-img" style="background-image: url('https://images.unsplash.com/photo-1628009368231-7bb7cbcb8127?q=80&w=800&auto=format&fit=crop');"></div>
+                <div class="profil-text">
+                    <p>Kami memahami bahwa hewan peliharaan adalah bagian dari keluarga Anda. Oleh karena itu, kami berkomitmen untuk memberikan perawatan medis dengan penuh kasih sayang dan profesional.</p>
+                    <ul>
+                        <li><span style="background:#333; color:white; border-radius:50%; width:20px; height:20px; display:inline-block; text-align:center; line-height:20px; font-size:12px;">✓</span> Dokter Hewan Berpengalaman</li>
+                        <li><span style="background:#333; color:white; border-radius:50%; width:20px; height:20px; display:inline-block; text-align:center; line-height:20px; font-size:12px;">✓</span> Fasilitas Medis Modern</li>
+                        <li><span style="background:#333; color:white; border-radius:50%; width:20px; height:20px; display:inline-block; text-align:center; line-height:20px; font-size:12px;">✓</span> Pet Shop Terlengkap</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="lokasi">
+<section class="lokasi">
         <div class="container">
-            <h2>Lokasi D&F</h2>
-            <p>D&F Pet Shop memiliki dua cabang di Subang, siap melayani berbagai kebutuhan hewan peliharaan kesayangan Anda.</p>
+            <h2 class="section-title" style="margin-bottom: 10px;">Lokasi D&F</h2>
+            <p class="lokasi-desc">D&F Pet Shop memiliki dua cabang di Subang, siap melayani berbagai kebutuhan hewan peliharaan kesayangan Anda.</p>
+
             <div class="maps-grid">
-                <div class="map-card">
-                    <div class="map-img img-placeholder"></div>
-                    <div class="map-label">D&F Pet Shop & Clinic Cabang 1<br><span style="font-size:12px; font-weight:normal;">Jl. [...]</span></div>
-                </div>
-                <div class="map-card">
-                    <div class="map-img img-placeholder"></div>
-                    <div class="map-label">D&F Pet Shop Cabang 2<br><span style="font-size:12px; font-weight:normal;">Jl. [...]</span></div>
-                </div>
+                <a href="https://maps.app.goo.gl/xxqApHvC4yykGRTD7" target="_blank" class="map-card">
+                    <div class="map-img" style="background-image: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=600&auto=format&fit=crop');"></div>
+                    <div class="map-label">D&F Pet Shop & Clinic Cabang 1<br>
+                        <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">Jl. DI.Panjaitan No.24, Soklat, Kec. Subang, Kabupaten Subang, Jawa Barat 51214</span>
+                    </div>
+                </a>
+
+                <a href="https://maps.app.goo.gl/TxGVGoUtfKUuNPh67" target="_blank" class="map-card">
+                    <div class="map-img" style="background-image: url('https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?q=80&w=600&auto=format&fit=crop');"></div>
+                    <div class="map-label">D&F Pet Shop Cabang 2<br>
+                        <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">Jl. Ion Martasasmita No.3, Rancasari, Kec. Pamanukan, Kabupaten Subang, Jawa Barat 41254</span>
+                    </div>
+                </a>
             </div>
+
         </div>
     </section>
 
     <section class="layanan" id="layanan">
         <div class="container">
-            <h2>Layanan Kami</h2>
+            <h2 class="section-title">Layanan Kami</h2>
             <div class="layanan-grid">
                 <div class="layanan-card">
-                    <div class="layanan-img img-placeholder"></div>
+                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1606425271394-c3ca9aa1fc06?q=80&w=400&auto=format&fit=crop');"></div>
                     <div class="layanan-info">
                         <div class="icon-circle">🩺</div>
                         <div class="layanan-text">
                             <h3>Klinik Hewan</h3>
-                            <p>Layanan konsultasi dan diagnosa hewan peliharaan.</p>
+                            <p>Layanan konsultasi dan diagnosa medis hewan peliharaan.</p>
                         </div>
                     </div>
                 </div>
                 <div class="layanan-card">
-                    <div class="layanan-img img-placeholder"></div>
+                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1576201836106-db1758fd1c97?q=80&w=400&auto=format&fit=crop');"></div>
                     <div class="layanan-info">
                         <div class="icon-circle">💉</div>
                         <div class="layanan-text">
                             <h3>Vaksinasi</h3>
-                            <p>Pencegahan penyakit menular pada hewan peliharaan.</p>
+                            <p>Pencegahan penyakit menular dan virus berbahaya.</p>
                         </div>
                     </div>
                 </div>
                 <div class="layanan-card">
-                    <div class="layanan-img img-placeholder"></div>
+                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1584015694208-410712f5a653?q=80&w=400&auto=format&fit=crop');"></div>
                     <div class="layanan-info">
                         <div class="icon-circle">✂️</div>
                         <div class="layanan-text">
                             <h3>Sterilisasi</h3>
-                            <p>Tindakan operasi steril untuk mengontrol populasi.</p>
+                            <p>Tindakan operasi steril untuk mengontrol populasi hewan.</p>
                         </div>
                     </div>
                 </div>
                 <div class="layanan-card">
-                    <div class="layanan-img img-placeholder"></div>
+                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=400&auto=format&fit=crop');"></div>
                     <div class="layanan-info">
                         <div class="icon-circle">🛁</div>
                         <div class="layanan-text">
                             <h3>Pet Grooming</h3>
-                            <p>Layanan mandi, potong kuku, dan perawatan bulu.</p>
+                            <p>Layanan mandi, potong kuku, dan perawatan bulu rapi.</p>
                         </div>
                     </div>
                 </div>
                 <div class="layanan-card">
-                    <div class="layanan-img img-placeholder"></div>
+                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?q=80&w=400&auto=format&fit=crop');"></div>
                     <div class="layanan-info">
                         <div class="icon-circle">🏨</div>
                         <div class="layanan-text">
                             <h3>Pet Hotel</h3>
-                            <p>Penitipan hewan yang aman dan nyaman.</p>
+                            <p>Penitipan hewan yang aman, nyaman, dan diawasi 24 jam.</p>
                         </div>
                     </div>
                 </div>
                 <div class="layanan-card">
-                    <div class="layanan-img img-placeholder"></div>
+                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1606514482705-ebcc5eb93ba5?q=80&w=400&auto=format&fit=crop');"></div>
                     <div class="layanan-info">
                         <div class="icon-circle">🛍️</div>
                         <div class="layanan-text">
                             <h3>Pet Shop</h3>
-                            <p>Menjual makanan, aksesoris & kebutuhan hewan.</p>
+                            <p>Menjual makanan premium, aksesoris & kebutuhan hewan.</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <a href="#" class="btn btn-dark btn-center">Lihat Semua</a>
+            <div class="btn-center">
+                <a href="{{ url('/layanan') }}" class="btn btn-dark" style="border-radius: 8px;">Lihat Semua</a>
+            </div>
         </div>
     </section>
 
-    <section class="produk" id="belanja">
+<section class="produk" id="belanja">
         <div class="container">
-            <h2>Belanja Kebutuhan Hewan</h2>
+            <h2 class="section-title">Belanja Kebutuhan Hewan</h2>
+
             <div class="produk-grid">
                 <div class="produk-card">
-                    <div class="produk-img"></div>
+                    <div class="produk-img" style="background-image: url('https://images.unsplash.com/photo-1589924691995-400dc9ecc119?q=80&w=400&auto=format&fit=crop');"></div>
                     <div class="produk-info">
                         <h3 class="produk-title">ROYAL CANIN KITTEN 2KG Makanan Anak Kucing</h3>
                         <div class="produk-price-row">
-                            <span class="produk-price">Rp. 270.000</span>
-                            <span class="produk-cart">🛒 2 Terjual</span>
+                            <span class="produk-price">Rp 270.000</span>
                         </div>
                     </div>
                 </div>
+
                 <div class="produk-card">
-                    <div class="produk-img"></div>
+                    <div class="produk-img" style="background-image: url('https://images.unsplash.com/photo-1623366302587-bcaad5cfdb66?q=80&w=400&auto=format&fit=crop');"></div>
                     <div class="produk-info">
-                        <h3 class="produk-title">Cat Choize Adult Fresh Salmon - 800g</h3>
+                        <h3 class="produk-title">Cat Choize Adult Fresh Salmon Dry Food - 800g</h3>
                         <div class="produk-price-row">
-                            <span class="produk-price">Rp. 25.000</span>
-                            <span class="produk-cart">🛒 5 Terjual</span>
+                            <span class="produk-price">Rp 25.000</span>
                         </div>
                     </div>
                 </div>
+
                 <div class="produk-card">
-                    <div class="produk-img"></div>
+                    <div class="produk-img" style="background-image: url('https://images.unsplash.com/photo-1574144611937-0df059b5ef3e?q=80&w=400&auto=format&fit=crop');"></div>
                     <div class="produk-info">
-                        <h3 class="produk-title">FRIESKIES Kitten Makanan Kucing Basah Pouch...</h3>
+                        <h3 class="produk-title">FRIESKIES Kitten Makanan Kucing Basah Pouch 80g</h3>
                         <div class="produk-price-row">
-                            <span class="produk-price">Rp. 6.000</span>
-                            <span class="produk-cart">🛒 10 Terjual</span>
+                            <span class="produk-price">Rp 6.000</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="pagination">
-                <div class="page-item">&laquo;</div>
-                <div class="page-item active">1</div>
-                <div class="page-item">2</div>
-                <div class="page-item">3</div>
-                <div class="page-item">&raquo;</div>
+            <div class="btn-center" style="margin-top: 20px;">
+                <a href="{{ url('/login') }}" class="btn btn-dark" style="border-radius: 8px; padding: 12px 35px;">Lihat Semua</a>
             </div>
-            <a href="#" class="btn btn-dark">Semua Kategori</a>
         </div>
     </section>
 
     <section class="dokter" id="dokter">
-        <div class="container">
-            <h2>Dokter</h2>
-
+        <div class="container dokter-container">
+            <h2 class="section-title">Dokter</h2>
             <div class="dokter-row">
-                <div class="dokter-img"></div>
+                <div class="dokter-img" style="background-image: url('https://images.unsplash.com/photo-1594824436998-dd40e4f69d3c?q=80&w=300&auto=format&fit=crop');"></div>
                 <div class="dokter-info">
                     <h3>drh. Nyoman Ayu</h3>
                     <span>Dokter Hewan Hewan Kecil</span>
-                    <p>Menjadi dokter sekaligus pemilik di D&F Sekitar sejak 2017 hingga saat ini.</p>
+                    <p>Menjadi dokter sekaligus pemilik di D&F Pet Shop & Clinic sejak 2017 hingga saat ini.</p>
                 </div>
             </div>
-
             <div class="dokter-row reverse">
-                <div class="dokter-img"></div>
+                <div class="dokter-img" style="background-image: url('https://images.unsplash.com/photo-1612349317150-e410f624c427?q=80&w=300&auto=format&fit=crop'); background-position: top;"></div>
                 <div class="dokter-info">
                     <h3>drh. Andi Susiro</h3>
-                    <span>Dokter Hewan Hewan Eksotik</span>
-                    <p>Menjadi dokter D&F Sekitar sejak 2019 dan mengelola cabang Perumahan.</p>
+                    <span>Dokter Hewan Eksotik</span>
+                    <p>Menjadi dokter D&F sejak 2019 dan mengelola cabang kedua untuk penanganan hewan khusus.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <section class="faq">
-        <div class="container">
-            <h2>Tanyakan Kepada Kami</h2>
-
+        <div class="container faq-container">
+            <h2 class="section-title">Tanyakan Kepada Kami</h2>
             <details>
                 <summary>Bagaimana cara jadwalkan layanan grooming & klinik?</summary>
-                <div class="faq-content">Anda dapat menekan tombol "Reservasi Layanan" atau melalui dashboard setelah login.</div>
+                <div class="faq-content">Anda dapat masuk melalui dashboard pelanggan setelah login. Anda bebas memilih tanggal dan jam operasional dokter.</div>
             </details>
             <details>
                 <summary>Apakah saya dapat langsung membeli produk tanpa login?</summary>
-                <div class="faq-content">Bisa, tetapi untuk proses checkout dan rekam medis pembelian disarankan untuk login terlebih dahulu.</div>
+                <div class="faq-content">Tidak, untuk proses checkout otomatis disarankan untuk login terlebih dahulu ke akun Paw Center.</div>
             </details>
             <details>
                 <summary>Berapa biaya konsultasi dengan dokter?</summary>
-                <div class="faq-content">Biaya konsultasi dasar mulai dari Rp. 50.000, belum termasuk tindakan atau obat-obatan.</div>
+                <div class="faq-content">Biaya konsultasi dasar mulai dari Rp. 50.000. Belum termasuk tindakan khusus atau obat-obatan.</div>
             </details>
             <details>
-                <summary>Apakah D&F menerima hewan berukuran besar?</summary>
-                <div class="faq-content">Ya, kami memiliki fasilitas untuk anjing trah besar. Silakan hubungi admin untuk info lebih lanjut.</div>
+                <summary>Apakah D&F menerima penitipan hewan berukuran besar?</summary>
+                <div class="faq-content">Ya, kami memiliki fasilitas untuk anjing trah besar. Kapasitas terbatas, silakan hubungi admin terlebih dahulu.</div>
             </details>
         </div>
     </section>
 
-    <section class="contact">
+    <section class="contact" id="kontak" style="padding: 80px 0; text-align: center;">
         <div class="container">
-            <h2>Hubungi Kami Sekarang</h2>
-            <p>Jika Anda memiliki pertanyaan seputar layanan yang ada di klinik dan pet shop kami, silakan hubungi kami melalui tombol chat WhatsApp.</p>
-            <a href="#" class="btn btn-light">Hubungi Via WhatsApp</a>
+            <h2 class="section-title" style="margin-bottom: 15px; color: var(--purple-900);">Hubungi Kami Sekarang</h2>
+            <p style="color: var(--text-muted); font-size: 15px; max-width: 600px; margin: 0 auto 30px; line-height: 1.6;">
+                Jika Anda memiliki pertanyaan seputar layanan klinik, stok produk pet shop, atau butuh tindakan darurat, silakan hubungi kami melalui WhatsApp.
+            </p>
+
+            <a href="https://wa.me/6285603320626?text=Halo%20Admin%20D%26F%20Pet%20Shop,%20saya%20ingin%20bertanya%20seputar%20layanan%20Paw%20Center."
+            target="_blank"
+            class="btn"
+            style="background-color: #f3f4f6; color: #333; border: 1px solid #d1d5db; border-radius: 30px; padding: 12px 30px; font-weight: 500; text-decoration: none; display: inline-block; transition: all 0.3s ease;">
+            Hubungi Via WhatsApp
+            </a>
         </div>
     </section>
 
@@ -807,7 +260,7 @@
             <div class="footer-grid">
                 <div class="footer-col">
                     <h4>Tentang Kami</h4>
-                    <p>D&F Petshop adalah klinik dan petshop terpercaya di Subang, Jawa Barat, yang menyediakan layanan kesehatan hewan terpadu dengan tim profesional dan fasilitas medis yang lengkap dan memadai.</p>
+                    <p>D&F Petshop adalah klinik dan pet shop terpercaya di Subang, Jawa Barat, yang menyediakan layanan kesehatan hewan terpadu dengan tim profesional dan fasilitas medis yang lengkap.</p>
                 </div>
                 <div class="footer-col">
                     <h4>Layanan Kami</h4>
@@ -822,7 +275,7 @@
                 <div class="footer-col">
                     <h4>Hubungi Kami</h4>
                     <ul>
-                        <li>📍 Jl. [...] No. XX, Subang</li>
+                        <li>📍 Jl. Otto Iskandardinata No. 12, Subang</li>
                         <li>📞 0812-3456-7890</li>
                         <li>✉️ cs@dnfpetshop.com</li>
                     </ul>
@@ -833,7 +286,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                &copy; 2026 D&F Pet Shop. All rights reserved.
+                &copy; 2026 Paw Center by D&F Pet Shop. All rights reserved.
             </div>
         </div>
     </footer>
