@@ -3,107 +3,98 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Produk;
+use App\Models\Layanan;
 
 class CheckoutController extends Controller
 {
-    // 1. Fungsi Tambah Barang ke Keranjang
-    // Fungsi Tambah Barang ke Keranjang
-    public function addToCart(Request $request)
+    // 1. Menampilkan halaman checkout
+    public function index()
     {
         $cart = session()->get('cart', []);
+        return view('dashboard.checkout', compact('cart'));
+    }
 
-        // Bikin ID unik untuk keranjang.
-        // Kalau produk biasa, biarin id-nya sama biar kalau dibeli lagi Qty-nya yang nambah.
-        // Tapi kalau LAYANAN, kita kasih tambahan waktu (time) biar reservasinya nggak numpuk walau jenisnya sama.
-        $cartKey = $request->id;
-        if ($request->type == 'Layanan') {
-            $cartKey = $request->id . '_' . time();
+    // 2. Memasukkan barang dari katalog ke keranjang
+    public function addToCart(Request $request)
+    {
+        $id = $request->item_id;
+        $tipe = $request->tipe;
+
+        $cart = session()->get('cart', []);
+        $cartKey = $tipe . '_' . $id;
+
+        if ($tipe == 'produk') {
+            $item = Produk::findOrFail($id);
+            $nama = $item->nama_produk;
+        } else {
+            $item = Layanan::findOrFail($id);
+            $nama = $item->nama_layanan;
         }
 
-        // Cek kalau produk udah ada, tambah qty
-        if (isset($cart[$cartKey]) && $request->type == 'Produk') {
-            $cart[$cartKey]['qty']++;
+        if(isset($cart[$cartKey])) {
+            $cart[$cartKey]['jumlah']++;
         } else {
-            // Masukin data baru
             $cart[$cartKey] = [
-                'name' => $request->name,
-                'price' => $request->price,
-                'type' => $request->type,
-                'qty' => 1,
-                // Tambahan khusus untuk form reservasi Layanan
-                'pet_name' => $request->pet_name ?? null,
-                'schedule_date' => $request->schedule_date ?? null,
-                'schedule_time' => $request->schedule_time ?? null,
-                'notes' => $request->notes ?? null,
+                "id" => $id,
+                "nama" => $nama,
+                "harga" => $item->harga,
+                "tipe" => $tipe,
+                "jumlah" => 1
             ];
         }
 
         session()->put('cart', $cart);
-
-        return back()->with('success', $request->name . ' berhasil ditambahkan ke keranjang!');
+        return redirect()->back()->with('success', 'Yey! ' . $nama . ' berhasil masuk ke keranjang 🛒');
     }
 
-    // Fungsi untuk Tambah (+) atau Kurang (-) Qty
+    // 3. Mesin Tombol + dan - (INI YANG BIKIN ERROR TADI!)
     public function updateCart(Request $request)
     {
+        $id = $request->id;
+        $action = $request->action;
         $cart = session()->get('cart', []);
 
-        if(isset($cart[$request->id])) {
-            if($request->action == 'plus') {
-                $cart[$request->id]['qty']++;
-            } elseif($request->action == 'minus' && $cart[$request->id]['qty'] > 1) {
-                $cart[$request->id]['qty']--;
+        if(isset($cart[$id])) {
+            if($action == 'plus') {
+                $cart[$id]['jumlah']++;
+            } elseif($action == 'minus') {
+                $cart[$id]['jumlah']--;
+
+                // Kalau dikurangi sampai 0, hapus sekalian
+                if($cart[$id]['jumlah'] <= 0) {
+                    unset($cart[$id]);
+                }
             }
             session()->put('cart', $cart);
         }
-        return back();
+
+        return redirect()->back();
     }
 
-    // Fungsi untuk Menghapus Item dari Keranjang
+    // 4. Mesin Tombol Tong Sampah
     public function removeFromCart(Request $request)
     {
+        $id = $request->id;
         $cart = session()->get('cart', []);
 
-        if(isset($cart[$request->id])) {
-            unset($cart[$request->id]);
+        if(isset($cart[$id])) {
+            unset($cart[$id]);
             session()->put('cart', $cart);
         }
-        return back()->with('success', 'Item berhasil dihapus dari keranjang.');
+
+        return redirect()->back()->with('success', 'Produk berhasil dihapus dari keranjang!');
     }
 
-    // ... (Fungsi index dan process yang sebelumnya tetap ada) ...
-    // 2. Menampilkan halaman checkout dinamis
-    public function index()
-    {
-        $cart = session()->get('cart', []);
-
-        $total_produk = 0;
-        $total_layanan = 0;
-
-        // Hitung total belanja
-        foreach($cart as $item) {
-            $subtotal = $item['price'] * $item['qty'];
-            if($item['type'] == 'Produk') {
-                $total_produk += $subtotal;
-            } else {
-                $total_layanan += $subtotal;
-            }
-        }
-
-        $biaya_admin = 2000;
-        $total_tagihan = $total_produk + $total_layanan + $biaya_admin;
-
-        // Bawa data hitungan ke file HTML (Blade)
-        return view('dashboard.checkout', compact('cart', 'total_produk', 'total_layanan', 'biaya_admin', 'total_tagihan'));
-    }
-
-    // 3. Memproses bukti pembayaran
+    // 5. Mesin Proses Pembayaran (Buat jaga-jaga kalau tombol "Konfirmasi" ditekan)
     public function process(Request $request)
     {
-        // Hapus keranjang setelah bayar
+        // Nantinya logika untuk menyimpan ke database akan ditaruh di sini
+
+        // Sementara ini, kita kosongkan keranjang saja
         session()->forget('cart');
 
-        return redirect()->route('dashboard.pelanggan')
-                         ->with('success', 'Pembayaran QRIS berhasil diunggah! Menunggu konfirmasi dari kasir.');
+        // Arahkan kembali ke dashboard pelanggan dengan pesan sukses
+        return redirect()->route('dashboard.pelanggan')->with('success', 'Pesanan kamu berhasil dibuat! Silakan tunggu konfirmasi admin.');
     }
 }

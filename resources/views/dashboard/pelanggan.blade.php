@@ -28,12 +28,6 @@
     .btn-katalog:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
 </style>
 
-<div style="text-align: right;">
-    <a href="{{ route('dashboard.katalog') }}" class="btn-katalog">
-        🐾 Booking Layanan & Belanja Produk
-    </a>
-</div>
-
 <div class="grid-dashboard">
     <div class="stat-card">
         <h3>Hewan Peliharaan Saya</h3>
@@ -50,7 +44,7 @@
         <div class="angka">{{ $cartCount }} Item</div>
 
         @if($cartCount > 0)
-            <a href="{{ route('checkout.index') }}" style="display: inline-block; margin-top: 10px; background: #800080; color: white; padding: 6px 15px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: bold;">Bayar Sekarang 🛒</a>
+            <a href="{{ route('dashboard.checkout') }}" style="display: inline-block; margin-top: 10px; background: #800080; color: white; padding: 6px 15px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: bold;">Bayar Sekarang 🛒</a>
         @endif
     </div>
 </div>
@@ -81,7 +75,7 @@
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #ddd; text-align: center;">
                 @if($jadwal->status != 'Dibatalkan')
-                    <form action="{{ route('reservasi.batal', $jadwal->id) }}" method="POST" onsubmit="return confirm('Apakah kamu yakin ingin membatalkan jadwal {{ $jadwal->nama_layanan }} ini?');">
+                    <form action="{{ route('reservasi.batal', $jadwal->id) }}" method="POST" onsubmit="mintaAlasan(event, this, '{{ $jadwal->nama_layanan }}');">
                         @csrf
                         <button type="submit" class="btn-batal">Batalkan</button>
                     </form>
@@ -97,4 +91,31 @@
         @endforelse
     </table>
 </div>
+
+<script>
+    function mintaAlasan(event, form, namaLayanan) {
+        // Hentikan form agar tidak langsung terkirim
+        event.preventDefault();
+
+        // Munculkan pop-up untuk meminta input alasan
+        let alasan = prompt(`Apakah kamu yakin ingin membatalkan jadwal ${namaLayanan} ini?\n\nSilakan masukkan alasan pembatalan:` );
+
+        // Cek apakah user mengisi sesuatu dan klik OK
+        if (alasan !== null && alasan.trim() !== '') {
+            // Buat input tersembunyi untuk menyimpan alasan
+            let inputAlasan = document.createElement('input');
+            inputAlasan.type = 'hidden';
+            inputAlasan.name = 'alasan_batal';
+            inputAlasan.value = alasan;
+
+            // Masukkan input tersebut ke dalam form, lalu submit
+            form.appendChild(inputAlasan);
+            form.submit();
+        } else if (alasan !== null) {
+            // Jika user klik OK tapi alasannya kosong
+            alert('Alasan pembatalan harus diisi ya!');
+        }
+        // Jika user klik Cancel, biarkan saja (tidak melakukan apa-apa)
+    }
+</script>
 @endsection

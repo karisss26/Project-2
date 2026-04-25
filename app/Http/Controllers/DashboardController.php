@@ -50,28 +50,28 @@ class DashboardController extends Controller
     /**
      * Fitur untuk membatalkan reservasi
      */
-    public function batalkan($id)
-    {
-        // Cari data di tabel reservasi berdasarkan ID
-        $data = reservasi::find($id);
+public function batalkan(Request $request, $id)
+{
+    // Cari data reservasi berdasarkan ID yang diklik
+    $reservasi = \App\Models\Reservasi::findOrFail($id);
 
-        // Validasi: Data ada dan milik user yang sedang login
-        if ($data && $data->user_id == Auth::id()) {
+    // Pastikan reservasi ini benar-benar milik user yang sedang login biar aman
+    if ($reservasi->user_id == Auth::id()) {
 
-            // Cek jika status sudah dibatalkan sebelumnya
-            if ($data->status == 'Dibatalkan') {
-                return redirect()->back()->with('error', 'Jadwal ini sudah dibatalkan sebelumnya.');
-            }
+        // Ubah statusnya jadi Dibatalkan
+        $reservasi->status = 'Dibatalkan';
 
-            $data->status = 'Dibatalkan';
-            $data->save();
+        // Simpan alasan batal yang dikirim dari form pop-up tadi
+        $reservasi->alasan_batal = $request->alasan_batal;
 
-            return redirect()->back()->with('success', 'Jadwal reservasi berhasil dibatalkan!');
-        }
+        // Simpan perubahan ke database
+        $reservasi->save();
 
-        return redirect()->back()->with('error', 'Maaf, data reservasi tidak ditemukan atau Anda tidak memiliki akses.');
+        return back()->with('success', 'Jadwal berhasil dibatalkan. Terima kasih atas konfirmasinya.');
     }
 
+    return back()->with('error', 'Gagal membatalkan jadwal. Data tidak ditemukan.');
+}
 
     public function dataHewan()
     {

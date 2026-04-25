@@ -96,7 +96,7 @@
                 <a href="{{ route('dashboard.pelanggan') }}">
                     <span class="menu-icon">🏠</span><span class="menu-text">Dashboard</span>
                 </a>
-                <a href="{{ url('/#layanan') }}">
+                <a href="{{ route('dashboard.katalog') }}">
                     <span class="menu-icon">🛍️</span><span class="menu-text">Layanan & Produk</span>
                 </a>
                 <a href="{{ route('pelanggan.hewan') }}">

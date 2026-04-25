@@ -83,6 +83,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/data-hewan/update/{id}', [DashboardController::class, 'updateHewan'])->name('hewan.update');
     Route::delete('/data-hewan/delete/{id}', [DashboardController::class, 'hapusHewan'])->name('hewan.hapus');
 
+    // Ganti nama rute agar sinkron
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('dashboard.checkout');
+
 });
 
 // ❌ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

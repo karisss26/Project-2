@@ -22,6 +22,6 @@ class RoleMiddleware
         }
 
         // Kalau rolenya nggak sesuai, tolak aksesnya (Error 403)
-        abort(403, 'Maaf sayang, kamu tidak punya akses ke halaman ini.');
+        abort(403, 'Maaf, kamu tidak punya akses ke halaman ini.');
     }
 }

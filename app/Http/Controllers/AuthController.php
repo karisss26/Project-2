@@ -14,8 +14,9 @@ class AuthController extends Controller
         if (Auth::check()) {
             $role = Auth::user()->role;
             // Kita ganti redirect()->route() jadi redirect() langsung ke URL
-            if (in_array($role, ['owner', 'admin'])) return redirect('/admin/dashboard');
-            if (in_array($role, ['kasir', 'staff'])) return redirect('/staff/dashboard');
+            if (in_array($role, ['owner'])) return redirect('/owner/dashboard');
+            if (in_array($role, ['admin', 'kasir'])) return redirect('/admin/dashboard');
+            if (in_array($role, ['staff'])) return redirect('/staff/dashboard');
             if ($role == 'dokter') return redirect('/dokter/dashboard');
             if ($role == 'pelanggan') return redirect('/dashboard');
         }
@@ -32,38 +33,40 @@ class AuthController extends Controller
     }
 
     // Proses Cek Login
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+public function login(Request $request)
+{
+    // Validasi input email dan password
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            $role = Auth::user()->role;
+    // Mengecek apakah email dan password cocok
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
 
-            switch ($role) {
-                case 'owner':
-                case 'admin':
-                    return redirect('/admin/dashboard');
-                case 'kasir':
-                case 'staff':
-                    return redirect('/staff/dashboard');
-                case 'dokter':
-                    return redirect('/dokter/dashboard');
-                case 'pelanggan':
-                    return redirect('/dashboard'); // Ganti di sini juga sayang
-                default:
-                    Auth::logout();
-                    return back()->withInput()->withErrors(['email' => 'Role tidak valid.']);
-            }
+        // 👇 INI BAGIAN PINTARNYA: Ambil data role yang login
+        $role = Auth::user()->role;
+
+        // Cek rolenya dan arahkan ke rute yang sesuai
+        if ($role === 'owner') {
+            return redirect()->route('dashboard.owner');
+        } elseif ($role === 'admin' || $role === 'kasir') {
+            return redirect()->route('dashboard.admin');
+        } elseif ($role === 'staff') {
+            return redirect()->route('dashboard.staff');
+        } elseif ($role === 'dokter') {
+            return redirect()->route('dashboard.dokter');
+        } else {
+            return redirect()->route('dashboard.pelanggan');
         }
-
-        return back()->withInput()->withErrors([
-            'email' => 'Maaf sayang, email atau kata sandi kamu salah.',
-        ]);
     }
+
+    // Jika password atau email salah, kembalikan ke halaman login bawa pesan error
+    return back()->withErrors([
+        'email' => 'Maaf, email atau kata sandi kamu salah.',
+    ])->onlyInput('email');
+}
 
     // Proses Mendaftar
     public function register(Request $request)

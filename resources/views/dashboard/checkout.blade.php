@@ -38,8 +38,6 @@
 
     .radio-group { display: flex; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px; border: 1px solid #eee; margin-bottom: 15px;}
     .radio-group label { margin: 0; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: normal;}
-    .info-box { background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; border-left: 4px solid #ffeeba; line-height: 1.5; }
-
     .jarak-badge { display: inline-block; background: #e2e3e5; color: #333; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px; font-weight: normal;}
 </style>
 
@@ -55,64 +53,59 @@
             <h3>📝 Rincian Pesanan Anda</h3>
             <table class="item-list">
                 <tr>
-                    <th>Tipe</th>
                     <th>Nama Item</th>
+                    <th style="text-align: center;">Harga</th>
                     <th style="text-align: center;">Qty</th>
                     <th style="text-align: right;">Subtotal</th>
                     <th style="text-align: center;">Hapus</th>
                 </tr>
 
-                @php $adaLayanan = false; @endphp
+        @php $total_produk = 0; @endphp
 
-                @forelse($cart as $id => $item)
-                    @php
-                        if(isset($item['type']) && $item['type'] == 'Layanan') {
-                            $adaLayanan = true;
-                        }
-                    @endphp
-                <tr>
-                    <td>
-                        @if($item['type'] == 'Produk')
-                            <span style="background: #E6E6FA; color: #800080; padding: 3px 8px; border-radius: 4px; font-size: 12px;">Produk</span>
-                        @else
-                            <span style="background: #ffc107; color: #856404; padding: 3px 8px; border-radius: 4px; font-size: 12px;">Layanan</span>
-                        @endif
-                    </td>
-                    <td>{{ $item['name'] }}</td>
+        @forelse($cart as $id => $item)
+            @php $total_produk += $item['harga'] * $item['jumlah']; @endphp
+            <tr>
+                <td>{{ $item['nama'] }}</td>
 
-                    <td style="text-align: center;">
-                        <div class="flex-center">
-                            <form action="{{ route('cart.update') }}" method="POST" style="margin:0;">
-                                @csrf
-                                <input type="hidden" name="id" value="{{ $id }}">
-                                <input type="hidden" name="action" value="minus">
-                                <button type="submit" class="qty-btn" title="Kurangi">-</button>
-                            </form>
-                            <span class="qty-display">{{ $item['qty'] }}</span>
-                            <form action="{{ route('cart.update') }}" method="POST" style="margin:0;">
-                                @csrf
-                                <input type="hidden" name="id" value="{{ $id }}">
-                                <input type="hidden" name="action" value="plus">
-                                <button type="submit" class="qty-btn" title="Tambah">+</button>
-                            </form>
-                        </div>
-                    </td>
+                <td style="text-align: center;">Rp {{ number_format($item['harga'], 0, ',', '.') }}</td>
 
-                    <td class="item-price">Rp {{ number_format($item['price'] * $item['qty'], 0, ',', '.') }}</td>
-
-                    <td style="text-align: center;">
-                        <form action="{{ route('cart.remove') }}" method="POST" style="margin:0;">
+                <td style="text-align: center;">
+                    <div class="flex-center">
+                        <form action="{{ route('cart.update') }}" method="POST" style="margin:0;">
                             @csrf
                             <input type="hidden" name="id" value="{{ $id }}">
-                            <button type="submit" class="remove-btn" title="Hapus Item">🗑️</button>
+                            <input type="hidden" name="action" value="minus">
+                            <button type="submit" class="qty-btn" title="Kurangi">-</button>
                         </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" style="text-align: center; padding: 20px; color: #888;">Keranjang kamu masih kosong nih. Yuk <a href="{{ url('/#produk') }}" style="color:#800080; font-weight:bold;">belanja dulu!</a></td>
-                </tr>
-                @endforelse
+
+                        <span class="qty-display">{{ $item['jumlah'] }}</span>
+
+                        <form action="{{ route('cart.update') }}" method="POST" style="margin:0;">
+                            @csrf
+                            <input type="hidden" name="id" value="{{ $id }}">
+                            <input type="hidden" name="action" value="plus">
+                            <button type="submit" class="qty-btn" title="Tambah">+</button>
+                        </form>
+                    </div>
+                </td>
+
+                <td class="item-price">Rp {{ number_format($item['harga'] * $item['jumlah'], 0, ',', '.') }}</td>
+
+                <td style="text-align: center;">
+                    <form action="{{ route('cart.remove') }}" method="POST" style="margin:0;">
+                        @csrf
+                        <input type="hidden" name="id" value="{{ $id }}">
+                        <button type="submit" class="remove-btn" title="Hapus Item">🗑️</button>
+                    </form>
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 20px; color: #888;">
+                    Keranjang kamu masih kosong nih. Yuk <a href="{{ route('dashboard.katalog') }}" style="color:#800080; font-weight:bold;">belanja dulu!</a>
+                </td>
+            </tr>
+        @endforelse
             </table>
         </div>
 
@@ -147,7 +140,6 @@
 
                 <input type="hidden" name="latitude" id="lat" form="form-checkout">
                 <input type="hidden" name="longitude" id="lng" form="form-checkout">
-
                 <input type="hidden" name="ongkir" id="input_ongkir" value="0" form="form-checkout">
                 <input type="hidden" name="jarak_km" id="input_jarak_km" value="0" form="form-checkout">
 
@@ -158,31 +150,20 @@
             </div>
 
             <div id="pickup_area">
-                @if($adaLayanan)
-                    <div class="form-group" style="background: #E6E6FA; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
-                        <label style="cursor: pointer; display: flex; align-items: center; gap: 10px; color: #4B0082; margin: 0; font-weight: normal;">
-                            <input type="checkbox" id="sync_schedule" name="sync_schedule" value="yes" onchange="togglePickupTime()" form="form-checkout">
-                            Samakan waktu Pick Up produk dengan jadwal reservasi layanan saya
-                        </label>
-                    </div>
-                @endif
-
-                <div class="form-group" id="manual_pickup_time">
+                <div class="form-group">
                     <label for="pickup_time">Pilih Waktu Pengambilan ke Klinik</label>
                     <input type="datetime-local" name="pickup_time" id="pickup_time" form="form-checkout">
                 </div>
             </div>
+
         </div>
         @endif
-
     </div>
 
     <div class="co-right">
         <h3 style="color: #333; margin-bottom: 10px;">Ringkasan Pembayaran</h3>
         <table style="width: 100%; color: #555; margin-bottom:15px;">
-            <tr><td style="padding: 5px 0;">Total Produk</td><td style="text-align: right;">Rp {{ number_format($total_produk ?? 0, 0, ',', '.') }}</td></tr>
-            <tr><td style="padding: 5px 0;">Total Layanan</td><td style="text-align: right;">Rp {{ number_format($total_layanan ?? 0, 0, ',', '.') }}</td></tr>
-            <tr><td style="padding: 5px 0;">Biaya Admin</td><td style="text-align: right;">Rp {{ number_format($biaya_admin ?? 0, 0, ',', '.') }}</td></tr>
+            <tr><td style="padding: 5px 0;">Total Produk</td><td style="text-align: right;">Rp {{ number_format($total_produk, 0, ',', '.') }}</td></tr>
 
             <tr id="row_ongkir" style="display: none;">
                 <td style="padding: 5px 0;">
@@ -195,7 +176,7 @@
 
         <div class="total-box">
             <span>Total Tagihan</span>
-            <span id="display_total_tagihan">Rp {{ number_format($total_tagihan ?? 0, 0, ',', '.') }}</span>
+            <span id="display_total_tagihan">Rp {{ number_format($total_produk, 0, ',', '.') }}</span>
         </div>
 
         <form action="{{ route('checkout.process') }}" method="POST" enctype="multipart/form-data" id="form-checkout">
@@ -234,7 +215,7 @@
             <div id="cash_area" style="display: none; text-align: center; padding: 20px; background: #e2e3e5; border-radius: 8px; margin-bottom: 20px;">
                 <h4 style="color: #333; margin-bottom: 5px;">Pembayaran Tunai (Cash)</h4>
                 <p style="font-size: 13px; color: #555;">
-                    Silakan siapkan uang tunai sebesar <strong id="cash_display_total">Rp {{ number_format($total_tagihan ?? 0, 0, ',', '.') }}</strong>. <br><br>
+                    Silakan siapkan uang tunai sebesar <strong id="cash_display_total">Rp {{ number_format($total_produk, 0, ',', '.') }}</strong>. <br><br>
                     Bayarkan di meja kasir saat mengambil pesanan, atau kepada kurir kami saat pesanan diantar (COD).
                 </p>
             </div>
@@ -249,18 +230,13 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5V_VOnPaboXlKYmpPD2rn5kx1b5pdY5M&libraries=places,geometry&callback=initMap" async defer></script>
 
 <script>
-    // Menyimpan base total dari controller (Produk + Layanan + Admin)
-    let baseTotal = {{ $total_tagihan ?? 0 }};
+    let baseTotal = {{ $total_produk }};
     let ongkirSekarang = 0;
 
-    // --- PENGATURAN KLINIK & TARIF ONGKIR ---
-    // Titik lokasi klinik D&F Pets (Ganti jika koordinatnya beda)
     const CLINIC_LAT = -6.5612;
     const CLINIC_LNG = 107.7621;
-    // Tarif per Kilometer
     const TARIF_PER_KM = 5000;
 
-    // --- FUNGSI GOOGLE MAPS ---
     let map, marker, geocoder;
 
     function initMap() {
@@ -329,35 +305,24 @@
         if (address) {
             document.getElementById('address').value = address;
         }
-
-        // Panggil fungsi hitung ongkir setiap kali pin berubah
         hitungOngkirOtomatis(location);
     }
 
-    // --- FUNGSI MENGHITUNG ONGKIR ---
     function hitungOngkirOtomatis(destinationLocation) {
         const method = document.querySelector('input[name="delivery_method"]:checked');
         if (method && method.value === 'delivery') {
             const clinicLocation = new google.maps.LatLng(CLINIC_LAT, CLINIC_LNG);
-
-            // Hitung jarak (dalam meter) menggunakan library spherical Google Maps
             const distanceInMeters = google.maps.geometry.spherical.computeDistanceBetween(clinicLocation, destinationLocation);
-
-            // Konversi ke KM dan bulatkan ke atas (misal 1.2 KM jadi 2 KM)
             const distanceInKm = Math.ceil(distanceInMeters / 1000);
 
-            // Hitung ongkir
             ongkirSekarang = distanceInKm * TARIF_PER_KM;
 
-            // Update UI
             document.getElementById('badge_jarak').innerText = distanceInKm + ' KM';
             document.getElementById('input_jarak_km').value = distanceInKm;
             updateRingkasanTagihan();
         }
     }
 
-
-    // --- FUNGSI UI BIASA ---
     function formatRupiah(angka) {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka).replace('Rp', 'Rp ').replace(',00', '');
     }
@@ -368,8 +333,6 @@
         document.getElementById('display_ongkir').innerText = formatRupiah(ongkirSekarang);
         document.getElementById('display_total_tagihan').innerText = formatRupiah(totalAkhir);
         document.getElementById('cash_display_total').innerText = formatRupiah(totalAkhir);
-
-        // Update input hidden untuk dikirim ke Controller
         document.getElementById('input_ongkir').value = ongkirSekarang;
     }
 
@@ -395,51 +358,32 @@
         const pickupArea = document.getElementById('pickup_area');
         const addressInput = document.getElementById('address');
         const pickupInput = document.getElementById('pickup_time');
-
         const rowOngkir = document.getElementById('row_ongkir');
 
         if (method.value === 'delivery') {
             deliveryArea.style.display = 'block';
             pickupArea.style.display = 'none';
+
             addressInput.setAttribute('required', 'required');
             if (pickupInput) pickupInput.removeAttribute('required');
 
-            // Tampilkan baris ongkir
             rowOngkir.style.display = 'table-row';
 
-            if (typeof google !== 'undefined' && map) {
+            if (typeof google !== 'undefined' && map && marker) {
                 google.maps.event.trigger(map, "resize");
                 map.setCenter(marker.getPosition());
+                hitungOngkirOtomatis(marker.getPosition());
             }
-
         } else {
             deliveryArea.style.display = 'none';
             pickupArea.style.display = 'block';
-            addressInput.removeAttribute('required');
 
-            // Sembunyikan baris ongkir dan kembalikan ongkir ke 0
+            addressInput.removeAttribute('required');
+            if (pickupInput) pickupInput.setAttribute('required', 'required');
+
             rowOngkir.style.display = 'none';
             ongkirSekarang = 0;
             updateRingkasanTagihan();
-
-            togglePickupTime();
-        }
-    }
-
-    function togglePickupTime() {
-        const syncCheck = document.getElementById('sync_schedule');
-        const manualTimeArea = document.getElementById('manual_pickup_time');
-        const pickupInput = document.getElementById('pickup_time');
-        const method = document.querySelector('input[name="delivery_method"]:checked');
-
-        if (method && method.value === 'pickup') {
-            if (syncCheck && syncCheck.checked) {
-                manualTimeArea.style.display = 'none';
-                if (pickupInput) pickupInput.removeAttribute('required');
-            } else {
-                manualTimeArea.style.display = 'block';
-                if (pickupInput) pickupInput.setAttribute('required', 'required');
-            }
         }
     }
 
