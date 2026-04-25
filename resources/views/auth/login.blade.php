@@ -207,7 +207,7 @@
                 <label for="email">Alamat Email</label>
                 <div class="input-wrapper">
                     <span class="input-icon">&#x2709;</span>
-                    <input type="email" id="email" name="email" required value="{{ old('email') }}" placeholder="contoh: budi@pawcenter.com">
+                    <input type="email" id="email" name="email" required value="{{ old('email') }}" placeholder="budi@pawcenter.com">
                 </div>
             </div>
 
@@ -225,7 +225,7 @@
 
         <div class="card-footer">
             <p>Belum punya akun? <a href="{{ url('/register') }}">Daftar Sekarang</a></p>
-            <p><a href="#">Lupa kata sandi?</a></p>
+            <p><a href="forgot-password">Lupa kata sandi?</a></p>
         </div>
     </div>
 

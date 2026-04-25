@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Owner (Admin)')
+@section('title', 'Dashboard Owner')
 
 @section('content')
 <style>

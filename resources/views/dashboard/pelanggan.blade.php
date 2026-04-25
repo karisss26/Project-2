@@ -22,7 +22,17 @@
     .stat-card .angka { font-size: 28px; font-weight: bold; color: #800080; }
     .btn-batal { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s; }
     .btn-batal:hover { background: #a71d2a; transform: scale(1.05); }
+
+    /* Tambahan style buat tombol Katalog */
+    .btn-katalog { display: inline-block; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .btn-katalog:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
 </style>
+
+<div style="text-align: right;">
+    <a href="{{ route('dashboard.katalog') }}" class="btn-katalog">
+        🐾 Booking Layanan & Belanja Produk
+    </a>
+</div>
 
 <div class="grid-dashboard">
     <div class="stat-card">
