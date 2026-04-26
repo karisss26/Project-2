@@ -49,7 +49,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/cart/update', [CheckoutController::class, 'updateCart'])->name('cart.update');
         Route::post('/cart/remove', [CheckoutController::class, 'removeFromCart'])->name('cart.remove');
 
-        Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
         Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
 
         Route::post('/dashboard/reservasi/{id}/batal', [DashboardController::class, 'batalkan'])->name('reservasi.batal');

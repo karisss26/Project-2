@@ -14,6 +14,7 @@
                         ungu: {
                             DEFAULT: '#7c3aed',
                             gelap: '#6d28d9',
+                            tua: '#2e1065', // Warna ungu tua pet shop baru
                             muda: '#e9d5ff',
                             terang: '#f3e8ff',
                         }
@@ -35,59 +36,74 @@
 
     <!-- Header -->
     <header class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3">
-            <div class="flex items-center justify-between gap-4">
-                <!-- Logo -->
-                <a href="{{ route('welcome') }}" class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-ungu rounded-full flex items-center justify-center">
-                        <i class="fas fa-paw text-white text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold text-ungu leading-tight">D&P Pet Shop</h1>
-                        <p class="text-xs text-gray-500">Peliharaan Sehat, Pemilik Senang</p>
-                    </div>
-                </a>
+            <div class="container mx-auto px-4 py-3">
+                <div class="flex items-center justify-between gap-4">
 
-                <!-- Search Bar -->
-                <div class="flex-1 max-w-xl">
-                    <div class="relative">
-                        <input
-                            type="text"
-                            id="searchInput"
-                            placeholder="Cari produk atau layanan..."
-                            class="w-full pl-10 pr-4 py-2.5 rounded-full border-2 border-ungu-muda focus:border-ungu focus:outline-none bg-ungu-terang/30 text-sm transition-colors"
-                        >
-                        <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-ungu"></i>
-                    </div>
-                </div>
+                    <a href="{{ route('home') }}" class="flex items-center gap-2">
+                        <div class="w-10 h-10 bg-ungu rounded-full flex items-center justify-center">
+                            <i class="fas fa-paw text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-ungu-tua leading-tight">D&P Pet Shop</h1>
+                            <p class="text-xs text-gray-500">Peliharaan Sehat, Pemilik Senang</p>
+                        </div>
+                    </a>
 
-                <!-- Icons -->
-                <div class="flex items-center gap-3">
-                    <a href="{{ route('checkout') }}" class="relative p-2 hover:bg-ungu-terang rounded-full transition-colors group">
-                        <i class="fas fa-shopping-cart text-ungu text-xl group-hover:scale-110 transition-transform"></i>
-                        <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
-                    </a>
-                    <button class="p-2 hover:bg-ungu-terang rounded-full transition-colors relative">
-                        <i class="fas fa-bell text-ungu text-xl"></i>
-                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-                    </button>
-                    <a href="{{ route('pelanggan') }}" class="p-2 hover:bg-ungu-terang rounded-full transition-colors group">
-                        <i class="fas fa-user-circle text-ungu text-2xl group-hover:scale-110 transition-transform"></i>
-                    </a>
+                    <div class="flex-1 max-w-xl hidden sm:block">
+                        <div class="relative">
+                            <input
+                                type="text"
+                                id="searchInput"
+                                placeholder="Cari produk atau layanan..."
+                                class="w-full pl-10 pr-4 py-2.5 rounded-full border-2 border-ungu-muda focus:border-ungu focus:outline-none bg-ungu-terang/30 text-sm transition-colors"
+                            >
+                            <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-ungu"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('dashboard.checkout') }}" class="relative p-2 hover:bg-ungu-terang rounded-full transition-colors group">
+                            <i class="fas fa-shopping-cart text-ungu text-xl group-hover:scale-110 transition-transform"></i>
+                            <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                                {{ count((array) session('cart')) }}
+                            </span>
+                        </a>
+
+                        <button class="p-2 hover:bg-ungu-terang rounded-full transition-colors relative hidden sm:block">
+                            <i class="fas fa-bell text-ungu text-xl"></i>
+                            <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+
+                        @auth
+                            <a href="{{ route('dashboard.pelanggan') }}" class="p-2 hover:bg-ungu-terang rounded-full transition-colors group" title="Dashboard Saya">
+                                <i class="fas fa-user-circle text-ungu text-2xl group-hover:scale-110 transition-transform"></i>
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="px-4 py-2 bg-ungu text-white rounded-full font-semibold hover:bg-ungu-gelap transition-colors text-sm shadow-sm">
+                                Login
+                            </a>
+                        @endauth
+                    </div>
+
                 </div>
             </div>
-        </div>
-    </header>
+        </header>
 
     <!-- Hero Banner -->
-    <section class="bg-gradient-to-r from-ungu to-ungu-gelap py-16">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-4xl font-bold text-white mb-4">Katalog Produk & Layanan</h2>
-            <p class="text-ungu-muda text-lg mb-8">Temukan kebutuhan terbaik untuk hewan peliharaan kesayangan Anda</p>
-            <a href="{{ route('welcome') }}" class="inline-flex items-center gap-2 bg-white text-ungu px-6 py-3 rounded-full font-semibold hover:bg-ungu-muda transition-colors shadow-lg">
-                <i class="fas fa-arrow-left"></i>
-                Kembali ke Beranda
-            </a>
+    <section class="bg-gradient-to-br from-ungu-tua via-[#3b0764] to-ungu-gelap py-20 relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-ungu/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-ungu-gelap/10 rounded-full blur-3xl"></div>
+
+        <a href="{{ route('home') }}" class="absolute top-4 left-4 sm:top-6 sm:left-8 inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm backdrop-blur-md transition-all border border-white/20 z-10">
+            <i class="fas fa-arrow-left text-xs"></i>
+            Kembali
+        </a>
+
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">Katalog Produk & Layanan</h2>
+            <p class="text-ungu-muda/80 text-lg md:text-xl max-w-2xl mx-auto">
+                Temukan kebutuhan terbaik untuk hewan peliharaan kesayangan Anda dengan kualitas premium dan pelayanan sepenuh hati.
+            </p>
         </div>
     </section>
 
@@ -99,250 +115,43 @@
                     <h3 class="text-2xl font-bold text-gray-800">Produk</h3>
                     <p class="text-gray-500 mt-1">Pilihan produk berkualitas untuk peliharaan Anda</p>
                 </div>
-                <div class="flex gap-2">
-                    <button class="px-4 py-2 bg-ungu text-white rounded-lg text-sm font-medium hover:bg-ungu-gelap transition-colors">Semua</button>
-                    <button class="px-4 py-2 bg-ungu-terang text-ungu rounded-lg text-sm font-medium hover:bg-ungu-muda transition-colors">Makanan</button>
-                    <button class="px-4 py-2 bg-ungu-terang text-ungu rounded-lg text-sm font-medium hover:bg-ungu-muda transition-colors">Aksesoris</button>
-                </div>
             </div>
 
             <div id="produkContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Produk 1 -->
-                <div class="search-item group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-ungu-muda transition-all duration-300 overflow-hidden" data-name="Royal Canin Kitten Makanan Kucing">
+                @foreach($produk as $p)
+                <div class="search-item group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-ungu-muda transition-all duration-300 overflow-hidden" data-name="{{ $p->nama_produk }}">
                     <div class="relative overflow-hidden">
-                        <img src="https://placehold.co/300x250/e9d5ff/7c3aed?text=Royal+Canin" alt="Produk" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                        <span class="absolute top-3 left-3 bg-ungu text-white text-xs px-2 py-1 rounded-full font-medium">Terlaris</span>
+                        @if($p->gambar)
+                            <img src="{{ asset('storage/' . $p->gambar) }}" alt="{{ $p->nama_produk }}" class="w-full h-48 object-cover">
+                        @else
+                            <img src="https://placehold.co/300x250?text=No+Image" class="w-full h-48 object-cover">
+                        @endif
                     </div>
                     <div class="p-4">
-                        <h4 class="font-semibold text-gray-800 mb-1 line-clamp-2">Royal Canin Kitten Makanan Kucing</h4>
-                        <div class="flex items-center gap-1 mb-2">
-                            <div class="flex text-yellow-400 text-xs">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                            <span class="text-xs text-gray-500">(4.5)</span>
+                        <h4 class="font-semibold text-gray-800 mb-1 line-clamp-2">{{ $p->nama_produk }}</h4>
+                        <div class="flex items-center justify-between mt-3 mb-3">
+                            <span class="text-lg font-bold text-ungu">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-lg font-bold text-ungu">Rp 45.000</span>
-                            <span class="text-xs text-gray-400">1 kg</span>
-                        </div>
-                        <button onclick="addToCart(this)" class="w-full mt-3 bg-ungu-terang text-ungu font-semibold py-2 rounded-xl hover:bg-ungu hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
-                            <i class="fas fa-shopping-bag text-sm"></i>
-                            Masuk Keranjang
-                        </button>
+
+                        @auth
+                            <form action="{{ route('cart.add') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="item_id" value="{{ $p->id }}">
+                                <input type="hidden" name="tipe" value="produk">
+
+                                <button type="submit" class="w-full mt-3 bg-ungu-terang text-ungu font-semibold py-2 rounded-xl hover:bg-ungu hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
+                                    <i class="fas fa-shopping-bag text-sm"></i>
+                                    Masuk Keranjang
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="w-full text-center block bg-ungu-terang text-ungu font-semibold py-2 rounded-xl hover:bg-ungu hover:text-white transition-all duration-300">
+                                <i class="fas fa-sign-in-alt text-sm mr-1"></i> Login untuk Membeli
+                            </a>
+                        @endauth
                     </div>
                 </div>
-
-                <!-- Produk 2 -->
-                <div class="search-item group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-ungu-muda transition-all duration-300 overflow-hidden" data-name="Whiskas Adult Makanan Kucing">
-                    <div class="relative overflow-hidden">
-                        <img src="https://placehold.co/300x250/e9d5ff/7c3aed?text=Whiskas" alt="Produk" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <div class="p-4">
-                        <h4 class="font-semibold text-gray-800 mb-1 line-clamp-2">Whiskas Adult Makanan Kucing Rasa Tuna</h4>
-                        <div class="flex items-center gap-1 mb-2">
-                            <div class="flex text-yellow-400 text-xs">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <span class="text-xs text-gray-500">(4.0)</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-lg font-bold text-ungu">Rp 28.500</span>
-                            <span class="text-xs text-gray-400">1.2 kg</span>
-                        </div>
-                        <button onclick="addToCart(this)" class="w-full mt-3 bg-ungu-terang text-ungu font-semibold py-2 rounded-xl hover:bg-ungu hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
-                            <i class="fas fa-shopping-bag text-sm"></i>
-                            Masuk Keranjang
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Produk 3 -->
-                <div class="search-item group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-ungu-muda transition-all duration-300 overflow-hidden" data-name="Pedigree Adult Makanan Anjing">
-                    <div class="relative overflow-hidden">
-                        <img src="https://placehold.co/300x250/e9d5ff/7c3aed?text=Pedigree" alt="Produk" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                        <span class="absolute top-3 left-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">Diskon 10%</span>
-                    </div>
-                    <div class="p-4">
-                        <h4 class="font-semibold text-gray-800 mb-1 line-clamp-2">Pedigree Adult Makanan Anjing Rasa Beef</h4>
-                        <div class="flex items-center gap-1 mb-2">
-                            <div class="flex text-yellow-400 text-xs">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <span class="text-xs text-gray-500">(5.0)</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-lg font-bold text-ungu">Rp 52.000</span>
-                                <span class="text-xs text-gray-400 line-through ml-1">Rp 57.800</span>
-                            </div>
-                            <span class="text-xs text-gray-400">3 kg</span>
-                        </div>
-                        <button onclick="addToCart(this)" class="w-full mt-3 bg-ungu-terang text-ungu font-semibold py-2 rounded-xl hover:bg-ungu hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
-                            <i class="fas fa-shopping-bag text-sm"></i>
-                            Masuk Keranjang
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Produk 4 -->
-                <div class="search-item group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-ungu-muda transition-all duration-300 overflow-hidden" data-name="Cat Choize Kitten Makanan Kucing">
-                    <div class="relative overflow-hidden">
-                        <img src="https://placehold.co/300x250/e9d5ff/7c3aed?text=Cat+Choize" alt="Produk" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <div class="p-4">
-                        <h4 class="font-semibold text-gray-800 mb-1 line-clamp-2">Cat Choize Kitten Makanan Kucing</h4>
-                        <div class="flex items-center gap-1 mb-2">
-                            <div class="flex text-yellow-400 text-xs">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <span class="text-xs text-gray-500">(4.2)</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-lg font-bold text-ungu">Rp 35.000</span>
-                            <span class="text-xs text-gray-400">800 gr</span>
-                        </div>
-                        <button onclick="addToCart(this)" class="w-full mt-3 bg-ungu-terang text-ungu font-semibold py-2 rounded-xl hover:bg-ungu hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
-                            <i class="fas fa-shopping-bag text-sm"></i>
-                            Masuk Keranjang
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Produk 5 -->
-                <div class="search-item group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-ungu-muda transition-all duration-300 overflow-hidden" data-name="Bolt Dog Food Makanan Anjing">
-                    <div class="relative overflow-hidden">
-                        <img src="https://placehold.co/300x250/e9d5ff/7c3aed?text=Bolt" alt="Produk" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <div class="p-4">
-                        <h4 class="font-semibold text-gray-800 mb-1 line-clamp-2">Bolt Dog Food Makanan Anjing Rasa Ayam</h4>
-                        <div class="flex items-center gap-1 mb-2">
-                            <div class="flex text-yellow-400 text-xs">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <span class="text-xs text-gray-500">(3.8)</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-lg font-bold text-ungu">Rp 42.000</span>
-                            <span class="text-xs text-gray-400">2.5 kg</span>
-                        </div>
-                        <button onclick="addToCart(this)" class="w-full mt-3 bg-ungu-terang text-ungu font-semibold py-2 rounded-xl hover:bg-ungu hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
-                            <i class="fas fa-shopping-bag text-sm"></i>
-                            Masuk Keranjang
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Produk 6 -->
-                <div class="search-item group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-ungu-muda transition-all duration-300 overflow-hidden" data-name="Pro Plan Adult Makanan Kucing">
-                    <div class="relative overflow-hidden">
-                        <img src="https://placehold.co/300x250/e9d5ff/7c3aed?text=Pro+Plan" alt="Produk" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                        <span class="absolute top-3 left-3 bg-ungu text-white text-xs px-2 py-1 rounded-full font-medium">Premium</span>
-                    </div>
-                    <div class="p-4">
-                        <h4 class="font-semibold text-gray-800 mb-1 line-clamp-2">Pro Plan Adult Makanan Kucing Sterilized</h4>
-                        <div class="flex items-center gap-1 mb-2">
-                            <div class="flex text-yellow-400 text-xs">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <span class="text-xs text-gray-500">(4.9)</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-lg font-bold text-ungu">Rp 85.000</span>
-                            <span class="text-xs text-gray-400">1.5 kg</span>
-                        </div>
-                        <button onclick="addToCart(this)" class="w-full mt-3 bg-ungu-terang text-ungu font-semibold py-2 rounded-xl hover:bg-ungu hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
-                            <i class="fas fa-shopping-bag text-sm"></i>
-                            Masuk Keranjang
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Produk 7 -->
-                <div class="search-item group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-ungu-muda transition-all duration-300 overflow-hidden" data-name="Tali Leher Kucing Aksesoris">
-                    <div class="relative overflow-hidden">
-                        <img src="https://placehold.co/300x250/e9d5ff/7c3aed?text=Tali+Leher" alt="Produk" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <div class="p-4">
-                        <h4 class="font-semibold text-gray-800 mb-1 line-clamp-2">Tali Leher Kucing Adjustable Motif Lucu</h4>
-                        <div class="flex items-center gap-1 mb-2">
-                            <div class="flex text-yellow-400 text-xs">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <span class="text-xs text-gray-500">(4.3)</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-lg font-bold text-ungu">Rp 18.000</span>
-                            <span class="text-xs text-gray-400">1 pcs</span>
-                        </div>
-                        <button onclick="addToCart(this)" class="w-full mt-3 bg-ungu-terang text-ungu font-semibold py-2 rounded-xl hover:bg-ungu hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
-                            <i class="fas fa-shopping-bag text-sm"></i>
-                            Masuk Keranjang
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Produk 8 -->
-                <div class="search-item group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-ungu-muda transition-all duration-300 overflow-hidden" data-name="Mainan Tikus Kucing">
-                    <div class="relative overflow-hidden">
-                        <img src="https://placehold.co/300x250/e9d5ff/7c3aed?text=Mainan+Tikus" alt="Produk" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                        <span class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">Baru</span>
-                    </div>
-                    <div class="p-4">
-                        <h4 class="font-semibold text-gray-800 mb-1 line-clamp-2">Mainan Tikus Kucing Bisa Bunyi Interactive</h4>
-                        <div class="flex items-center gap-1 mb-2">
-                            <div class="flex text-yellow-400 text-xs">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                            <span class="text-xs text-gray-500">(4.7)</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-lg font-bold text-ungu">Rp 25.000</span>
-                            <span class="text-xs text-gray-400">1 pcs</span>
-                        </div>
-                        <button onclick="addToCart(this)" class="w-full mt-3 bg-ungu-terang text-ungu font-semibold py-2 rounded-xl hover:bg-ungu hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
-                            <i class="fas fa-shopping-bag text-sm"></i>
-                            Masuk Keranjang
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center mt-10">
-                <button class="px-8 py-3 bg-ungu text-white rounded-full font-semibold hover:bg-ungu-gelap transition-colors shadow-lg hover:shadow-xl">
-                    Selengkapnya
-                </button>
+                @endforeach
             </div>
         </div>
     </section>
@@ -356,141 +165,44 @@
             </div>
 
             <div id="layananContainer" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                <!-- Layanan 1: Grooming -->
-                <div class="search-item group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-transparent hover:border-ungu" data-name="Grooming">
-                    <div class="h-48 bg-gradient-to-br from-ungu-muda to-ungu-terang flex items-center justify-center relative overflow-hidden">
-                        <i class="fas fa-cut text-6xl text-ungu group-hover:scale-110 transition-transform duration-300"></i>
-                        <div class="absolute inset-0 bg-ungu opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-xl font-bold text-gray-800">Grooming</h4>
-                            <span class="bg-ungu-terang text-ungu text-xs px-3 py-1 rounded-full font-semibold">Tersedia</span>
-                        </div>
-                        <p class="text-gray-500 text-sm mb-4 leading-relaxed">
-                            Layanan perawatan kebersihan dan penampilan lengkap termasuk mandi, potong kuku, bersihkan telinga, dan styling bulu.
-                        </p>
-                        <div class="flex items-center gap-2 mb-4 text-sm text-gray-600">
-                            <i class="fas fa-clock text-ungu"></i>
-                            <span>60 - 90 menit</span>
-                        </div>
-                        <div class="border-t border-gray-100 pt-4">
-                            <div class="flex items-center justify-between mb-4">
-                                <div>
-                                    <span class="text-xs text-gray-400">Mulai dari</span>
-                                    <p class="text-2xl font-bold text-ungu">Rp 75.000</p>
-                                </div>
-                                <div class="text-right">
-                                    <div class="flex text-yellow-400 text-xs">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                    </div>
-                                    <span class="text-xs text-gray-500">(128 ulasan)</span>
-                                </div>
-                            </div>
-                            <button onclick="openReservasiModal('Grooming', 75000)" class="w-full bg-ungu text-white font-semibold py-3 rounded-xl hover:bg-ungu-gelap transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-ungu/30">
-                                <i class="fas fa-calendar-check"></i>
-                                Reservasi
-                            </button>
-                        </div>
-                    </div>
+            @foreach($layanan as $l)
+            <div class="search-item group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-transparent hover:border-ungu" data-name="{{ $l->nama_layanan }}">
+                <div class="h-48 bg-gradient-to-br from-ungu-muda to-ungu-terang flex items-center justify-center relative overflow-hidden">
+                    <i class="fas fa-briefcase-medical text-6xl text-ungu group-hover:scale-110 transition-transform duration-300"></i>
                 </div>
-
-                <!-- Layanan 2: Konsultasi Klinik -->
-                <div class="search-item group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-transparent hover:border-ungu" data-name="Konsultasi Klinik">
-                    <div class="h-48 bg-gradient-to-br from-ungu-muda to-ungu-terang flex items-center justify-center relative overflow-hidden">
-                        <i class="fas fa-user-md text-6xl text-ungu group-hover:scale-110 transition-transform duration-300"></i>
-                        <div class="absolute inset-0 bg-ungu opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-xl font-bold text-gray-800">Konsultasi Klinik</h4>
-                            <span class="bg-ungu-terang text-ungu text-xs px-3 py-1 rounded-full font-semibold">Tersedia</span>
-                        </div>
-                        <p class="text-gray-500 text-sm mb-4 leading-relaxed">
-                            Konsultasi kesehatan dengan dokter hewan berpengalaman. Termasuk pemeriksaan umum, vaksinasi, dan resep obat.
-                        </p>
-                        <div class="flex items-center gap-2 mb-4 text-sm text-gray-600">
-                            <i class="fas fa-clock text-ungu"></i>
-                            <span>30 - 45 menit</span>
-                        </div>
-                        <div class="border-t border-gray-100 pt-4">
-                            <div class="flex items-center justify-between mb-4">
-                                <div>
-                                    <span class="text-xs text-gray-400">Mulai dari</span>
-                                    <p class="text-2xl font-bold text-ungu">Rp 100.000</p>
-                                </div>
-                                <div class="text-right">
-                                    <div class="flex text-yellow-400 text-xs">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star-half-alt"></i>
-                                    </div>
-                                    <span class="text-xs text-gray-500">(96 ulasan)</span>
-                                </div>
+                <div class="p-6">
+                    <h4 class="text-xl font-bold text-gray-800 mb-3">{{ $l->nama_layanan }}</h4>
+                    <p class="text-gray-500 text-sm mb-4 leading-relaxed">
+                        {{ $l->deskripsi }}
+                    </p>
+                    <div class="border-t border-gray-100 pt-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <span class="text-xs text-gray-400">Harga</span>
+                                <p class="text-2xl font-bold text-ungu">Rp {{ number_format($l->harga, 0, ',', '.') }}</p>
                             </div>
-                            <button onclick="openReservasiModal('Konsultasi Klinik', 100000)" class="w-full bg-ungu text-white font-semibold py-3 rounded-xl hover:bg-ungu-gelap transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-ungu/30">
-                                <i class="fas fa-calendar-check"></i>
-                                Reservasi
-                            </button>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Layanan 3: Pet Hotel -->
-                <div class="search-item group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-transparent hover:border-ungu" data-name="Pet Hotel">
-                    <div class="h-48 bg-gradient-to-br from-ungu-muda to-ungu-terang flex items-center justify-center relative overflow-hidden">
-                        <i class="fas fa-hotel text-6xl text-ungu group-hover:scale-110 transition-transform duration-300"></i>
-                        <div class="absolute inset-0 bg-ungu opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-xl font-bold text-gray-800">Pet Hotel</h4>
-                            <span class="bg-ungu-terang text-ungu text-xs px-3 py-1 rounded-full font-semibold">Tersedia</span>
-                        </div>
-                        <p class="text-gray-500 text-sm mb-4 leading-relaxed">
-                            Penitipan hewan peliharaan dengan fasilitas nyaman, monitoring 24 jam, makanan terjadwal, dan area bermain.
-                        </p>
-                        <div class="flex items-center gap-2 mb-4 text-sm text-gray-600">
-                            <i class="fas fa-clock text-ungu"></i>
-                            <span>24 jam / hari</span>
-                        </div>
-                        <div class="border-t border-gray-100 pt-4">
-                            <div class="flex items-center justify-between mb-4">
-                                <div>
-                                    <span class="text-xs text-gray-400">Mulai dari</span>
-                                    <p class="text-2xl font-bold text-ungu">Rp 150.000<span class="text-sm font-normal text-gray-400">/hari</span></p>
-                                </div>
-                                <div class="text-right">
-                                    <div class="flex text-yellow-400 text-xs">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                    </div>
-                                    <span class="text-xs text-gray-500">(84 ulasan)</span>
-                                </div>
-                            </div>
-                            <button onclick="openReservasiModal('Pet Hotel', 150000)" class="w-full bg-ungu text-white font-semibold py-3 rounded-xl hover:bg-ungu-gelap transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-ungu/30">
-                                <i class="fas fa-calendar-check"></i>
-                                Reservasi
+                        @auth
+                            <button onclick="openReservasiModal('{{ $l->nama_layanan }}', {{ $l->harga }}, {{ $l->id }})" class="w-full bg-ungu text-white font-semibold py-3 rounded-xl hover:bg-ungu-gelap transition-all duration-300 flex items-center justify-center gap-2 shadow-lg">
+                                <i class="fas fa-calendar-check"></i> Reservasi
                             </button>
-                        </div>
+                        @else
+                            <a href="{{ route('login') }}" class="w-full block text-center bg-ungu text-white font-semibold py-3 rounded-xl hover:bg-ungu-gelap transition-all duration-300 shadow-lg">
+                                <i class="fas fa-sign-in-alt mr-1"></i> Login untuk Reservasi
+                            </a>
+                        @endauth
                     </div>
                 </div>
             </div>
+            @endforeach
+        </div>
         </div>
     </section>
 
-    <!-- Modal Reservasi -->
     <div id="reservasiModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl transform transition-all scale-100">
+
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-gray-800">Reservasi Layanan</h3>
                 <button onclick="closeReservasiModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
@@ -498,7 +210,10 @@
                 </button>
             </div>
 
-            <form id="reservasiForm" onsubmit="submitReservasi(event)">
+            <form id="reservasiForm" action="{{ route('checkout.process') }}" method="POST">
+                @csrf
+                <input type="hidden" name="layanan_id" id="modalLayananId">
+
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Layanan</label>
                     <input type="text" id="modalLayanan" readonly class="w-full px-4 py-2 bg-ungu-terang/30 border border-ungu-muda rounded-xl text-ungu font-semibold focus:outline-none">
@@ -511,26 +226,23 @@
 
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Reservasi</label>
-                    <input type="date" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
+                    <input type="date" name="tanggal_reservasi" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Waktu</label>
-                    <select required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
+                    <select name="waktu_reservasi" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
                         <option value="">Pilih Waktu</option>
                         <option value="09:00">09:00 WIB</option>
                         <option value="10:00">10:00 WIB</option>
-                        <option value="11:00">11:00 WIB</option>
                         <option value="13:00">13:00 WIB</option>
-                        <option value="14:00">14:00 WIB</option>
                         <option value="15:00">15:00 WIB</option>
-                        <option value="16:00">16:00 WIB</option>
                     </select>
                 </div>
 
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Nama Hewan</label>
-                    <input type="text" placeholder="Masukkan nama hewan peliharaan" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
+                    <input type="text" name="nama_hewan" placeholder="Masukkan nama hewan peliharaan" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
                 </div>
 
                 <button type="submit" class="w-full bg-ungu text-white font-semibold py-3 rounded-xl hover:bg-ungu-gelap transition-colors flex items-center justify-center gap-2">
@@ -668,9 +380,12 @@
         // Reservasi Modal
         const modal = document.getElementById('reservasiModal');
 
-        function openReservasiModal(layanan, harga) {
+        // Ganti fungsi openReservasiModal menjadi ini:
+        function openReservasiModal(layanan, harga, id) {
             document.getElementById('modalLayanan').value = layanan;
             document.getElementById('modalHarga').value = 'Rp ' + harga.toLocaleString('id-ID');
+            document.getElementById('modalLayananId').value = id; // Mengisi ID hidden
+
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -706,6 +421,53 @@
                 toast.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
         }
+
+        // --- Fungsi Filter Kategori Produk ---
+        function filterKategori(kategori, btn) {
+            // 1. Ubah warna semua tombol kembali ke warna tidak aktif (ungu-terang)
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(b => {
+                b.classList.remove('bg-ungu', 'text-white');
+                b.classList.add('bg-ungu-terang', 'text-ungu');
+            });
+
+            // 2. Ubah warna tombol yang sedang diklik menjadi aktif (ungu solid)
+            btn.classList.remove('bg-ungu-terang', 'text-ungu');
+            btn.classList.add('bg-ungu', 'text-white');
+
+            // 3. Filter produk yang ditampilkan
+            const items = document.querySelectorAll('#produkContainer .search-item');
+
+            items.forEach(item => {
+                // Ambil nama produk dan kategori (jika ada)
+                const name = item.getAttribute('data-name').toLowerCase();
+                const itemKategori = item.getAttribute('data-kategori') ? item.getAttribute('data-kategori').toLowerCase() : '';
+
+                // Logika pengecekan
+                if (kategori === 'semua') {
+                    // Tampilkan semua
+                    item.style.display = '';
+                    item.style.opacity = '1';
+                } else if (itemKategori.includes(kategori) || name.includes(kategori)) {
+                    // Tampilkan jika kategori atau nama mengandung kata 'makanan' atau 'aksesoris'
+                    item.style.display = '';
+                    item.style.opacity = '1';
+                } else {
+                    // Sembunyikan yang tidak cocok
+                    item.style.display = 'none';
+                    item.style.opacity = '0';
+                }
+            });
+        }
     </script>
+
+    @if(session('success'))
+    <script>
+        // Jalankan pop-up notifikasi otomatis saat halaman selesai dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast("{!! session('success') !!}");
+        });
+    </script>
+    @endif
 </body>
 </html>

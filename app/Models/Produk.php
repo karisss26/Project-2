@@ -11,4 +11,5 @@ class Produk extends Model
 
     protected $table = 'produk'; // Nama tabel di database
     protected $guarded = ['id']; // Membiarkan semua kolom bisa diisi kecuali ID
+
 }
