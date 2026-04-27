@@ -55,6 +55,9 @@ Route::middleware(['auth'])->group(function () {
         Route::view('/layanan-produk', 'dashboard.layanan')->name('pelanggan.layanan');
         Route::get('/profil-saya', [DashboardController::class, 'profil'])->name('pelanggan.profil');
         Route::post('/profil-saya/update', [DashboardController::class, 'updateProfil'])->name('pelanggan.profil.update');
+        Route::post('/reservasi/proses', [CheckoutController::class, 'prosesReservasi'])->name('reservasi.proses');
+        Route::get('/reservasi/bayar/{id}', [CheckoutController::class, 'bayarDp'])->name('reservasi.bayar');
+Route::post('/reservasi/bayar/{id}/upload', [CheckoutController::class, 'uploadBuktiDp'])->name('reservasi.upload');
     });
 
 // --- RUTE DOKTER ---

@@ -120,11 +120,11 @@
             <div id="produkContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($produk as $p)
                 <div class="search-item group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-ungu-muda transition-all duration-300 overflow-hidden" data-name="{{ $p->nama_produk }}">
-                    <div class="relative overflow-hidden">
+                    <div class="relative overflow-hidden bg-white border-b border-gray-50 h-72 flex items-center justify-center p-4">
                         @if($p->gambar)
-                            <img src="{{ asset('storage/' . $p->gambar) }}" alt="{{ $p->nama_produk }}" class="w-full h-48 object-cover">
+                            <img src="{{ asset('storage/' . $p->gambar) }}" alt="{{ $p->nama_produk }}" class="w-full h-full object-contain hover:scale-105 transition-transform duration-300">
                         @else
-                            <img src="https://placehold.co/300x250?text=No+Image" class="w-full h-48 object-cover">
+                            <img src="https://placehold.co/300x400?text=No+Image" class="w-full h-full object-contain">
                         @endif
                     </div>
                     <div class="p-4">
@@ -167,9 +167,15 @@
             <div id="layananContainer" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             @foreach($layanan as $l)
             <div class="search-item group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-transparent hover:border-ungu" data-name="{{ $l->nama_layanan }}">
-                <div class="h-48 bg-gradient-to-br from-ungu-muda to-ungu-terang flex items-center justify-center relative overflow-hidden">
-                    <i class="fas fa-briefcase-medical text-6xl text-ungu group-hover:scale-110 transition-transform duration-300"></i>
-                </div>
+            <div class="h-48 bg-gray-100 flex items-center justify-center relative overflow-hidden">
+                @if($l->gambar)
+                    <img src="{{ asset('storage/' . $l->gambar) }}" alt="{{ $l->nama_layanan }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                @else
+                    <div class="w-full h-full bg-gradient-to-br from-ungu-muda to-ungu-terang flex items-center justify-center">
+                        <i class="fas fa-hand-holding-heart text-6xl text-ungu"></i>
+                    </div>
+                @endif
+            </div>
                 <div class="p-6">
                     <h4 class="text-xl font-bold text-gray-800 mb-3">{{ $l->nama_layanan }}</h4>
                     <p class="text-gray-500 text-sm mb-4 leading-relaxed">
@@ -210,18 +216,19 @@
                 </button>
             </div>
 
-            <form id="reservasiForm" action="{{ route('checkout.process') }}" method="POST">
+<form id="reservasiForm" action="{{ route('reservasi.proses') }}" method="POST">
                 @csrf
                 <input type="hidden" name="layanan_id" id="modalLayananId">
+                <input type="hidden" name="nama_layanan" id="modalNamaLayananInput">
 
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Layanan</label>
-                    <input type="text" id="modalLayanan" readonly class="w-full px-4 py-2 bg-ungu-terang/30 border border-ungu-muda rounded-xl text-ungu font-semibold focus:outline-none">
+                    <input type="text" id="modalLayanan" disabled class="w-full px-4 py-2 bg-ungu-terang/30 border border-ungu-muda rounded-xl text-ungu font-semibold focus:outline-none cursor-not-allowed">
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Harga</label>
-                    <input type="text" id="modalHarga" readonly class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 font-semibold focus:outline-none">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Harga (Bayar di Klinik)</label>
+                    <input type="text" id="modalHarga" disabled class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 font-semibold focus:outline-none cursor-not-allowed">
                 </div>
 
                 <div class="mb-4">
@@ -232,22 +239,31 @@
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Waktu</label>
                     <select name="waktu_reservasi" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
-                        <option value="">Pilih Waktu</option>
-                        <option value="09:00">09:00 WIB</option>
-                        <option value="10:00">10:00 WIB</option>
-                        <option value="13:00">13:00 WIB</option>
-                        <option value="15:00">15:00 WIB</option>
+                        <option value="" disabled selected>Pilih Waktu</option>
+                        <option value="09:00:00">09:00 WIB</option>
+                        <option value="10:00:00">10:00 WIB</option>
+                        <option value="13:00:00">13:00 WIB</option>
+                        <option value="15:00:00">15:00 WIB</option>
                     </select>
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Hewan</label>
-                    <input type="text" name="nama_hewan" placeholder="Masukkan nama hewan peliharaan" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Anabul Kamu</label>
+                    <select name="nama_hewan" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
+                        <option value="" disabled selected>Pilih Hewan Peliharaan</option>
+                        @auth
+                            @forelse($hewan_user as $hewan)
+                                <option value="{{ $hewan->nama_hewan }}">{{ $hewan->nama_hewan }} ({{ $hewan->jenis_hewan }})</option>
+                            @empty
+                                <option value="" disabled>Belum ada hewan. Tambah di Dashboard dulu ya!</option>
+                            @endforelse
+                        @endauth
+                    </select>
                 </div>
 
                 <button type="submit" class="w-full bg-ungu text-white font-semibold py-3 rounded-xl hover:bg-ungu-gelap transition-colors flex items-center justify-center gap-2">
-                    <i class="fas fa-check-circle"></i>
-                    Konfirmasi Reservasi
+                    <i class="fas fa-calendar-check"></i>
+                    Booking Sekarang
                 </button>
             </form>
         </div>
@@ -383,6 +399,7 @@
         // Ganti fungsi openReservasiModal menjadi ini:
         function openReservasiModal(layanan, harga, id) {
             document.getElementById('modalLayanan').value = layanan;
+            document.getElementById('modalNamaLayananInput').value = layanan;
             document.getElementById('modalHarga').value = 'Rp ' + harga.toLocaleString('id-ID');
             document.getElementById('modalLayananId').value = id; // Mengisi ID hidden
 

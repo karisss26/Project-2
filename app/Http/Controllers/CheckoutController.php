@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Produk;
 use App\Models\Layanan;
+use App\Models\reservasi; // Wajib dipanggil biar bisa nge-save
+use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
@@ -96,5 +98,76 @@ class CheckoutController extends Controller
 
         // Arahkan kembali ke dashboard pelanggan dengan pesan sukses
         return redirect()->route('dashboard.pelanggan')->with('success', 'Pesanan kamu berhasil dibuat! Silakan tunggu konfirmasi admin.');
+    }
+
+    // 6. Mesin Khusus Proses Reservasi Layanan (Pisah dari keranjang produk)
+// 6. Mesin Khusus Proses Reservasi (Sekarang pakai hitungan DP)
+    public function prosesReservasi(Request $request)
+    {
+        $request->validate([
+            'layanan_id' => 'required',
+            'nama_layanan' => 'required',
+            'tanggal_reservasi' => 'required|date',
+            'waktu_reservasi' => 'required',
+            'nama_hewan' => 'required'
+        ]);
+
+        // Ambil data layanan dari database biar harganya akurat dan aman
+        $layanan = Layanan::findOrFail($request->layanan_id);
+
+        // Perhitungan DP 30%
+        $harga_total = $layanan->harga;
+        $dp = $harga_total * 0.30; // 30 persen
+        $sisa_bayar = $harga_total - $dp;
+
+        // Simpan ke database
+        $reservasi = reservasi::create([
+            'user_id' => Auth::id(),
+            'nama_layanan' => $request->nama_layanan,
+            'tanggal' => $request->tanggal_reservasi,
+            'waktu' => $request->waktu_reservasi,
+            'pet_name' => $request->nama_hewan,
+            'harga_total' => $harga_total,
+            'dp' => $dp,
+            'sisa_bayar' => $sisa_bayar,
+            'status' => 'Menunggu Pembayaran', // Status berubah
+            'alasan_batal' => null
+        ]);
+
+        // Arahkan ke halaman upload struk DP
+        return redirect()->route('reservasi.bayar', $reservasi->id);
+    }
+
+    // 7. Menampilkan halaman upload struk DP
+    public function bayarDp($id)
+    {
+        $reservasi = reservasi::findOrFail($id);
+
+        // Pastikan keamanan: Cuma bisa diakses sama yang punya reservasi & statusnya "Menunggu Pembayaran"
+        if($reservasi->user_id != Auth::id() || $reservasi->status != 'Menunggu Pembayaran') {
+            return redirect()->route('dashboard.pelanggan')->with('error', 'Akses ditolak atau tagihan sudah dibayar.');
+        }
+
+        return view('dashboard.bayar_dp', compact('reservasi'));
+    }
+
+    // 8. Mesin Proses Upload Struk DP
+    public function uploadBuktiDp(Request $request, $id)
+    {
+        $request->validate([
+            'bukti_pembayaran_dp' => 'required|image|mimes:jpeg,png,jpg|max:2048' // Maksimal 2MB
+        ]);
+
+        $reservasi = reservasi::findOrFail($id);
+
+        if ($request->hasFile('bukti_pembayaran_dp')) {
+            $pathFoto = $request->file('bukti_pembayaran_dp')->store('bukti_dp', 'public');
+
+            $reservasi->bukti_pembayaran_dp = $pathFoto;
+            $reservasi->status = 'Menunggu Konfirmasi Admin'; // Ubah status biar admin ngecek
+            $reservasi->save();
+        }
+
+        return redirect()->route('dashboard.pelanggan')->with('success', 'Bukti transfer DP berhasil dikirim! Silakan tunggu konfirmasi dari admin Paw Center.');
     }
 }

@@ -68,32 +68,47 @@ class DashboardController extends Controller
         return view('dashboard.hewan', compact('semua_hewan'));
     }
 
-    public function storeHewan(Request $request) {
+public function storeHewan(Request $request) {
         $request->validate([
             'nama_hewan' => 'required',
             'jenis_hewan' => 'required',
             'ras' => 'required',
-            'umur' => 'required'
+            'umur_angka' => 'required|numeric',
+            'umur_satuan' => 'required'
         ]);
+
+        // Gabungkan angka dan satuan menjadi satu string
+        $umur_gabungan = $request->umur_angka . ' ' . $request->umur_satuan;
 
         hewan::create([
             'user_id' => Auth::id(),
             'nama_hewan' => $request->nama_hewan,
             'jenis_hewan' => $request->jenis_hewan,
             'ras' => $request->ras,
-            'umur' => $request->umur,
+            'umur' => $umur_gabungan, // Masukkan variabel yang sudah digabung
         ]);
 
         return back()->with('success', 'Anabul baru berhasil didaftarkan!');
     }
 
     public function updateHewan(Request $request, $id) {
+        $request->validate([
+            'nama_hewan' => 'required',
+            'jenis_hewan' => 'required',
+            'ras' => 'required',
+            'umur_angka' => 'required|numeric',
+            'umur_satuan' => 'required'
+        ]);
+
         $h = hewan::findOrFail($id);
+
+        $umur_gabungan = $request->umur_angka . ' ' . $request->umur_satuan;
+
         $h->update([
             'nama_hewan' => $request->nama_hewan,
             'jenis_hewan' => $request->jenis_hewan,
             'ras' => $request->ras,
-            'umur' => $request->umur,
+            'umur' => $umur_gabungan,
         ]);
 
         return back()->with('success', 'Data anabul berhasil diperbarui!');
@@ -110,20 +125,33 @@ class DashboardController extends Controller
         return view('dashboard.profil');
     }
 
-    public function updateProfil(Request $request) {
+public function updateProfil(Request $request) {
         $user = User::find(Auth::id());
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
+            'no_hp' => 'nullable|string|max:20',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:8|confirmed',
+            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Maksimal 2MB
         ]);
 
         $user->name = $request->name;
+        $user->username = $request->username;
+        $user->no_hp = $request->no_hp;
         $user->email = $request->email;
 
+        // Jika password diisi, maka update password
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
+        }
+
+        // Proses jika ada upload foto profil baru
+        if ($request->hasFile('foto_profil')) {
+            // Simpan foto ke folder storage/app/public/profil
+            $pathFoto = $request->file('foto_profil')->store('profil', 'public');
+            $user->foto_profil = $pathFoto;
         }
 
         $user->save();
@@ -162,6 +190,32 @@ class DashboardController extends Controller
         ]);
 
         return back()->with('success', 'Produk berhasil ditambahkan!');
+    }
+
+    public function storeLayanan(Request $request)
+    {
+        $request->validate([
+            'nama_layanan' => 'required|string|max:255',
+            'harga' => 'required|numeric',
+            'deskripsi' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $pathFoto = null;
+
+        if ($request->hasFile('gambar')) {
+            // Kita pisah foldernya ke 'layanan' biar rapi
+            $pathFoto = $request->file('gambar')->store('layanan', 'public');
+        }
+
+        \App\Models\Layanan::create([
+            'nama_layanan' => $request->nama_layanan,
+            'harga' => $request->harga,
+            'deskripsi' => $request->deskripsi,
+            'gambar' => $pathFoto,
+        ]);
+
+        return back()->with('success', 'Layanan baru berhasil ditambahkan!');
     }
 
     public function admin()

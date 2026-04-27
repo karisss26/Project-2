@@ -73,10 +73,8 @@
         /* --- HEADER PUTIH --- */
         .header {
             background-color: #ffffff; padding: 0 30px; height: 70px; display: flex;
-            justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            justify-content: flex-end; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .header h2 { color: #333; font-size: 20px; }
-        .header .user-info { font-weight: bold; color: #800080; }
 
         /* --- KONTEN HALAMAN --- */
         .content { padding: 30px; overflow-y: auto; height: calc(100vh - 70px); }
@@ -87,7 +85,7 @@
 
     <div class="sidebar" id="mySidebar">
         <div class="sidebar-header">
-            <div class="logo-text">🐾 D&F Pets</div>
+            <div class="logo-text">🐾 Paw Center</div>
             <button class="toggle-btn" id="toggleBtn" title="Kecilkan/Besarkan Sidebar">☰</button>
         </div>
 
@@ -115,17 +113,23 @@
             @endif
         </div>
 
-        <a href="{{ route('logout') }}" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 10px;">
-            <span>🚪</span>
-            <span>Keluar</span>
+        <a href="{{ route('logout') }}" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s;" onmouseover="this.style.backgroundColor='#dc3545'" onmouseout="this.style.backgroundColor='transparent'">
+            <span class="menu-icon">🚪</span>
+            <span class="menu-text">Keluar</span>
         </a>
     </div>
 
     <div class="main-content">
+
         <div class="header">
-            <h2>@yield('title', 'Dashboard')</h2>
-            <div class="user-info">
-                Halo, {{ Auth::user()->name ?? 'Sayang' }}
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="{{ Auth::user()->foto_profil ? asset('storage/' . Auth::user()->foto_profil) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&background=800080&color=fff' }}"
+                    alt="Foto Profil"
+                    style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #800080; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+
+                <span style="font-weight: bold; color: #333; font-size: 16px;">
+                    Halo, {{ Auth::user()->name }}! 👋
+                </span>
             </div>
         </div>
 
@@ -134,10 +138,10 @@
                 @yield('content')
             </div>
         </div>
+
     </div>
 
     <script>
-        // Ini yang dibenerin: Pakai DOMContentLoaded biar scriptnya nggak error
         document.addEventListener("DOMContentLoaded", function() {
             const sidebar = document.getElementById('mySidebar');
             const toggleBtn = document.getElementById('toggleBtn');

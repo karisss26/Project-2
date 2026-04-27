@@ -68,23 +68,59 @@
                 <label>Nama Anabul</label>
                 <input type="text" name="nama_hewan" required placeholder="Contoh: Mochi">
             </div>
+
             <div style="display: flex; gap: 10px;">
                 <div class="form-group" style="flex: 1;">
                     <label>Jenis</label>
                     <select name="jenis_hewan" required>
+                        <option value="" disabled selected>Pilih Jenis</option>
                         <option value="Kucing">Kucing</option>
                         <option value="Anjing">Anjing</option>
+                        <option value="Kelinci">Kelinci</option>
+                        <option value="Hamster">Hamster</option>
+                        <option value="Burung">Burung</option>
+                        <option value="Reptil">Reptil</option>
                         <option value="Lainnya">Lainnya</option>
                     </select>
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label>Umur</label>
-                    <input type="text" name="umur" required placeholder="Contoh: 2 Tahun">
+                    <div style="display: flex; gap: 5px;">
+                        <input type="number" name="umur_angka" required min="1" placeholder="Angka" style="width: 50%;">
+                        <select name="umur_satuan" required style="width: 50%;">
+                            <option value="Bulan">Bulan</option>
+                            <option value="Tahun">Tahun</option>
+                        </select>
+                    </div>
                 </div>
             </div>
+
             <div class="form-group">
                 <label>Ras / Keturunan</label>
-                <input type="text" name="ras" required placeholder="Contoh: Persia, Golden Retriever">
+                <select name="ras" required>
+                    <option value="" disabled selected>Pilih Ras</option>
+                    <optgroup label="Kucing">
+                        <option value="Domestik (Kampung)">Domestik (Kampung)</option>
+                        <option value="Persia">Persia</option>
+                        <option value="Anggora">Anggora</option>
+                        <option value="Maine Coon">Maine Coon</option>
+                        <option value="Himalaya">Himalaya</option>
+                        <option value="British Shorthair">British Shorthair</option>
+                    </optgroup>
+                    <optgroup label="Anjing">
+                        <option value="Domestik (Kampung)">Domestik (Kampung)</option>
+                        <option value="Golden Retriever">Golden Retriever</option>
+                        <option value="Pomeranian">Pomeranian</option>
+                        <option value="Siberian Husky">Siberian Husky</option>
+                        <option value="Bulldog">Bulldog</option>
+                        <option value="Chihuahua">Chihuahua</option>
+                    </optgroup>
+                    <optgroup label="Lainnya">
+                        <option value="Campuran (Mix)">Campuran (Mix)</option>
+                        <option value="Tidak Diketahui">Tidak Diketahui</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </optgroup>
+                </select>
             </div>
             <button type="submit" class="btn-save">Simpan Anabul</button>
             <button type="button" onclick="closeModal('modalTambah')" style="width: 100%; background: none; border: none; color: #999; margin-top: 10px; cursor: pointer;">Batal</button>
@@ -101,23 +137,57 @@
                 <label>Nama Anabul</label>
                 <input type="text" name="nama_hewan" id="edit_nama" required>
             </div>
+
             <div style="display: flex; gap: 10px;">
                 <div class="form-group" style="flex: 1;">
                     <label>Jenis</label>
                     <select name="jenis_hewan" id="edit_jenis" required>
                         <option value="Kucing">Kucing</option>
                         <option value="Anjing">Anjing</option>
+                        <option value="Kelinci">Kelinci</option>
+                        <option value="Hamster">Hamster</option>
+                        <option value="Burung">Burung</option>
+                        <option value="Reptil">Reptil</option>
                         <option value="Lainnya">Lainnya</option>
                     </select>
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label>Umur</label>
-                    <input type="text" name="umur" id="edit_umur" required>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="number" name="umur_angka" id="edit_umur_angka" required min="1" style="width: 50%;">
+                        <select name="umur_satuan" id="edit_umur_satuan" required style="width: 50%;">
+                            <option value="Bulan">Bulan</option>
+                            <option value="Tahun">Tahun</option>
+                        </select>
+                    </div>
                 </div>
             </div>
+
             <div class="form-group">
                 <label>Ras / Keturunan</label>
-                <input type="text" name="ras" id="edit_ras" required>
+                <select name="ras" id="edit_ras" required>
+                    <optgroup label="Kucing">
+                        <option value="Domestik (Kampung)">Domestik (Kampung)</option>
+                        <option value="Persia">Persia</option>
+                        <option value="Anggora">Anggora</option>
+                        <option value="Maine Coon">Maine Coon</option>
+                        <option value="Himalaya">Himalaya</option>
+                        <option value="British Shorthair">British Shorthair</option>
+                    </optgroup>
+                    <optgroup label="Anjing">
+                        <option value="Domestik (Kampung)">Domestik (Kampung)</option>
+                        <option value="Golden Retriever">Golden Retriever</option>
+                        <option value="Pomeranian">Pomeranian</option>
+                        <option value="Siberian Husky">Siberian Husky</option>
+                        <option value="Bulldog">Bulldog</option>
+                        <option value="Chihuahua">Chihuahua</option>
+                    </optgroup>
+                    <optgroup label="Lainnya">
+                        <option value="Campuran (Mix)">Campuran (Mix)</option>
+                        <option value="Tidak Diketahui">Tidak Diketahui</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </optgroup>
+                </select>
             </div>
             <button type="submit" class="btn-save" style="background: #ffc107;">Update Data</button>
             <button type="button" onclick="closeModal('modalEdit')" style="width: 100%; background: none; border: none; color: #999; margin-top: 10px; cursor: pointer;">Batal</button>
@@ -132,8 +202,30 @@
     function openEditModal(id, nama, jenis, ras, umur) {
         document.getElementById('edit_nama').value = nama;
         document.getElementById('edit_jenis').value = jenis;
-        document.getElementById('edit_ras').value = ras;
-        document.getElementById('edit_umur').value = umur;
+
+        // Memastikan ras yang dipilih sesuai dengan dropdown (kasus sensitif)
+        let rasDropdown = document.getElementById('edit_ras');
+        let rasFound = false;
+        for(let i=0; i<rasDropdown.options.length; i++) {
+            if(rasDropdown.options[i].value === ras) {
+                rasDropdown.selectedIndex = i;
+                rasFound = true;
+                break;
+            }
+        }
+        if(!rasFound) document.getElementById('edit_ras').value = 'Lainnya'; // Fallback jika data ras lama tidak ada di list
+
+        // Memecah umur yang bentuknya string (misal: "2 Tahun") jadi angka dan satuan
+        if(umur) {
+            let umurSplit = umur.split(" ");
+            if(umurSplit.length >= 2) {
+                document.getElementById('edit_umur_angka').value = umurSplit[0];
+                document.getElementById('edit_umur_satuan').value = umurSplit[1];
+            } else {
+                document.getElementById('edit_umur_angka').value = umur;
+            }
+        }
+
         document.getElementById('formEdit').action = "/data-hewan/update/" + id;
         openModal('modalEdit');
     }
