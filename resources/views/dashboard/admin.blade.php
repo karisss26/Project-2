@@ -146,42 +146,60 @@
         </div>
     </div>
 
-    <div class="admin-card">
-                <h3>Antrean Konfirmasi Pembayaran</h3>
-                <div style="overflow-x: auto;">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>ID Reservasi</th>
-                                <th>Pelanggan</th>
-                                <th>Tanggal & Waktu</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($antreanPembayaran as $antrean)
-                            <tr>
-                                <td>#RES-{{ $antrean->id }}</td>
-                                <td>{{ $antrean->user->name ?? 'User Tidak Ditemukan' }}</td>
-                                <td>{{ \Carbon\Carbon::parse($antrean->tanggal)->format('d M Y') }} - {{ $antrean->waktu }}</td>
-                                <td><span class="badge badge-pending">{{ $antrean->status }}</span></td>
-                                <td>
-                                    <form action="#" method="POST" style="display:inline;">
-                                        @csrf
-                                        <button type="submit" class="btn-sm btn-acc">Konfirmasi</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" style="text-align: center; color: var(--text-muted);">Tidak ada antrean pembayaran saat ini.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+<div class="admin-card">
+    <h3>Antrean Konfirmasi Pembayaran</h3>
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID Reservasi</th>
+                    <th>Pelanggan</th>
+                    <th>Tanggal & Waktu</th>
+                    <th>Status</th>
+                    <th>Bukti Transfer</th> <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($antreanPembayaran as $antrean)
+                <tr>
+                    <td>#RES-{{ $antrean->id }}</td>
+                    <td>{{ $antrean->user->name ?? 'User Tidak Ditemukan' }}</td>
+                    <td>{{ \Carbon\Carbon::parse($antrean->tanggal)->format('d M Y') }} - {{ $antrean->waktu }}</td>
+                    <td><span class="badge badge-pending">{{ $antrean->status }}</span></td>
+                    <td>
+                        @if($antrean->bukti_dp)
+                            <a href="{{ asset('storage/' . $antrean->bukti_dp) }}" target="_blank">
+                                <img src="{{ asset('storage/' . $antrean->bukti_dp) }}" width="60" style="border-radius: 8px; border: 1px solid var(--purple-100);">
+                            </a>
+                        @else
+                            <span style="color: #dc3545; font-size: 12px;">Belum Bayar</span>
+                        @endif
+                    </td>
+                    <td style="display: flex; gap: 10px;">
+                        <form action="{{ route('admin.reservasi.setujui', $antrean->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn-sm" style="background: #28a745; color: white; border: none; cursor: pointer;" onclick="return confirm('Setujui pembayaran dan reservasi ini?')">
+                                ✓ Setujui
+                            </button>
+                        </form>
+
+                        <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn-sm btn-tolak" onclick="return confirm('Yakin ingin menolak reservasi ini?')">
+                                ✕ Tolak
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted);">Tidak ada antrean pembayaran saat ini.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
             <div class="admin-card">
                 <h3>Kelola Status Reservasi / Pesanan</h3>
                 <div style="overflow-x: auto;">

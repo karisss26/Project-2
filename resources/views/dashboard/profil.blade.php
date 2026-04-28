@@ -12,8 +12,9 @@
         </div>
     @endif
 
-    <form action="{{ route('pelanggan.profil.update') }}" method="POST" enctype="multipart/form-data">
-        @csrf
+    <form action="{{ route('profil.umum.update') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+        <a href="{{ route('profil.umum') }}">⚙️ Pengaturan Profil</a>
 
         <div style="text-align: center; margin-bottom: 25px;">
             <img id="preview-foto" src="{{ Auth::user()->foto_profil ? asset('storage/' . Auth::user()->foto_profil) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&background=800080&color=fff' }}" alt="Foto Profil" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #E6E6FA; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;">

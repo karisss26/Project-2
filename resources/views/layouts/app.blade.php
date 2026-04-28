@@ -105,26 +105,18 @@
                 <a href="{{ route('pelanggan.hewan') }}">
                     <span class="menu-icon">🐶</span><span class="menu-text">Data Hewan</span>
                 </a>
-                <a href="{{ route('pelanggan.profil') }}">
+                <a href="{{ route('profil.umum') }}">
                     <span class="menu-icon">👤</span><span class="menu-text">Profil Saya</span>
                 </a>
 
             @elseif(Auth::check() && in_array(Auth::user()->role, ['admin', 'kasir']))
-                <a href="{{ route('dashboard.admin') }}">
-                    <span class="menu-icon">📊</span><span class="menu-text">Dashboard Utama</span>
-                </a>
-                <a href="#">
-                    <span class="menu-icon">👥</span><span class="menu-text">Kelola Akun Pengguna</span>
-                </a>
-                <a href="{{ route('dashboard.katalog') }}">
-                    <span class="menu-icon">📦</span><span class="menu-text">Kelola Katalog Produk</span>
-                </a>
-                <a href="#">
-                    <span class="menu-icon">🏥</span><span class="menu-text">Kelola Layanan Klinik</span>
-                </a>
-                <a href="#">
-                    <span class="menu-icon">⚙️</span><span class="menu-text">Pengaturan Profil</span>
-                </a>
+            <div class="panel-menu">
+                <a href="{{ route('dashboard.admin') }}">🏠 Dashboard</a>
+                <a href="{{ route('admin.users.index') }}">👥 Kelola Akun</a>
+                <a href="{{ route('admin.katalog.index') }}">📦 Kelola Katalog Produk</a>
+                <a href="{{ route('admin.layanan.index') }}">🩺 Kelola Layanan Klinik</a>
+                <a href="{{ route('admin.profil') }}">⚙️ Pengaturan Profil</a>
+            </div>
 
             @else
                 <a href="#">

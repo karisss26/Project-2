@@ -11,7 +11,7 @@ use App\Models\User;
 use App\Models\reservasi;
 use App\Models\Produk;
 use App\Models\LogAktivitas;
-
+use App\Notifications\ReservasiNotification;
 class DashboardController extends Controller
 {
     public function pelanggan()
@@ -57,19 +57,23 @@ class DashboardController extends Controller
         return redirect()->back()->with('success', 'Reservasi berhasil dibatalkan.');
     }
 
-    public function admin()
+public function admin()
     {
         $totalPengguna = User::where('role', 'pelanggan')->count();
-        $menungguKonfirmasi = reservasi::where('status', 'Menunggu')->count();
+
+        // 1. Kita perluas pencarian statusnya biar pesanan pelanggan pasti ketangkep!
+        $menungguKonfirmasi = reservasi::whereIn('status', ['Menunggu', 'Menunggu Pembayaran', 'Pending'])->count();
         $pesananDiproses = reservasi::where('status', 'Dikonfirmasi')->count();
 
+        // 2. Tangkap data untuk Antrean Pembayaran
         $antreanPembayaran = reservasi::with('user')
-                                      ->where('status', 'Menunggu')
+                                      ->whereIn('status', ['Menunggu', 'Menunggu Pembayaran', 'Pending'])
                                       ->orderBy('created_at', 'desc')
                                       ->get();
 
+        // 3. Tangkap data Pesanan yang Sedang Aktif / Diproses
         $pesananAktif = reservasi::with('user')
-                                 ->whereIn('status', ['Dikonfirmasi'])
+                                 ->whereIn('status', ['Dikonfirmasi', 'Diproses'])
                                  ->orderBy('updated_at', 'desc')
                                  ->get();
 
@@ -132,24 +136,68 @@ class DashboardController extends Controller
 
     public function updateProfil(Request $request)
     {
-        $user = User::findOrFail(Auth::id());
-        $user->update($request->only('name', 'email', 'no_hp', 'alamat'));
+        // 1. Ambil data user yang sedang login langsung dari database
+        $user = User::find(auth()->user()->id);
 
-        if ($request->hasFile('foto_profil')) {
-            if ($user->foto_profil) {
-                Storage::disk('public')->delete($user->foto_profil);
-            }
-            $path = $request->file('foto_profil')->store('profil', 'public');
-            $user->update(['foto_profil' => $path]);
-        }
-
-        LogAktivitas::create([
-            'user_id' => Auth::id(),
-            'aktivitas' => 'Update Profil',
-            'deskripsi' => Auth::user()->name . ' memperbarui informasi profilnya.'
+        // 2. Validasi semua input dari form profil.blade.php kamu
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
+            'no_hp' => 'nullable|string|max:20',
+            'foto_profil' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'password' => 'nullable|string|min:8|confirmed' // 'confirmed' akan otomatis mengecek input 'password_confirmation'
         ]);
 
-        return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
+        // 3. Masukkan data ke model secara manual (ini bypass error $fillable)
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->no_hp = $request->no_hp;
+
+        // Simpan username jika ada inputnya
+        if ($request->has('username')) {
+            $user->username = $request->username;
+        }
+
+        // 4. Jika user mengisi password baru, kita enkripsi (Hash) lalu simpan
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        // 5. Proses ganti foto profil
+        if ($request->hasFile('foto_profil')) {
+            // Hapus foto lama di storage jika sebelumnya sudah ada
+            if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
+                Storage::disk('public')->delete($user->foto_profil);
+            }
+            // Simpan foto baru
+            $user->foto_profil = $request->file('foto_profil')->store('profil', 'public');
+        }
+
+        // 6. Simpan permanen ke database!
+        $user->save();
+
+        return redirect()->back()->with('success', 'Hore! Profil kamu berhasil diperbarui.');
+    }
+
+    public function setujuiReservasi($id) {
+    $reservasi = reservasi::findOrFail($id);
+    $reservasi->update(['status' => 'Dikonfirmasi']);
+
+    // Kirim notifikasi ke pelanggan
+    $reservasi->user->notify(new ReservasiNotification($reservasi, 'Dikonfirmasi'));
+
+    return back()->with('success', 'Reservasi disetujui!');
+    }
+
+    public function tolakReservasi($id) {
+    $reservasi = reservasi::findOrFail($id);
+    $reservasi->update(['status' => 'Dibatalkan']);
+
+    // Kirim notifikasi ke pelanggan
+    $reservasi->user->notify(new ReservasiNotification($reservasi, 'Ditolak'));
+
+    return back()->with('success', 'Reservasi ditolak.');
     }
 
     public function owner() { return view('dashboard.owner'); }

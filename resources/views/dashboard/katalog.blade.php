@@ -69,10 +69,26 @@
                             </span>
                         </a>
 
-                        <button class="p-2 hover:bg-ungu-terang rounded-full transition-colors relative hidden sm:block">
-                            <i class="fas fa-bell text-ungu text-xl"></i>
-                            <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
+<div class="dropdown">
+    <button class="btn-icon">
+        <i class="fas fa-bell"></i>
+        @if(auth()->user()->unreadNotifications->count() > 0)
+            <span class="badge-notif">{{ auth()->user()->unreadNotifications->count() }}</span>
+        @endif
+    </button>
+
+    <div class="dropdown-menu">
+        <h6 class="dropdown-header">Notifikasi</h6>
+        @forelse(auth()->user()->notifications as $notification)
+            <a class="dropdown-item {{ $notification->read_at ? '' : 'unread' }}" href="#">
+                {{ $notification->data['pesan'] }}
+                <small>{{ $notification->created_at->diffForHumans() }}</small>
+            </a>
+        @empty
+            <p class="dropdown-item">Tidak ada notifikasi baru</p>
+        @endforelse
+    </div>
+</div>
 
                         @auth
                             <a href="{{ route('dashboard.pelanggan') }}" class="p-2 hover:bg-ungu-terang rounded-full transition-colors group" title="Dashboard Saya">
