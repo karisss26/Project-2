@@ -6,14 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Models\LogAktivitas;
 
 class AuthController extends Controller
 {
-    // Tampilkan Halaman Login
     public function showLogin() {
         if (Auth::check()) {
             $role = Auth::user()->role;
-            // Kita ganti redirect()->route() jadi redirect() langsung ke URL
             if (in_array($role, ['owner'])) return redirect('/owner/dashboard');
             if (in_array($role, ['admin', 'kasir'])) return redirect('/admin/dashboard');
             if (in_array($role, ['staff'])) return redirect('/staff/dashboard');
@@ -32,43 +31,43 @@ class AuthController extends Controller
         return view('auth.forgot-password');
     }
 
-    // Proses Cek Login
-public function login(Request $request)
-{
-    // Validasi input email dan password
-    $credentials = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ]);
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-    // Mengecek apakah email dan password cocok
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
 
-        // 👇 INI BAGIAN PINTARNYA: Ambil data role yang login
-        $role = Auth::user()->role;
+            $user = Auth::user();
+            $role = $user->role;
 
-        // Cek rolenya dan arahkan ke rute yang sesuai
-        if ($role === 'owner') {
-            return redirect()->route('dashboard.owner');
-        } elseif ($role === 'admin' || $role === 'kasir') {
-            return redirect()->route('dashboard.admin');
-        } elseif ($role === 'staff') {
-            return redirect()->route('dashboard.staff');
-        } elseif ($role === 'dokter') {
-            return redirect()->route('dashboard.dokter');
-        } else {
-            return redirect()->route('dashboard.pelanggan');
+            LogAktivitas::create([
+                'user_id' => $user->id,
+                'aktivitas' => 'Login',
+                'deskripsi' => $user->name . ' (' . $role . ') masuk ke sistem.'
+            ]);
+
+            if ($role === 'owner') {
+                return redirect()->route('dashboard.owner');
+            } elseif ($role === 'admin' || $role === 'kasir') {
+                return redirect()->route('dashboard.admin');
+            } elseif ($role === 'staff') {
+                return redirect()->route('dashboard.staff');
+            } elseif ($role === 'dokter') {
+                return redirect()->route('dashboard.dokter');
+            } else {
+                return redirect()->route('dashboard.pelanggan');
+            }
         }
+
+        return back()->withErrors([
+            'email' => 'Maaf, email atau kata sandi kamu salah.',
+        ])->onlyInput('email');
     }
 
-    // Jika password atau email salah, kembalikan ke halaman login bawa pesan error
-    return back()->withErrors([
-        'email' => 'Maaf, email atau kata sandi kamu salah.',
-    ])->onlyInput('email');
-}
-
-    // Proses Mendaftar
     public function register(Request $request)
     {
         $request->validate([
@@ -87,14 +86,30 @@ public function login(Request $request)
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect('/dashboard')->with('success', 'Berhasil mendaftar!'); // URL Langsung
+        LogAktivitas::create([
+            'user_id' => $user->id,
+            'aktivitas' => 'Register Akun Baru',
+            'deskripsi' => $user->name . ' mendaftar sebagai pelanggan baru dan langsung masuk ke sistem.'
+        ]);
+
+        return redirect('/dashboard')->with('success', 'Berhasil mendaftar!');
     }
 
     public function logout(Request $request)
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            LogAktivitas::create([
+                'user_id' => $user->id,
+                'aktivitas' => 'Logout',
+                'deskripsi' => $user->name . ' keluar dari sistem.'
+            ]);
+        }
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/')->with('success', 'Berhasil keluar!');
     }
 }

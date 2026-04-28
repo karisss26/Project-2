@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paw Center - D&F Pet Shop</title>
+
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
     <style>
         /* Reset CSS Dasar */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { display: flex; height: 100vh; background-color: #f4f4f9; overflow: hidden; }
+
+        /* ... (sisa CSS di bawahnya biarkan sama persis nggak usah diubah) ... */
 
         /* --- SIDEBAR UNGU --- */
         .sidebar {
@@ -103,12 +108,27 @@
                 <a href="{{ route('pelanggan.profil') }}">
                     <span class="menu-icon">👤</span><span class="menu-text">Profil Saya</span>
                 </a>
-            @else
-                <a href="#">
+
+            @elseif(Auth::check() && in_array(Auth::user()->role, ['admin', 'kasir']))
+                <a href="{{ route('dashboard.admin') }}">
                     <span class="menu-icon">📊</span><span class="menu-text">Dashboard Utama</span>
                 </a>
                 <a href="#">
-                    <span class="menu-icon">📁</span><span class="menu-text">Kelola Data</span>
+                    <span class="menu-icon">👥</span><span class="menu-text">Kelola Akun Pengguna</span>
+                </a>
+                <a href="{{ route('dashboard.katalog') }}">
+                    <span class="menu-icon">📦</span><span class="menu-text">Kelola Katalog Produk</span>
+                </a>
+                <a href="#">
+                    <span class="menu-icon">🏥</span><span class="menu-text">Kelola Layanan Klinik</span>
+                </a>
+                <a href="#">
+                    <span class="menu-icon">⚙️</span><span class="menu-text">Pengaturan Profil</span>
+                </a>
+
+            @else
+                <a href="#">
+                    <span class="menu-icon">📊</span><span class="menu-text">Dashboard</span>
                 </a>
             @endif
         </div>

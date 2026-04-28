@@ -5,22 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use App\Models\hewan;
 use App\Models\User;
 use App\Models\reservasi;
-use App\Models\Produk; // Pastikan model Produk dipanggil
+use App\Models\Produk;
+use App\Models\LogAktivitas;
 
 class DashboardController extends Controller
 {
-    /**
-     * Menampilkan halaman dashboard pelanggan
-     */
     public function pelanggan()
     {
         $userId = Auth::id();
-
         $petCount = hewan::where('user_id', $userId)->count();
-
         $activeReservationsCount = reservasi::where('user_id', $userId)
                                             ->whereIn('status', ['Menunggu', 'Dikonfirmasi'])
                                             ->count();
@@ -43,198 +40,121 @@ class DashboardController extends Controller
         ));
     }
 
-    /**
-     * Fitur untuk membatalkan reservasi
-     */
     public function batalkan(Request $request, $id)
     {
         $reservasi = reservasi::findOrFail($id);
-
-        if ($reservasi->user_id == Auth::id()) {
-            $reservasi->status = 'Dibatalkan';
-            $reservasi->alasan_batal = $request->alasan_batal;
-            $reservasi->save();
-
-            return back()->with('success', 'Jadwal berhasil dibatalkan.');
-        }
-
-        return back()->with('error', 'Gagal membatalkan jadwal.');
-    }
-
-    public function dataHewan()
-    {
-        $userId = Auth::id();
-        $semua_hewan = hewan::where('user_id', $userId)->get();
-        return view('dashboard.hewan', compact('semua_hewan'));
-    }
-
-public function storeHewan(Request $request) {
-        $request->validate([
-            'nama_hewan' => 'required',
-            'jenis_hewan' => 'required',
-            'ras' => 'required',
-            'umur_angka' => 'required|numeric',
-            'umur_satuan' => 'required'
+        $reservasi->update([
+            'status' => 'Dibatalkan',
+            'alasan_batal' => $request->alasan_batal
         ]);
 
-        // Gabungkan angka dan satuan menjadi satu string
-        $umur_gabungan = $request->umur_angka . ' ' . $request->umur_satuan;
-
-        hewan::create([
+        LogAktivitas::create([
             'user_id' => Auth::id(),
-            'nama_hewan' => $request->nama_hewan,
-            'jenis_hewan' => $request->jenis_hewan,
-            'ras' => $request->ras,
-            'umur' => $umur_gabungan, // Masukkan variabel yang sudah digabung
+            'aktivitas' => 'Pembatalan Reservasi',
+            'deskripsi' => Auth::user()->name . ' membatalkan reservasi #' . $id . ' dengan alasan: ' . $request->alasan_batal
         ]);
 
-        return back()->with('success', 'Anabul baru berhasil didaftarkan!');
-    }
-
-    public function updateHewan(Request $request, $id) {
-        $request->validate([
-            'nama_hewan' => 'required',
-            'jenis_hewan' => 'required',
-            'ras' => 'required',
-            'umur_angka' => 'required|numeric',
-            'umur_satuan' => 'required'
-        ]);
-
-        $h = hewan::findOrFail($id);
-
-        $umur_gabungan = $request->umur_angka . ' ' . $request->umur_satuan;
-
-        $h->update([
-            'nama_hewan' => $request->nama_hewan,
-            'jenis_hewan' => $request->jenis_hewan,
-            'ras' => $request->ras,
-            'umur' => $umur_gabungan,
-        ]);
-
-        return back()->with('success', 'Data anabul berhasil diperbarui!');
-    }
-
-    public function hapusHewan($id) {
-        $h = hewan::findOrFail($id);
-        $h->delete();
-
-        return back()->with('success', 'Data anabul telah dihapus.');
-    }
-
-    public function profil() {
-        return view('dashboard.profil');
-    }
-
-public function updateProfil(Request $request) {
-        $user = User::find(Auth::id());
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
-            'no_hp' => 'nullable|string|max:20',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|min:8|confirmed',
-            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Maksimal 2MB
-        ]);
-
-        $user->name = $request->name;
-        $user->username = $request->username;
-        $user->no_hp = $request->no_hp;
-        $user->email = $request->email;
-
-        // Jika password diisi, maka update password
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        }
-
-        // Proses jika ada upload foto profil baru
-        if ($request->hasFile('foto_profil')) {
-            // Simpan foto ke folder storage/app/public/profil
-            $pathFoto = $request->file('foto_profil')->store('profil', 'public');
-            $user->foto_profil = $pathFoto;
-        }
-
-        $user->save();
-
-        return back()->with('success', 'Profil kamu berhasil diperbarui!');
-    }
-
-    // =========================================================================
-    // PERBAIKAN: Fungsi storeProduk menggunakan kolom 'gambar'
-    // =========================================================================
-    public function storeProduk(Request $request)
-    {
-        $request->validate([
-            'nama_produk' => 'required|string|max:255',
-            'kategori' => 'nullable|string',
-            'harga' => 'required|numeric',
-            'stok' => 'required|integer',
-            'deskripsi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Menggunakan 'gambar' sesuai input
-        ]);
-
-        $pathFoto = null;
-
-        if ($request->hasFile('gambar')) {
-            // Simpan ke storage/app/public/produk
-            $pathFoto = $request->file('gambar')->store('produk', 'public');
-        }
-
-        Produk::create([
-            'nama_produk' => $request->nama_produk,
-            'gambar' => $pathFoto, // Simpan ke kolom 'gambar'
-            'kategori' => $request->kategori,
-            'harga' => $request->harga,
-            'stok' => $request->stok,
-            'deskripsi' => $request->deskripsi,
-        ]);
-
-        return back()->with('success', 'Produk berhasil ditambahkan!');
-    }
-
-    public function storeLayanan(Request $request)
-    {
-        $request->validate([
-            'nama_layanan' => 'required|string|max:255',
-            'harga' => 'required|numeric',
-            'deskripsi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
-        $pathFoto = null;
-
-        if ($request->hasFile('gambar')) {
-            // Kita pisah foldernya ke 'layanan' biar rapi
-            $pathFoto = $request->file('gambar')->store('layanan', 'public');
-        }
-
-        \App\Models\Layanan::create([
-            'nama_layanan' => $request->nama_layanan,
-            'harga' => $request->harga,
-            'deskripsi' => $request->deskripsi,
-            'gambar' => $pathFoto,
-        ]);
-
-        return back()->with('success', 'Layanan baru berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Reservasi berhasil dibatalkan.');
     }
 
     public function admin()
     {
-        return view('dashboard.admin');
+        $totalPengguna = User::where('role', 'pelanggan')->count();
+        $menungguKonfirmasi = reservasi::where('status', 'Menunggu')->count();
+        $pesananDiproses = reservasi::where('status', 'Dikonfirmasi')->count();
+
+        $antreanPembayaran = reservasi::with('user')
+                                      ->where('status', 'Menunggu')
+                                      ->orderBy('created_at', 'desc')
+                                      ->get();
+
+        $pesananAktif = reservasi::with('user')
+                                 ->whereIn('status', ['Dikonfirmasi'])
+                                 ->orderBy('updated_at', 'desc')
+                                 ->get();
+
+        $riwayatAktivitas = LogAktivitas::with('user')
+                                        ->orderBy('created_at', 'desc')
+                                        ->take(10)
+                                        ->get();
+
+        return view('dashboard.admin', compact(
+            'totalPengguna',
+            'menungguKonfirmasi',
+            'pesananDiproses',
+            'antreanPembayaran',
+            'pesananAktif',
+            'riwayatAktivitas'
+        ));
     }
 
-    public function owner()
+    public function storeHewan(Request $request)
     {
-        return view('dashboard.owner');
+        $hewan = hewan::create($request->all());
+
+        LogAktivitas::create([
+            'user_id' => Auth::id(),
+            'aktivitas' => 'Tambah Hewan',
+            'deskripsi' => Auth::user()->name . ' menambahkan data hewan baru: ' . $hewan->nama_hewan
+        ]);
+
+        return redirect()->back()->with('success', 'Data hewan berhasil ditambahkan.');
     }
 
-    public function dokter()
+    public function updateHewan(Request $request, $id)
     {
-        return view('dashboard.dokter');
+        $hewan = hewan::findOrFail($id);
+        $hewan->update($request->all());
+
+        LogAktivitas::create([
+            'user_id' => Auth::id(),
+            'aktivitas' => 'Update Hewan',
+            'deskripsi' => Auth::user()->name . ' memperbarui data hewan: ' . $hewan->nama_hewan
+        ]);
+
+        return redirect()->back()->with('success', 'Data hewan berhasil diperbarui.');
     }
 
-    public function staff()
+    public function hapusHewan($id)
     {
-        return view('dashboard.staff');
+        $hewan = hewan::findOrFail($id);
+        $nama = $hewan->nama_hewan;
+        $hewan->delete();
+
+        LogAktivitas::create([
+            'user_id' => Auth::id(),
+            'aktivitas' => 'Hapus Hewan',
+            'deskripsi' => Auth::user()->name . ' menghapus data hewan: ' . $nama
+        ]);
+
+        return redirect()->back()->with('success', 'Data hewan berhasil dihapus.');
     }
+
+    public function updateProfil(Request $request)
+    {
+        $user = User::findOrFail(Auth::id());
+        $user->update($request->only('name', 'email', 'no_hp', 'alamat'));
+
+        if ($request->hasFile('foto_profil')) {
+            if ($user->foto_profil) {
+                Storage::disk('public')->delete($user->foto_profil);
+            }
+            $path = $request->file('foto_profil')->store('profil', 'public');
+            $user->update(['foto_profil' => $path]);
+        }
+
+        LogAktivitas::create([
+            'user_id' => Auth::id(),
+            'aktivitas' => 'Update Profil',
+            'deskripsi' => Auth::user()->name . ' memperbarui informasi profilnya.'
+        ]);
+
+        return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function owner() { return view('dashboard.owner'); }
+    public function dokter() { return view('dashboard.dokter'); }
+    public function staff() { return view('dashboard.staff'); }
+    public function dataHewan() { return view('dashboard.hewan'); }
+    public function profil() { return view('dashboard.profil'); }
 }
