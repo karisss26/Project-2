@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\Produk;
 use App\Models\Layanan;
 use App\Models\reservasi; // Wajib dipanggil biar bisa nge-save
-use Illuminate\Support\Facades\Auth;
+use App\Models\Transaksi;
+use App\Models\DetilTransaksiProduk;
 
 class CheckoutController extends Controller
 {
@@ -91,17 +94,58 @@ class CheckoutController extends Controller
     // 5. Mesin Proses Pembayaran (Buat jaga-jaga kalau tombol "Konfirmasi" ditekan)
     public function process(Request $request)
     {
-        // Nantinya logika untuk menyimpan ke database akan ditaruh di sini
+        $cart = session()->get('cart', []);
 
-        // Sementara ini, kita kosongkan keranjang saja
+        if (empty($cart)) {
+            return redirect()->back()->with('error', 'Keranjang kamu masih kosong!');
+        }
+
+        // Hitung total harga produk
+        $totalHarga = 0;
+        foreach ($cart as $details) {
+            $totalHarga += $details['harga'] * $details['jumlah'];
+        }
+
+        // Tambahkan ongkos kirim (jika user pilih delivery)
+        $ongkir = $request->input('ongkir', 0);
+        $totalHarga += $ongkir;
+
+        // --- LOGIKA STATUS & BUKTI BAYAR ---
+        $buktiPath = null;
+        $statusAwal = 'Menunggu Pembayaran'; // Status awal default (untuk Cash/Tunai)
+
+        // Kalau bayar pakai Transfer dan ada file yang diupload
+        if ($request->payment_method == 'transfer' && $request->hasFile('bukti_bayar')) {
+            $buktiPath = $request->file('bukti_bayar')->store('bukti_pembayaran', 'public');
+            $statusAwal = 'Menunggu Konfirmasi Admin'; // Status langsung naik jadi nunggu dicek
+        }
+
+        DB::transaction(function () use ($cart, $totalHarga, $buktiPath, $statusAwal) {
+            // 1. Simpan Transaksi Utama
+            $transaksi = Transaksi::create([
+                'user_id' => Auth::id(),
+                'total_harga' => $totalHarga,
+                'status' => $statusAwal,
+                'bukti_pembayaran' => $buktiPath,
+            ]);
+
+            // 2. Simpan Detil Belanjaannya
+            foreach ($cart as $details) {
+                if ($details['tipe'] == 'produk') {
+                    DetilTransaksiProduk::create([
+                        'transaksi_id' => $transaksi->id,
+                        'produk_id' => $details['id'],
+                        'jumlah' => $details['jumlah'],
+                        'harga_satuan' => $details['harga'],
+                    ]);
+                }
+            }
+        });
+
         session()->forget('cart');
 
-        // Arahkan kembali ke dashboard pelanggan dengan pesan sukses
-        return redirect()->route('dashboard.pelanggan')->with('success', 'Pesanan kamu berhasil dibuat! Silakan tunggu konfirmasi admin.');
+        return redirect()->route('dashboard.pelanggan')->with('success', 'Pesanan berhasil dibuat! Menunggu konfirmasi.');
     }
-
-    // 6. Mesin Khusus Proses Reservasi Layanan (Pisah dari keranjang produk)
-// 6. Mesin Khusus Proses Reservasi (Sekarang pakai hitungan DP)
     public function prosesReservasi(Request $request)
     {
         $request->validate([

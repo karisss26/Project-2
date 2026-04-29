@@ -69,26 +69,52 @@
                             </span>
                         </a>
 
-<div class="dropdown">
-    <button class="btn-icon">
-        <i class="fas fa-bell"></i>
-        @if(auth()->user()->unreadNotifications->count() > 0)
-            <span class="badge-notif">{{ auth()->user()->unreadNotifications->count() }}</span>
-        @endif
-    </button>
+@auth
+    <div class="relative inline-block text-left" id="notifContainer">
+        <button type="button" id="notifButton" class="relative p-2 hover:bg-ungu-terang rounded-full transition-colors group focus:outline-none" title="Notifikasi">
+            <i class="fas fa-bell text-ungu text-xl group-hover:scale-110 transition-transform"></i>
 
-    <div class="dropdown-menu">
-        <h6 class="dropdown-header">Notifikasi</h6>
-        @forelse(auth()->user()->notifications as $notification)
-            <a class="dropdown-item {{ $notification->read_at ? '' : 'unread' }}" href="#">
-                {{ $notification->data['pesan'] }}
-                <small>{{ $notification->created_at->diffForHumans() }}</small>
-            </a>
-        @empty
-            <p class="dropdown-item">Tidak ada notifikasi baru</p>
-        @endforelse
+            {{-- Badge Angka Notifikasi --}}
+            @if(auth()->user()->unreadNotifications->count() > 0)
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white">
+                    {{ auth()->user()->unreadNotifications->count() }}
+                </span>
+            @endif
+        </button>
+
+        <div id="notifMenu" class="hidden absolute right-0 mt-2 w-80 origin-top-right rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden z-50 transform transition-all duration-200 opacity-0 scale-95">
+
+            <div class="bg-gray-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-sm font-bold text-gray-800">Notifikasi Kamu</h3>
+                @if(auth()->user()->unreadNotifications->count() > 0)
+                    <span class="text-xs bg-ungu-terang text-ungu px-2 py-1 rounded-md font-semibold">
+                        {{ auth()->user()->unreadNotifications->count() }} Baru
+                    </span>
+                @endif
+            </div>
+
+            <div class="max-h-80 overflow-y-auto">
+                @forelse(auth()->user()->unreadNotifications as $notification)
+                    <a href="{{ route('notif.read', $notification->id) }}" class="block px-4 py-3 hover:bg-ungu-terang/50 transition-colors border-b border-gray-50 last:border-0 relative">
+                        <span class="absolute left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-ungu rounded-full"></span>
+                        <div class="pl-3">
+                            <p class="text-sm text-gray-700 leading-snug">{{ $notification->data['pesan'] }}</p>
+                            <p class="text-xs text-gray-400 mt-1"><i class="far fa-clock mr-1"></i>{{ $notification->created_at->diffForHumans() }}</p>
+                        </div>
+                    </a>
+                @empty
+                    <div class="px-4 py-8 text-center">
+                        <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <i class="far fa-bell-slash text-gray-300 text-xl"></i>
+                        </div>
+                        <p class="text-sm text-gray-500 font-medium">Kosong nih!</p>
+                        <p class="text-xs text-gray-400">Belum ada notifikasi baru untukmu.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
     </div>
-</div>
+@endauth
 
                         @auth
                             <a href="{{ route('dashboard.pelanggan') }}" class="p-2 hover:bg-ungu-terang rounded-full transition-colors group" title="Dashboard Saya">
@@ -502,5 +528,38 @@
         });
     </script>
     @endif
+
+    <script>
+    // Logic untuk buka-tutup notifikasi
+    const notifButton = document.getElementById('notifButton');
+    const notifMenu = document.getElementById('notifMenu');
+    const notifContainer = document.getElementById('notifContainer');
+
+    if(notifButton && notifMenu) {
+        notifButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (notifMenu.classList.contains('hidden')) {
+                notifMenu.classList.remove('hidden');
+                setTimeout(() => {
+                    notifMenu.classList.remove('opacity-0', 'scale-95');
+                    notifMenu.classList.add('opacity-100', 'scale-100');
+                }, 10);
+            } else {
+                notifMenu.classList.remove('opacity-100', 'scale-100');
+                notifMenu.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => { notifMenu.classList.add('hidden'); }, 200);
+            }
+        });
+
+        // Tutup kalau klik sembarang tempat di luar kotak
+        document.addEventListener('click', function(e) {
+            if (!notifContainer.contains(e.target) && !notifMenu.classList.contains('hidden')) {
+                notifMenu.classList.remove('opacity-100', 'scale-100');
+                notifMenu.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => { notifMenu.classList.add('hidden'); }, 200);
+            }
+        });
+    }
+</script>
 </body>
 </html>

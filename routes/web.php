@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\KatalogController;
+use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
 
 // =========================================================
 // 1. RUTE PUBLIK
@@ -41,6 +42,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profil-saya', [DashboardController::class, 'profil'])->name('profil.umum');
     Route::post('/profil-saya/update', [DashboardController::class, 'updateProfil'])->name('profil.umum.update');
 
+        // Rute untuk menandai notifikasi sudah dibaca
+    Route::get('/notifikasi/read/{id}', function($id) {
+        // Cari notifikasi berdasarkan ID
+        $notif = auth()->user()->notifications()->find($id);
+
+        if($notif) {
+            $notif->markAsRead(); // Ubah status jadi 'read'
+        }
+
+        // Redirect ke dashboard pelanggan supaya mereka bisa lihat status pesanannya
+        return redirect()->route('dashboard.pelanggan');
+    })->name('notif.read');
+
     // --- GRUP PELANGGAN ---
     Route::middleware(['role:pelanggan'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'pelanggan'])->name('dashboard.pelanggan');
@@ -56,7 +70,9 @@ Route::middleware(['auth'])->group(function () {
         Route::view('/layanan-produk', 'dashboard.layanan')->name('pelanggan.layanan');
         Route::post('/reservasi/proses', [CheckoutController::class, 'prosesReservasi'])->name('reservasi.proses');
         Route::get('/reservasi/bayar/{id}', [CheckoutController::class, 'bayarDp'])->name('reservasi.bayar');
-        Route::post('/reservasi/bayar/{id}/upload', [CheckoutController::class, 'uploadBuktiDp'])->name('reservasi.upload');
+        Route::post('/reservasi/konfirmasi/{id}', [DashboardController::class, 'konfirmasiPembayaran'])->name('reservasi.konfirmasi');
+        // Rute untuk memproses upload bukti bayar DP
+        Route::post('/reservasi/upload/{id}', [DashboardController::class, 'uploadBukti'])->name('reservasi.upload');
     });
 
     // --- RUTE DOKTER ---
@@ -74,7 +90,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
 
         Route::post('/admin/reservasi/setujui/{id}', [DashboardController::class, 'setujuiReservasi'])->name('admin.reservasi.setujui');
-    Route::post('/admin/reservasi/tolak/{id}', [DashboardController::class, 'tolakReservasi'])->name('admin.reservasi.tolak');
+        Route::post('/admin/reservasi/tolak/{id}', [DashboardController::class, 'tolakReservasi'])->name('admin.reservasi.tolak');
 
         // 1. Kelola Akun User (CRUD & Unblock)
         Route::prefix('admin/users')->name('admin.users.')->group(function() {
@@ -104,6 +120,12 @@ Route::middleware(['auth'])->group(function () {
         // 4. Pengaturan Profil Admin
         Route::get('/admin/profil', [DashboardController::class, 'profil'])->name('admin.profil');
         Route::post('/admin/profil/update', [DashboardController::class, 'updateProfil'])->name('admin.profil.update');
+
+        // Rute Kelola Pesanan Produk (Admin)
+        Route::get('/admin/transaksi', [AdminTransaksiController::class, 'index'])->name('admin.transaksi.index');
+        Route::post('/admin/transaksi/{id}/status', [AdminTransaksiController::class, 'updateStatus'])->name('admin.transaksi.update');
+
+        Route::post('/admin/pesanan/{id}/update-status', [App\Http\Controllers\DashboardController::class, 'updateStatus'])->name('admin.pesanan.updateStatus');
     });
 
     // --- RUTE OWNER ---

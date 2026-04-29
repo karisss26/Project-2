@@ -6,19 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+
+            // --- INI KOLOM YANG TADI HILANG ---
+            $table->string('username')->nullable()->unique();
+            $table->string('no_hp')->nullable();
+            $table->string('foto_profil')->nullable();
+            // ----------------------------------
+
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
-            // Kolom role dengan tambahan 'staff'
             $table->enum('role', ['admin', 'kasir', 'staff', 'dokter', 'pelanggan'])->default('pelanggan');
 
             $table->rememberToken();
@@ -41,9 +44,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('users');

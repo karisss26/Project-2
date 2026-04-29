@@ -4,268 +4,170 @@
 
 @section('content')
 <style>
-    /* Menggunakan variabel warna dari style.css kamu */
-    .admin-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-    }
-    .admin-header h2 {
-        color: var(--purple-900);
-        font-weight: 700;
-    }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .admin-header h2 { color: var(--purple-900); font-weight: 700; }
 
-    /* Grid Statistik */
-    .grid-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    .stat-card {
-        background: var(--white);
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05);
-        border: 1px solid var(--purple-100);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
+    .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .stat-card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05); border: 1px solid var(--purple-100); display: flex; flex-direction: column; justify-content: center; }
     .stat-card .title { color: var(--text-muted); font-size: 14px; font-weight: 600; margin-bottom: 10px; }
     .stat-card .angka { font-size: 32px; font-weight: 800; color: var(--purple-600); }
 
-    /* Grid Layout Utama */
-    .grid-main {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 30px;
-        margin-bottom: 30px;
-    }
+    .admin-card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05); border: 1px solid var(--purple-100); margin-bottom: 30px; }
+    .admin-card h3 { color: var(--purple-800); font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--purple-50); }
 
-    /* Card Container Umum */
-    .admin-card {
-        background: var(--white);
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05);
-        border: 1px solid var(--purple-100);
-        margin-bottom: 30px;
-    }
-    .admin-card h3 {
-        color: var(--purple-800);
-        font-size: 18px;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid var(--purple-50);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    /* Tabel Styling */
     .admin-table { width: 100%; border-collapse: collapse; }
-    .admin-table th { background: var(--purple-50); color: var(--purple-900); padding: 12px 15px; text-align: left; font-size: 14px; }
-    .admin-table td { padding: 15px; border-bottom: 1px solid var(--purple-50); font-size: 14px; color: var(--text-main); }
-    .admin-table tr:hover { background-color: var(--purple-50); }
+    .admin-table th { background: var(--purple-50); color: var(--purple-900); padding: 12px 15px; text-align: left; font-size: 13px; }
+    .admin-table td { padding: 15px; border-bottom: 1px solid var(--purple-50); font-size: 13px; color: var(--text-main); vertical-align: top;}
 
-    /* Badges Status */
-    .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
     .badge-pending { background: #fff3cd; color: #856404; }
-    .badge-process { background: #cce5ff; color: #004085; }
-    .badge-success { background: #d4edda; color: #155724; }
 
-    /* Buttons */
-    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; transition: 0.3s; }
+    .btn-sm { padding: 6px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; transition: 0.3s; }
     .btn-acc { background: var(--purple-600); color: white; }
-    .btn-acc:hover { background: var(--purple-800); }
     .btn-tolak { background: #dc3545; color: white; }
-    .btn-tolak:hover { background: #c82333; }
 
-    /* POS Banner */
-    .pos-banner {
-        background: linear-gradient(135deg, var(--purple-600), var(--purple-800));
-        border-radius: 12px;
-        padding: 30px;
-        text-align: center;
-        color: white;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 25px rgba(91, 33, 182, 0.3);
-    }
-    .pos-banner h2 { font-size: 24px; margin-bottom: 10px; }
-    .pos-banner p { color: var(--purple-100); margin-bottom: 20px; font-size: 14px; }
-    .btn-pos { background: var(--white); color: var(--purple-700); padding: 12px 25px; border-radius: 25px; font-weight: 700; display: inline-block; transition: 0.3s; text-decoration: none;}
-    .btn-pos:hover { background: var(--purple-100); transform: translateY(-2px); }
+    .status-select { padding: 5px; border-radius: 6px; border: 1px solid var(--purple-200); color: var(--purple-900); font-size: 12px; outline: none; width: 100%; }
+    .detail-list { margin: 5px 0 0 0; padding-left: 15px; font-size: 12px; color: #555; }
 
-    /* Aktivitas List */
-    .activity-list { list-style: none; padding: 0; }
-    .activity-list li { padding: 12px 0; border-bottom: 1px solid var(--purple-50); display: flex; align-items: flex-start; gap: 10px; }
-    .activity-list li:last-child { border-bottom: none; }
-    .activity-time { font-size: 12px; color: var(--text-muted); min-width: 60px; }
+    /* STYLE RIWAYAT (FULL WIDTH DI BAWAH) */
+    .activity-list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+    .activity-list li { padding: 15px; background: var(--purple-50); border-radius: 10px; display: flex; flex-direction: column; gap: 5px; border-left: 4px solid var(--purple-300); }
+    .activity-time { font-size: 11px; color: var(--text-muted); font-weight: 600; }
     .activity-desc { font-size: 13px; color: var(--text-main); }
-
-    /* Menu Panel */
-    .panel-menu { display: flex; flex-direction: column; gap: 10px; }
-    .panel-menu a { display: block; padding: 15px; background: var(--purple-50); color: var(--purple-900); border-radius: 8px; font-weight: 600; text-decoration: none; transition: 0.3s; border-left: 4px solid transparent; }
-    .panel-menu a:hover { background: var(--purple-100); border-left-color: var(--purple-600); padding-left: 20px; }
-
-    /* Select Dropdown Table */
-    .status-select { padding: 6px; border-radius: 6px; border: 1px solid var(--purple-200); color: var(--purple-900); font-size: 13px; outline: none; }
 </style>
 
 <div class="content">
     <div class="admin-header">
         <h2>Dashboard Utama (Admin & Kasir)</h2>
-        <div>
-            <a href="#" class="btn btn-outline" style="border-radius: 8px; padding: 10px 20px;">Halo, Admin 👋</a>
-        </div>
-    </div>
-
-    <div class="pos-banner">
-        <h2>Sistem Kasir (Point of Sales) 🛒</h2>
-        <p>Buka antarmuka kasir untuk memproses transaksi langsung di toko, penjualan produk retail, maupun pembayaran layanan klinik.</p>
-        <a href="#" class="btn-pos">Buka Aplikasi POS Sekarang</a>
     </div>
 
     <div class="grid-stats">
-        <div class="stat-card">
-            <span class="title">Total Pemasukan Hari Ini</span>
-            <span class="angka">Rp ---</span> </div>
-        <div class="stat-card">
-            <span class="title">Menunggu Konfirmasi</span>
-            <span class="angka" style="color: #e67e22;">{{ $menungguKonfirmasi }}</span>
-        </div>
-        <div class="stat-card">
-            <span class="title">Pesanan/Reservasi Diproses</span>
-            <span class="angka" style="color: #3498db;">{{ $pesananDiproses }}</span>
-        </div>
-        <div class="stat-card">
-            <span class="title">Total Pengguna (Pelanggan)</span>
-            <span class="angka">{{ $totalPengguna }}</span>
+        <div class="stat-card"><span class="title">Total Pemasukan</span><span class="angka">Rp ---</span></div>
+        <div class="stat-card"><span class="title">Menunggu Konfirmasi</span><span class="angka" style="color: #e67e22;">{{ $menungguKonfirmasi }}</span></div>
+        <div class="stat-card"><span class="title">Pesanan Aktif</span><span class="angka" style="color: #3498db;">{{ $pesananDiproses }}</span></div>
+        <div class="stat-card"><span class="title">Total Pengguna</span><span class="angka">{{ $totalPengguna }}</span></div>
+    </div>
+
+    <div class="admin-card">
+        <h3>Antrean Konfirmasi Pembayaran</h3>
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Pelanggan</th>
+                        <th>Rincian Belanja</th>
+                        <th>Bukti</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($antreanPembayaran as $antrean)
+                    <tr>
+                        <td>#{{ $antrean->nama_layanan ? 'RES' : 'TRX' }}-{{ $antrean->id }}</td>
+                        <td>{{ $antrean->user->name ?? 'User' }}</td>
+                        <td>
+                            @if($antrean->nama_layanan)
+                                <strong>🏥 {{ $antrean->nama_layanan }}</strong>
+                            @else
+                                <strong>📦 Produk:</strong>
+                                <ul class="detail-list">
+                                    @foreach($antrean->detail_belanja as $detail)
+                                        <li>{{ $detail->nama_produk }} (x{{ $detail->jumlah }})</li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </td>
+                        <td>
+                            @php $path = $antrean->bukti_pembayaran_dp ?? $antrean->bukti_pembayaran; @endphp
+                            @if($path)
+                                <a href="{{ asset('storage/' . $path) }}" target="_blank" style="background: var(--purple-900); color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px;">Lihat Struk</a>
+                            @else
+                                <span style="color: red; font-size: 11px;">Belum Bayar</span>
+                            @endif
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <form action="{{ route('admin.reservasi.setujui', $antrean->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="tipe" value="{{ $antrean->nama_layanan ? 'reservasi' : 'transaksi' }}">
+                                    <button type="submit" class="btn-sm" style="background: #28a745; color: white;">Setujui</button>
+                                </form>
+                                <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="tipe" value="{{ $antrean->nama_layanan ? 'reservasi' : 'transaksi' }}">
+                                    <button type="submit" class="btn-sm btn-tolak">Tolak</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="5" style="text-align: center;">Tidak ada antrean.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 
-<div class="admin-card">
-    <h3>Antrean Konfirmasi Pembayaran</h3>
-    <div style="overflow-x: auto;">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>ID Reservasi</th>
-                    <th>Pelanggan</th>
-                    <th>Tanggal & Waktu</th>
-                    <th>Status</th>
-                    <th>Bukti Transfer</th> <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($antreanPembayaran as $antrean)
-                <tr>
-                    <td>#RES-{{ $antrean->id }}</td>
-                    <td>{{ $antrean->user->name ?? 'User Tidak Ditemukan' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($antrean->tanggal)->format('d M Y') }} - {{ $antrean->waktu }}</td>
-                    <td><span class="badge badge-pending">{{ $antrean->status }}</span></td>
-                    <td>
-                        @if($antrean->bukti_dp)
-                            <a href="{{ asset('storage/' . $antrean->bukti_dp) }}" target="_blank">
-                                <img src="{{ asset('storage/' . $antrean->bukti_dp) }}" width="60" style="border-radius: 8px; border: 1px solid var(--purple-100);">
-                            </a>
-                        @else
-                            <span style="color: #dc3545; font-size: 12px;">Belum Bayar</span>
-                        @endif
-                    </td>
-                    <td style="display: flex; gap: 10px;">
-                        <form action="{{ route('admin.reservasi.setujui', $antrean->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn-sm" style="background: #28a745; color: white; border: none; cursor: pointer;" onclick="return confirm('Setujui pembayaran dan reservasi ini?')">
-                                ✓ Setujui
-                            </button>
-                        </form>
-
-                        <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn-sm btn-tolak" onclick="return confirm('Yakin ingin menolak reservasi ini?')">
-                                ✕ Tolak
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" style="text-align: center; color: var(--text-muted);">Tidak ada antrean pembayaran saat ini.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+    <div class="admin-card">
+        <h3>Kelola Status Pesanan Aktif</h3>
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Pelanggan</th>
+                        <th>Item</th>
+                        <th>Update Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($pesananAktif as $pesanan)
+                    <tr>
+                        <td>#{{ $pesanan->nama_layanan ? 'RES' : 'TRX' }}-{{ $pesanan->id }}</td>
+                        <td>{{ $pesanan->user->name ?? 'User' }}</td>
+                        <td>{{ $pesanan->nama_layanan ?? 'Pembelian Produk' }}</td>
+                        <td>
+                            <form action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}" method="POST" style="display: flex; gap: 5px;">
+                                @csrf
+                                <input type="hidden" name="tipe" value="{{ $pesanan->nama_layanan ? 'reservasi' : 'transaksi' }}">
+                                <select name="status" class="status-select">
+                                    <option value="Dikonfirmasi" {{ $pesanan->status == 'Dikonfirmasi' ? 'selected' : '' }}>Dikonfirmasi</option>
+                                    @if($pesanan->nama_layanan)
+                                        <option value="Menunggu Jadwal" {{ $pesanan->status == 'Menunggu Jadwal' ? 'selected' : '' }}>Menunggu Jadwal</option>
+                                    @else
+                                        <option value="Menunggu Jadwal" {{ $pesanan->status == 'Menunggu Jadwal' ? 'selected' : '' }}>Menunggu Diambil</option>
+                                        <option value="Menunggu Kurir" {{ $pesanan->status == 'Menunggu Kurir' ? 'selected' : '' }}>Menunggu Kurir</option>
+                                        <option value="Pesanan Diantar" {{ $pesanan->status == 'Pesanan Diantar' ? 'selected' : '' }}>Diantar</option>
+                                    @endif
+                                    <option value="Selesai" {{ $pesanan->status == 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                                </select>
+                                <button type="submit" class="btn-sm btn-acc">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="4" style="text-align: center;">Kosong.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
-            <div class="admin-card">
-                <h3>Kelola Status Reservasi / Pesanan</h3>
-                <div style="overflow-x: auto;">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>ID Reservasi</th>
-                                <th>Pelanggan</th>
-                                <th>Layanan / Catatan</th>
-                                <th>Status Saat Ini</th>
-                                <th>Update Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($pesananAktif as $pesanan)
-                            <tr>
-                                <td>#RES-{{ $pesanan->id }}</td>
-                                <td>{{ $pesanan->user->name ?? 'User Tidak Ditemukan' }}</td>
-                                <td>{{ $pesanan->keluhan ?? '-' }}</td>
-                                <td><span class="badge badge-process">{{ $pesanan->status }}</span></td>
-                                <td>
-                                    <form action="#" method="POST" style="display: flex; gap: 5px;">
-                                        @csrf
-                                        <select name="status" class="status-select">
-                                            <option value="Dikonfirmasi" {{ $pesanan->status == 'Dikonfirmasi' ? 'selected' : '' }}>Dikonfirmasi</option>
-                                            <option value="Selesai">Selesai</option>
-                                        </select>
-                                        <button type="submit" class="btn-sm btn-acc" style="padding: 5px 10px;">✓</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" style="text-align: center; color: var(--text-muted);">Tidak ada pesanan yang sedang diproses.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
 
-            <div class="admin-card">
-                <h3>Grafik Penjualan & Reservasi (Minggu Ini)</h3>
-                <div style="height: 250px; background: var(--purple-50); border-radius: 8px; display:flex; justify-content:center; align-items:center; color: var(--purple-400); font-weight:600; border: 2px dashed var(--purple-200);">
-                    [ Area Canvas Chart.js ]
-                </div>
-            </div>
-        </div>
-
-        <div class="admin-card">
-            <h3>Riwayat Aktivitas Sistem</h3>
-            <ul class="activity-list">
-                @forelse($riwayatAktivitas as $log)
-                    <li>
-                        <span class="activity-time">{{ $log->created_at->diffForHumans() }}</span>
-                        <span class="activity-desc">
-                            <strong>[{{ $log->aktivitas }}]</strong> {{ $log->deskripsi }}
-                        </span>
-                    </li>
-                @empty
-                    <li class="activity-desc">Belum ada aktivitas yang tercatat.</li>
-                @endforelse
-            </ul>
-            <a href="#" style="display: block; text-align: center; margin-top: 15px; font-size: 13px; color: var(--purple-600); font-weight: 600;">Lihat Semua Laporan Aktivitas</a>
-        </div>
-
+    <div class="admin-card">
+        <h3>Riwayat Aktivitas Sistem</h3>
+        <ul class="activity-list">
+            @forelse($riwayatAktivitas as $log)
+                <li>
+                    <span class="activity-time">{{ $log->created_at->diffForHumans() }}</span>
+                    <span class="activity-desc">
+                        <strong>[{{ $log->aktivitas }}]</strong> {{ $log->deskripsi }}
+                    </span>
+                </li>
+            @empty
+                <li class="activity-desc">Belum ada catatan.</li>
+            @endforelse
+        </ul>
     </div>
 </div>
 @endsection

@@ -26,11 +26,18 @@ class ReservasiNotification extends Notification
     }
 
     public function toArray($notifiable)
-    {
-        return [
-            'id_reservasi' => $this->reservasi->id,
-            'pesan' => 'Reservasi Anda pada tanggal ' . $this->reservasi->tanggal . ' telah ' . $this->status . '.',
-            'status' => $this->status,
-        ];
-    }
+        {
+            // Sesuaikan pesan berdasarkan status
+            if ($this->status == 'Dikonfirmasi') {
+                $pesan = 'Hore! Pembayaran DP untuk reservasi tanggal ' . $this->reservasi->tanggal . ' berhasil dikonfirmasi Admin. Layanan akan segera diproses.';
+            } else {
+                $pesan = 'Maaf, pembayaran DP untuk reservasi tanggal ' . $this->reservasi->tanggal . ' gagal/ditolak. Silakan cek kembali.';
+            }
+
+            return [
+                'id_reservasi' => $this->reservasi->id,
+                'pesan' => $pesan,
+                'status' => $this->status,
+            ];
+        }
 }

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paw Center - D&F Pet Shop</title>
@@ -115,6 +116,8 @@
                 <a href="{{ route('admin.users.index') }}">👥 Kelola Akun</a>
                 <a href="{{ route('admin.katalog.index') }}">📦 Kelola Katalog Produk</a>
                 <a href="{{ route('admin.layanan.index') }}">🩺 Kelola Layanan Klinik</a>
+                <a href="#" class="menu-panel-item">🛒 Aplikasi Kasir (POS)</a>
+                <a href="#" class="menu-panel-item">📊 Laporan Penjualan</a>
                 <a href="{{ route('admin.profil') }}">⚙️ Pengaturan Profil</a>
             </div>
 

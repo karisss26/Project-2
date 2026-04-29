@@ -12,33 +12,37 @@ use App\Models\reservasi;
 use App\Models\Produk;
 use App\Models\LogAktivitas;
 use App\Notifications\ReservasiNotification;
+use App\Models\DetilTransaksiProduk;
+use App\Models\Transaksi;
 class DashboardController extends Controller
 {
-    public function pelanggan()
-    {
-        $userId = Auth::id();
-        $petCount = hewan::where('user_id', $userId)->count();
-        $activeReservationsCount = reservasi::where('user_id', $userId)
-                                            ->whereIn('status', ['Menunggu', 'Dikonfirmasi'])
-                                            ->count();
+public function pelanggan()
+{
+    $userId = Auth::id();
+    $petCount = hewan::where('user_id', $userId)->count();
+    $cartCount = count(session('cart', []));
 
-        $cart = session('cart', []);
-        $cartCount = count($cart);
+    // Data untuk tabel 1: Reservasi Layanan
+    $reservasiLayanan = reservasi::where('user_id', $userId)
+                                              ->orderBy('created_at', 'desc')
+                                              ->get();
 
-        $jadwalTerdekat = reservasi::where('user_id', $userId)
-                                     ->whereIn('status', ['Menunggu', 'Dikonfirmasi'])
-                                     ->orderBy('tanggal', 'asc')
-                                     ->orderBy('waktu', 'asc')
-                                     ->take(5)
-                                     ->get();
+    // Data untuk tabel 2: Pembelian Produk
+    $pembelianProduk = \App\Models\Transaksi::where('user_id', $userId)
+                                            ->orderBy('created_at', 'desc')
+                                            ->get();
 
-        return view('dashboard.pelanggan', compact(
-            'petCount',
-            'activeReservationsCount',
-            'cartCount',
-            'jadwalTerdekat'
-        ));
-    }
+    // Hitung reservasi aktif (dicek admin atau disetujui)
+    $activeReservationsCount = $reservasiLayanan->whereIn('status', ['Menunggu Konfirmasi Admin', 'Dikonfirmasi'])->count();
+
+    return view('dashboard.pelanggan', compact(
+        'petCount',
+        'activeReservationsCount',
+        'cartCount',
+        'reservasiLayanan',
+        'pembelianProduk'
+    ));
+}
 
     public function batalkan(Request $request, $id)
     {
@@ -57,44 +61,18 @@ class DashboardController extends Controller
         return redirect()->back()->with('success', 'Reservasi berhasil dibatalkan.');
     }
 
-public function admin()
+public function storeHewan(Request $request)
     {
-        $totalPengguna = User::where('role', 'pelanggan')->count();
+        // 1. Ambil semua request, TAPI kecualikan umur_angka dan umur_satuan
+        $data = $request->except(['umur_angka', 'umur_satuan']);
 
-        // 1. Kita perluas pencarian statusnya biar pesanan pelanggan pasti ketangkep!
-        $menungguKonfirmasi = reservasi::whereIn('status', ['Menunggu', 'Menunggu Pembayaran', 'Pending'])->count();
-        $pesananDiproses = reservasi::where('status', 'Dikonfirmasi')->count();
+        // 2. Gabungkan angka dan satuan menjadi satu string, lalu simpan ke kolom 'umur'
+        $data['umur'] = $request->umur_angka . ' ' . $request->umur_satuan;
 
-        // 2. Tangkap data untuk Antrean Pembayaran
-        $antreanPembayaran = reservasi::with('user')
-                                      ->whereIn('status', ['Menunggu', 'Menunggu Pembayaran', 'Pending'])
-                                      ->orderBy('created_at', 'desc')
-                                      ->get();
+        // 3. Pastikan user_id (pemilik hewan) otomatis terisi oleh user yang sedang login
+        $data['user_id'] = Auth::id();
 
-        // 3. Tangkap data Pesanan yang Sedang Aktif / Diproses
-        $pesananAktif = reservasi::with('user')
-                                 ->whereIn('status', ['Dikonfirmasi', 'Diproses'])
-                                 ->orderBy('updated_at', 'desc')
-                                 ->get();
-
-        $riwayatAktivitas = LogAktivitas::with('user')
-                                        ->orderBy('created_at', 'desc')
-                                        ->take(10)
-                                        ->get();
-
-        return view('dashboard.admin', compact(
-            'totalPengguna',
-            'menungguKonfirmasi',
-            'pesananDiproses',
-            'antreanPembayaran',
-            'pesananAktif',
-            'riwayatAktivitas'
-        ));
-    }
-
-    public function storeHewan(Request $request)
-    {
-        $hewan = hewan::create($request->all());
+        $hewan = hewan::create($data);
 
         LogAktivitas::create([
             'user_id' => Auth::id(),
@@ -108,7 +86,15 @@ public function admin()
     public function updateHewan(Request $request, $id)
     {
         $hewan = hewan::findOrFail($id);
-        $hewan->update($request->all());
+
+        $data = $request->except(['umur_angka', 'umur_satuan']);
+
+        // Kalau user update umurnya juga, kita gabungkan lagi
+        if ($request->has('umur_angka') && $request->has('umur_satuan')) {
+            $data['umur'] = $request->umur_angka . ' ' . $request->umur_satuan;
+        }
+
+        $hewan->update($data);
 
         LogAktivitas::create([
             'user_id' => Auth::id(),
@@ -180,29 +166,113 @@ public function admin()
         return redirect()->back()->with('success', 'Hore! Profil kamu berhasil diperbarui.');
     }
 
-    public function setujuiReservasi($id) {
-    $reservasi = reservasi::findOrFail($id);
-    $reservasi->update(['status' => 'Dikonfirmasi']);
+    public function admin()
+    {
+        $totalPengguna = User::where('role', 'pelanggan')->count();
 
-    // Kirim notifikasi ke pelanggan
-    $reservasi->user->notify(new ReservasiNotification($reservasi, 'Dikonfirmasi'));
+        $reservasi = reservasi::with('user')->get();
+        $transaksi = Transaksi::with('user')->get();
 
-    return back()->with('success', 'Reservasi disetujui!');
+        // [BARU] Bongkar keranjang belanja produk buat ditampilin ke Admin
+        foreach($transaksi as $trx) {
+            $trx->detail_belanja = DetilTransaksiProduk::where('transaksi_id', $trx->id)->get();
+            foreach($trx->detail_belanja as $detail) {
+                $produk = Produk::find($detail->produk_id);
+                $detail->nama_produk = $produk ? $produk->nama_produk : 'Produk (Dihapus)';
+            }
+        }
+
+        $semuaPesanan = $reservasi->concat($transaksi)->sortByDesc('created_at');
+
+        $antreanPembayaran = $semuaPesanan->whereIn('status', ['Menunggu', 'Menunggu Pembayaran', 'Menunggu Konfirmasi Admin', 'Pending']);
+
+        // Tambahan status "Menunggu Kurir" dan "Pesanan Diantar"
+        $pesananAktif = $semuaPesanan->whereIn('status', ['Dikonfirmasi', 'Diproses', 'Menunggu Jadwal', 'Menunggu Kurir', 'Pesanan Diantar']);
+
+        $menungguKonfirmasi = $antreanPembayaran->count();
+        $pesananDiproses = $pesananAktif->count();
+
+        $riwayatAktivitas = LogAktivitas::with('user')->orderBy('created_at', 'desc')->take(10)->get();
+
+        return view('dashboard.admin', compact('totalPengguna', 'menungguKonfirmasi', 'pesananDiproses', 'antreanPembayaran', 'pesananAktif', 'riwayatAktivitas'));
     }
 
-    public function tolakReservasi($id) {
-    $reservasi = reservasi::findOrFail($id);
-    $reservasi->update(['status' => 'Dibatalkan']);
+    public function setujuiReservasi(Request $request, $id)
+    {
+        // Cek apakah dia produk atau reservasi
+        $pesanan = ($request->tipe == 'transaksi')
+                    ? \App\Models\Transaksi::findOrFail($id)
+                    : reservasi::findOrFail($id);
 
-    // Kirim notifikasi ke pelanggan
-    $reservasi->user->notify(new ReservasiNotification($reservasi, 'Ditolak'));
+        $pesanan->update(['status' => 'Dikonfirmasi']);
 
-    return back()->with('success', 'Reservasi ditolak.');
+        // Kirim notifikasi ke pelanggan (kalau transaksi belum ada relasi notif, bisa diabaikan dulu atau disesuaikan)
+        if($request->tipe != 'transaksi'){
+             $pesanan->user->notify(new ReservasiNotification($pesanan, 'Dikonfirmasi'));
+        }
+
+        return back()->with('success', 'Pesanan disetujui!');
     }
+
+    public function tolakReservasi(Request $request, $id)
+    {
+        $pesanan = ($request->tipe == 'transaksi')
+                    ? \App\Models\Transaksi::findOrFail($id)
+                    : reservasi::findOrFail($id);
+
+        $pesanan->update(['status' => 'Dibatalkan']);
+
+        if($request->tipe != 'transaksi'){
+            $pesanan->user->notify(new ReservasiNotification($pesanan, 'Ditolak'));
+        }
+
+        return back()->with('success', 'Pesanan ditolak.');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $pesanan = ($request->tipe == 'transaksi')
+                    ? \App\Models\Transaksi::findOrFail($id)
+                    : reservasi::findOrFail($id);
+
+        $pesanan->status = $request->status;
+        $pesanan->save();
+
+        return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui menjadi: ' . $request->status);
+    }
+
+    public function uploadBukti(Request $request, $id)
+{
+    $request->validate([
+        'bukti_pembayaran_dp' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+    ]);
+
+    $reservasi = reservasi::findOrFail($id);
+
+    if ($request->hasFile('bukti_pembayaran_dp')) {
+        // Simpan file ke folder storage/app/public/bukti_dp
+        $path = $request->file('bukti_pembayaran_dp')->store('bukti_dp', 'public');
+
+        // Update status dan simpan nama filenya
+        $reservasi->update([
+            'bukti_pembayaran_dp' => $path,
+            'status' => 'Menunggu Konfirmasi Admin'
+        ]);
+    }
+
+    return redirect()->route('dashboard.pelanggan')->with('success', 'Bukti pembayaran berhasil diunggah, silakan tunggu konfirmasi admin.');
+}
 
     public function owner() { return view('dashboard.owner'); }
     public function dokter() { return view('dashboard.dokter'); }
     public function staff() { return view('dashboard.staff'); }
-    public function dataHewan() { return view('dashboard.hewan'); }
+    public function dataHewan()
+    {
+        // Ambil data hewan khusus milik pelanggan yang sedang login
+        $semua_hewan = hewan::where('user_id', Auth::id())->get();
+
+        // Bawa datanya ke halaman view
+        return view('dashboard.hewan', compact('semua_hewan'));
+    }
     public function profil() { return view('dashboard.profil'); }
 }
