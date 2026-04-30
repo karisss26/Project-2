@@ -44,7 +44,7 @@
             @csrf
             <div class="form-group">
                 <label>Nama Lengkap</label>
-                <input type="text" name="name" required value="{{ old('name') }}" placeholder="Karisma Ainun">
+                <input type="text" name="name" required value="{{ old('name') }}" placeholder="Isi dengan nama lengkap">
             </div>
             <div class="form-group">
                 <label>Alamat Email</label>

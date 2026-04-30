@@ -8,7 +8,7 @@
 </style>
 
 <div class="alert-stok">
-    <strong>⚠️ Peringatan:</strong> Ada 3 produk yang stoknya hampir habis. Segera lakukan restock!
+    <strong>⚠️ Peringatan:</strong> Ada 2 produk yang stoknya hampir habis. Segera lakukan restock!
 </div>
 
 <h3 style="margin-bottom: 15px; color: #333;">Daftar Produk Kritis</h3>
