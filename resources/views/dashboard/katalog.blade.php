@@ -30,6 +30,79 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+        /* Style Navigasi Cepat Katalog (Pure CSS) */
+    .katalog-jump-nav {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 30px 0;
+    }
+
+    .jump-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 25px;
+        background-color: #fff;
+        border: 2px solid #7c3aed; /* Warna ungu kamu */
+        color: #7c3aed;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .jump-btn:hover {
+        background-color: #7c3aed;
+        color: #fff;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(124, 58, 237, 0.2);
+    }
+
+    /* Efek smooth scroll */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* --- Tombol Back to Top --- */
+    .btn-to-top {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background-color: #7c3aed; /* Warna ungu Paw Center */
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+        transition: all 0.3s ease;
+        z-index: 999;
+        /* Default disembunyiin dulu pas di posisi paling atas */
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+    }
+
+    /* Class ini bakal ditambahin pakai JS pas layar di-scroll */
+    .btn-to-top.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .btn-to-top:hover {
+        background-color: #6d28d9;
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(124, 58, 237, 0.6);
+        color: white;
+    }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -143,6 +216,10 @@
 
         <div class="container mx-auto px-4 text-center relative z-10">
             <h2 class="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">Katalog Produk & Layanan</h2>
+            <div class="katalog-jump-nav">
+                <a href="#produk-section" class="jump-btn">🛍️ Lihat Produk</a>
+                <a href="#layanan-section" class="jump-btn">🏥 Lihat Layanan</a>
+            </div>
             <p class="text-ungu-muda/80 text-lg md:text-xl max-w-2xl mx-auto">
                 Temukan kebutuhan terbaik untuk hewan peliharaan kesayangan Anda dengan kualitas premium dan pelayanan sepenuh hati.
             </p>
@@ -151,7 +228,7 @@
 
     <!-- Produk Section -->
     <section class="py-12 bg-white">
-        <div class="container mx-auto px-4">
+        <div id="produk-section" class="container-katalog mx-auto px-4">
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h3 class="text-2xl font-bold text-gray-800">Produk</h3>
@@ -200,7 +277,7 @@
 
     <!-- Layanan Section -->
     <section class="py-12 bg-ungu-terang/30">
-        <div class="container mx-auto px-4">
+        <div id="layanan-section" class="container-katalog mx-auto px-4">
             <div class="text-center mb-10">
                 <h3 class="text-2xl font-bold text-gray-800">Layanan</h3>
                 <p class="text-gray-500 mt-2">Layanan profesional untuk kesehatan dan kebersihan peliharaan Anda</p>
@@ -529,6 +606,10 @@
     </script>
     @endif
 
+    <button id="backToTopBtn" class="btn-to-top" onclick="scrollToTop()" title="Kembali ke atas">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <script>
     // Logic untuk buka-tutup notifikasi
     const notifButton = document.getElementById('notifButton');
@@ -558,6 +639,26 @@
                 notifMenu.classList.add('opacity-0', 'scale-95');
                 setTimeout(() => { notifMenu.classList.add('hidden'); }, 200);
             }
+        });
+    }
+
+    // --- Logic Tombol Back to Top ---
+    const backToTopBtn = document.getElementById("backToTopBtn");
+
+    // Ngecek posisi scroll buat nampilin/ngilangin tombol
+    window.addEventListener("scroll", function() {
+        if (window.scrollY > 300) {
+            backToTopBtn.classList.add("show");
+        } else {
+            backToTopBtn.classList.remove("show");
+        }
+    });
+
+    // Fungsi buat scroll mulus ke atas pas diklik
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
         });
     }
 </script>

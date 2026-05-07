@@ -14,6 +14,7 @@ use App\Models\LogAktivitas;
 use App\Notifications\ReservasiNotification;
 use App\Models\DetilTransaksiProduk;
 use App\Models\Transaksi;
+use App\Notifications\TransaksiNotification;
 class DashboardController extends Controller
 {
 public function pelanggan()
@@ -28,7 +29,7 @@ public function pelanggan()
                                               ->get();
 
     // Data untuk tabel 2: Pembelian Produk
-    $pembelianProduk = \App\Models\Transaksi::where('user_id', $userId)
+    $pembelianProduk = Transaksi::where('user_id', $userId)
                                             ->orderBy('created_at', 'desc')
                                             ->get();
 
@@ -197,7 +198,7 @@ public function storeHewan(Request $request)
         return view('dashboard.admin', compact('totalPengguna', 'menungguKonfirmasi', 'pesananDiproses', 'antreanPembayaran', 'pesananAktif', 'riwayatAktivitas'));
     }
 
-    public function setujuiReservasi(Request $request, $id)
+public function setujuiReservasi(Request $request, $id)
     {
         // Cek apakah dia produk atau reservasi
         $pesanan = ($request->tipe == 'transaksi')
@@ -206,9 +207,11 @@ public function storeHewan(Request $request)
 
         $pesanan->update(['status' => 'Dikonfirmasi']);
 
-        // Kirim notifikasi ke pelanggan (kalau transaksi belum ada relasi notif, bisa diabaikan dulu atau disesuaikan)
+        // Kirim notifikasi sesuai tipe pesanannya sayang
         if($request->tipe != 'transaksi'){
              $pesanan->user->notify(new ReservasiNotification($pesanan, 'Dikonfirmasi'));
+        } else {
+             $pesanan->user->notify(new TransaksiNotification($pesanan, 'Dikonfirmasi'));
         }
 
         return back()->with('success', 'Pesanan disetujui!');
@@ -222,8 +225,11 @@ public function storeHewan(Request $request)
 
         $pesanan->update(['status' => 'Dibatalkan']);
 
+        // Kirim notifikasi penolakan
         if($request->tipe != 'transaksi'){
             $pesanan->user->notify(new ReservasiNotification($pesanan, 'Ditolak'));
+        } else {
+            $pesanan->user->notify(new TransaksiNotification($pesanan, 'Ditolak'));
         }
 
         return back()->with('success', 'Pesanan ditolak.');
@@ -232,7 +238,7 @@ public function storeHewan(Request $request)
     public function updateStatus(Request $request, $id)
     {
         $pesanan = ($request->tipe == 'transaksi')
-                    ? \App\Models\Transaksi::findOrFail($id)
+                    ? Transaksi::findOrFail($id)
                     : reservasi::findOrFail($id);
 
         $pesanan->status = $request->status;

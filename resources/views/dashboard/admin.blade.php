@@ -117,7 +117,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Pelanggan</th>
-                        <th>Item</th>
+                        <th>Jenis</th>
                         <th>Update Status</th>
                     </tr>
                 </thead>

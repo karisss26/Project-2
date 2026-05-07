@@ -10,14 +10,19 @@ use Illuminate\Support\Facades\Storage;
 class ProdukController extends Controller
 {
     // 1. Menampilkan Halaman Kelola Katalog
-    public function index()
-    {
-        // Mengambil semua data produk dari database, diurutkan dari yang terbaru
-        $produk = Produk::orderBy('created_at', 'desc')->get();
+    public function index(Request $request)
+        {
+            $search = $request->input('search');
 
-        // Pastikan kamu nanti bikin file view-nya di resources/views/dashboard/admin/katalog/index.blade.php ya!
-        return view('dashboard.admin.katalog.index', compact('produk'));
-    }
+            // Query buat nampilin data, kalo ada search dia bakal filter
+            $produk = Produk::when($search, function ($query, $search) {
+                return $query->where('nama_produk', 'like', '%' . $search . '%')
+                            ->orWhere('kategori', 'like', '%' . $search . '%');
+            })->paginate(20)->appends(['search' => $search]);
+            // appends() itu penting banget biar keyword search-nya tetep nempel pas kita klik Next Page
+
+            return view('dashboard.admin.katalog.index', compact('produk'));
+        }
 
     // 2. Menyimpan Data Produk Baru (Create)
     public function store(Request $request)

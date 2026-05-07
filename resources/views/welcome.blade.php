@@ -134,24 +134,24 @@
             <h3 class="sub-judul">Produk Pilihan</h3>
             <div class="produk-grid">
                 <div class="produk-card">
+                    <div class="produk-img" style="background-image: url('https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=400&auto=format&fit=crop');"></div>
+                    <div class="produk-info">
+                        <h3 class="produk-title">Ransel Astronot</h3>
+                        <span class="produk-price">Rp 350.000</span>
+                    </div>
+                </div>
+                <div class="produk-card">
                     <div class="produk-img" style="background-image: url('https://images.unsplash.com/photo-1589924691995-400dc9ecc119?q=80&w=400&auto=format&fit=crop');"></div>
                     <div class="produk-info">
-                        <h3 class="produk-title">ROYAL CANIN KITTEN 2KG</h3>
-                        <span class="produk-price">Rp 270.000</span>
+                        <h3 class="produk-title">Royal Canin Persian Adult 400g</h3>
+                        <span class="produk-price">Rp 85.000</span>
                     </div>
                 </div>
                 <div class="produk-card">
                     <div class="produk-img" style="background-image: url('https://images.unsplash.com/photo-1623366302587-bcaad5cfdb66?q=80&w=400&auto=format&fit=crop');"></div>
                     <div class="produk-info">
-                        <h3 class="produk-title">Cat Choize Adult 800g</h3>
-                        <span class="produk-price">Rp 25.000</span>
-                    </div>
-                </div>
-                <div class="produk-card">
-                    <div class="produk-img" style="background-image: url('https://images.unsplash.com/photo-1574144611937-0df059b5ef3e?q=80&w=400&auto=format&fit=crop');"></div>
-                    <div class="produk-info">
-                        <h3 class="produk-title">FRIESKIES Kitten Pouch 80g</h3>
-                        <span class="produk-price">Rp 6.000</span>
+                        <h3 class="produk-title">Proplan Kitten 500g</h3>
+                        <span class="produk-price">Rp 85.000</span>
                     </div>
                 </div>
             </div>
