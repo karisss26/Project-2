@@ -12,4 +12,9 @@ class DetilTransaksiProduk extends Model
     public function produk() {
         return $this->belongsTo(Produk::class, 'produk_id');
     }
+
+    // Tambahin relasi ini ya sayang biar bisa diakses dari controller
+    public function transaksi() {
+        return $this->belongsTo(Transaksi::class, 'transaksi_id');
+    }
 }

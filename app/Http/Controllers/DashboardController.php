@@ -187,22 +187,29 @@ public function storeHewan(Request $request)
 
         $antreanPembayaran = $semuaPesanan->whereIn('status', ['Menunggu', 'Menunggu Pembayaran', 'Menunggu Konfirmasi Admin', 'Pending']);
 
-        // Tambahan status "Menunggu Kurir" dan "Pesanan Diantar"
-        $pesananAktif = $semuaPesanan->whereIn('status', ['Dikonfirmasi', 'Diproses', 'Menunggu Jadwal', 'Menunggu Kurir', 'Pesanan Diantar']);
+        // Tambahan status "Menunggu Kurir", "Pesanan Diantar", dan "Selesai"
+        $pesananAktif = $semuaPesanan->whereIn('status', ['Dikonfirmasi', 'Diproses', 'Menunggu Jadwal', 'Menunggu Kurir', 'Pesanan Diantar', 'Selesai']);
 
         $menungguKonfirmasi = $antreanPembayaran->count();
-        $pesananDiproses = $pesananAktif->count();
+
+        // Biar angka di card "Pesanan Aktif" atas nggak ikut ngitung yang udah selesai
+        $pesananDiproses = $pesananAktif->where('status', '!=', 'Selesai')->count();
+
+        // [TAMBAHAN BARU] Hitung total pendapatan khusus dari transaksi yang selesai
+        // (Pastikan nama kolom harganya 'total_harga' ya, kalau pakai nama lain tinggal disesuaikan)
+        $totalPemasukan = Transaksi::where('status', 'Selesai')->sum('total_harga');
 
         $riwayatAktivitas = LogAktivitas::with('user')->orderBy('created_at', 'desc')->take(10)->get();
 
-        return view('dashboard.admin', compact('totalPengguna', 'menungguKonfirmasi', 'pesananDiproses', 'antreanPembayaran', 'pesananAktif', 'riwayatAktivitas'));
+        // [PERBAIKAN] Variabel 'totalPemasukan' wajib dimasukkan ke compact() ini
+        return view('dashboard.admin', compact('totalPengguna', 'menungguKonfirmasi', 'pesananDiproses', 'antreanPembayaran', 'pesananAktif', 'riwayatAktivitas', 'totalPemasukan'));
     }
 
 public function setujuiReservasi(Request $request, $id)
     {
         // Cek apakah dia produk atau reservasi
         $pesanan = ($request->tipe == 'transaksi')
-                    ? \App\Models\Transaksi::findOrFail($id)
+                    ? Transaksi::findOrFail($id)
                     : reservasi::findOrFail($id);
 
         $pesanan->update(['status' => 'Dikonfirmasi']);
@@ -220,7 +227,7 @@ public function setujuiReservasi(Request $request, $id)
     public function tolakReservasi(Request $request, $id)
     {
         $pesanan = ($request->tipe == 'transaksi')
-                    ? \App\Models\Transaksi::findOrFail($id)
+                    ? Transaksi::findOrFail($id)
                     : reservasi::findOrFail($id);
 
         $pesanan->update(['status' => 'Dibatalkan']);
@@ -269,8 +276,71 @@ public function setujuiReservasi(Request $request, $id)
     return redirect()->route('dashboard.pelanggan')->with('success', 'Bukti pembayaran berhasil diunggah, silakan tunggu konfirmasi admin.');
 }
 
-    public function owner() { return view('dashboard.owner'); }
-    public function dokter() { return view('dashboard.dokter'); }
+    public function owner()
+    {
+        // Ini contoh query, sesuaikan dengan nama kolom di database kamu ya sayang
+        $pendapatanHariIni = Transaksi::whereDate('created_at', today())->sum('total_harga') ?? 1450000; // Contoh fallback
+        $layananSelesai = reservasi::where('status', 'Selesai')->count();
+        $produkTerjual = DetilTransaksiProduk::whereHas('transaksi', function($q) {
+            $q->whereDate('created_at', today());
+        })->sum('jumlah') ?? 18;
+        $petHotel = hewan::count(); // Contoh, sesuaikan logic pet hotel
+
+        // Data dummy untuk grafik pendapatan 7 hari terakhir (Bisa diganti query eloquent yang di-group by tanggal)
+        $chartData = [
+            'labels' => ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+            'data' => [500000, 750000, 600000, 1200000, 900000, 1500000, 1450000]
+        ];
+
+        // Data untuk tabel laporan operasional
+        $laporanOperasional = Transaksi::with('user')->orderBy('created_at', 'desc')->take(10)->get();
+
+        return view('dashboard.owner', compact(
+            'pendapatanHariIni',
+            'layananSelesai',
+            'produkTerjual',
+            'petHotel',
+            'chartData',
+            'laporanOperasional'
+        ));
+    }
+        public function dokter()
+        {
+            // Kita ambil data reservasi yang statusnya sudah 'Dikonfirmasi' oleh Admin
+            // dan urutkan dari yang paling lama (biar antreannya benar)
+            $jadwalLayanan = reservasi::with(['user', 'hewan'])
+                ->whereIn('status', ['Dikonfirmasi', 'Diproses'])
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            // Kita juga ambil riwayat rekam medis biar dokter bisa baca history pasien
+            $rekamMedis = \App\Models\RekamMedis::with(['hewan'])->latest()->take(10)->get();
+
+            return view('dashboard.dokter', compact('jadwalLayanan', 'rekamMedis'));
+        }
+
+        // Tambahkan method baru untuk simpan rekam medis
+        public function simpanRekamMedis(Request $request)
+        {
+            $request->validate([
+                'hewan_id' => 'required',
+                'diagnosa' => 'required',
+                'keluhan' => 'required',
+                'tindakan' => 'required'
+            ]);
+
+            // Simpan ke database (Sesuaikan field-nya dengan migrasi kamu ya)
+            \App\Models\RekamMedis::create([
+                'hewan_id' => $request->hewan_id,
+                'user_id' => auth()->id(), // Dokter yang menangani
+                'keluhan' => $request->keluhan,
+                'diagnosa' => $request->diagnosa,
+                'tindakan' => $request->tindakan,
+                'tanggal_periksa' => now(),
+            ]);
+
+            return redirect()->back()->with('success', 'Rekam medis berhasil diperbarui!');
+        }
     public function staff() { return view('dashboard.staff'); }
     public function dataHewan()
     {

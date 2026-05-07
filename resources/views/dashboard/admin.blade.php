@@ -42,12 +42,14 @@
     </div>
 
     <div class="grid-stats">
-        <div class="stat-card"><span class="title">Total Pemasukan</span><span class="angka">Rp ---</span></div>
+        <div class="stat-card">
+            <span class="title">Total Pemasukan</span>
+            <span class="angka">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</span>
+        </div>
         <div class="stat-card"><span class="title">Menunggu Konfirmasi</span><span class="angka" style="color: #e67e22;">{{ $menungguKonfirmasi }}</span></div>
         <div class="stat-card"><span class="title">Pesanan Aktif</span><span class="angka" style="color: #3498db;">{{ $pesananDiproses }}</span></div>
         <div class="stat-card"><span class="title">Total Pengguna</span><span class="angka">{{ $totalPengguna }}</span></div>
     </div>
-
     <div class="admin-card">
         <h3>Antrean Konfirmasi Pembayaran</h3>
         <div style="overflow-x: auto;">

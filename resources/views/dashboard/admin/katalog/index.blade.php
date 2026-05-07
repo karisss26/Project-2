@@ -85,7 +85,7 @@
         @empty
         <tr>
             <td colspan="6" style="text-align: center; padding: 30px; color: #6c757d;">
-                Wah, produknya nggak ketemu sayang. Coba kata kunci lain ya! 🥺
+                Wah, produknya nggak ketemu. Coba kata kunci lain ya!
             </td>
         </tr>
         @endforelse
