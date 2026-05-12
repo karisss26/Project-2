@@ -6,6 +6,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
+use App\Http\Controllers\Admin\PosKasirController;
+use App\Http\Controllers\ReservasiTicketController;
+
+
+
 
 // =========================================================
 // 1. RUTE PUBLIK
@@ -15,6 +20,9 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/katalog', [KatalogController::class, 'index'])->name('dashboard.katalog');
+
+// E-Ticket Reservasi (PDF) - hanya setelah admin menyetujui
+Route::get('/reservasi/{id}/e-ticket', [ReservasiTicketController::class, 'download'])->name('reservasi.e-ticket.download');
 
 
 // =========================================================
@@ -90,6 +98,12 @@ Route::post('/dashboard/dokter/simpan-rm', [DashboardController::class, 'simpanR
     // --- RUTE ADMIN & KASIR (Dinamis) ---
     Route::middleware(['role:admin,kasir'])->group(function () {
         Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
+
+
+        // POS Kasir (Admin)
+        Route::get('/admin/pos', [PosKasirController::class, 'index'])->name('admin.pos.index');
+        Route::post('/admin/pos/checkout', [PosKasirController::class, 'checkout'])->name('admin.pos.checkout');
+
 
         Route::post('/admin/reservasi/setujui/{id}', [DashboardController::class, 'setujuiReservasi'])->name('admin.reservasi.setujui');
         Route::post('/admin/reservasi/tolak/{id}', [DashboardController::class, 'tolakReservasi'])->name('admin.reservasi.tolak');

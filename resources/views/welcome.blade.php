@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <style>
         .sub-judul {
-            text-align: center; color: #8E24AA; font-size: 1.3rem; margin: 40px 0 20px; font-weight: 600;
+            text-align: center; color: #36005E; font-size: 1.3rem; margin: 40px 0 20px; font-weight: 600;
         }
+
         /* Memaksa area tombol auth agar tidak hilang atau tertutup */
         .auth-btns {
             display: flex !important;
@@ -42,9 +43,11 @@
                         elseif($role == 'dokter') $route = 'dashboard.dokter';
                     @endphp
                     <a href="{{ route($route) }}" class="btn btn-dark" style="border-radius: 25px; padding: 8px 20px;">Dashboard</a>
+
                 @else
                     <a href="{{ url('/login') }}" class="btn btn-dark" style="border-radius: 25px; padding: 8px 20px;">Masuk</a>
-                    <a href="{{ url('/register') }}" class="btn btn-outline" style="border-radius: 25px; padding: 8px 20px; border: 1px solid #333;">Daftar</a>
+                    <a href="{{ url('/register') }}" class="btn btn-outline" style="border-radius: 25px; padding: 8px 20px; border: 1px solid #36005E;">Daftar</a>
+
                 @endif
             </div>
         </div>
@@ -69,9 +72,12 @@
                 <div class="profil-text">
                     <p>Kami memahami bahwa hewan peliharaan adalah bagian dari keluarga Anda. Oleh karena itu, kami berkomitmen untuk memberikan perawatan medis dengan penuh kasih sayang dan profesional.</p>
                     <ul>
-                        <li><span style="background:#333; color:white; border-radius:50%; width:20px; height:20px; display:inline-block; text-align:center; line-height:20px; font-size:12px;">✓</span> Dokter Hewan Berpengalaman</li>
-                        <li><span style="background:#333; color:white; border-radius:50%; width:20px; height:20px; display:inline-block; text-align:center; line-height:20px; font-size:12px;">✓</span> Fasilitas Medis Modern</li>
-                        <li><span style="background:#333; color:white; border-radius:50%; width:20px; height:20px; display:inline-block; text-align:center; line-height:20px; font-size:12px;">✓</span> Pet Shop Terlengkap</li>
+                    <li><span style="background:#36005E; color:white; border-radius:50%; width:20px; height:20px; display:inline-block; text-align:center; line-height:20px; font-size:12px;">✓</span> Dokter Hewan Berpengalaman</li>
+
+                    <li><span style="background:#36005E; color:white; border-radius:50%; width:20px; height:20px; display:inline-block; text-align:center; line-height:20px; font-size:12px;">✓</span> Fasilitas Medis Modern</li>
+
+                    <li><span style="background:#36005E; color:white; border-radius:50%; width:20px; height:20px; display:inline-block; text-align:center; line-height:20px; font-size:12px;">✓</span> Pet Shop Terlengkap</li>
+
                     </ul>
                 </div>
             </div>
@@ -168,7 +174,7 @@
             <div class="dokter-row">
                 <div class="dokter-img" style="background-image: url('https://images.unsplash.com/photo-1594824436998-dd40e4f69d3c?q=80&w=300&auto=format&fit=crop');"></div>
                 <div class="dokter-info">
-                    <h3>drh. Nyoman Ayu</h3>
+                    <h3>drh. Arifa Nurjayanti</h3>
                     <span>Dokter Hewan Kecil</span>
                     <p>Menjadi dokter sekaligus pemilik di D&F Pet Shop & Clinic sejak 2017 hingga saat ini.</p>
                 </div>
@@ -176,7 +182,7 @@
             <div class="dokter-row reverse">
                 <div class="dokter-img" style="background-image: url('https://images.unsplash.com/photo-1612349317150-e410f624c427?q=80&w=300&auto=format&fit=crop'); background-position: top;"></div>
                 <div class="dokter-info">
-                    <h3>drh. Andi Susiro</h3>
+                    <h3>drh. Aditya Lanang W.</h3>
                     <span>Dokter Hewan Eksotik</span>
                     <p>Menjadi dokter D&F sejak 2019 dan mengelola cabang kedua untuk penanganan hewan khusus.</p>
                 </div>
@@ -208,7 +214,8 @@
             <p style="color: var(--text-muted); font-size: 15px; max-width: 600px; margin: 0 auto 30px; line-height: 1.6;">
                 Jika Anda memiliki pertanyaan seputar layanan klinik, stok produk pet shop, atau butuh tindakan darurat, silakan hubungi kami melalui WhatsApp.
             </p>
-            <a href="https://wa.me/6285603320626" target="_blank" class="btn" style="background-color: #f3f4f6; color: #333; border: 1px solid #d1d5db; border-radius: 30px; padding: 12px 30px; font-weight: 500; text-decoration: none; display: inline-block;">
+            <a href="https://wa.me/6285603320626" target="_blank" class="btn" style="background-color: #36005E; color: #ffffff; border: 1px solid #2c004f; border-radius: 30px; padding: 12px 30px; font-weight: 500; text-decoration: none; display: inline-block;">
+
                 Hubungi Via WhatsApp
             </a>
         </div>

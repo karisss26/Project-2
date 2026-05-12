@@ -2,21 +2,26 @@
 
 /* === 1. ROOT VARIABLES (PALET WARNA UNGU AESTHETIC) === */
 :root {
-    --purple-50: #f5f3ff;
-    --purple-100: #ede9fe;
-    --purple-200: #ddd6fe;
-    --purple-300: #c4b5fd;
-    --purple-400: #a78bfa;
-    --purple-500: #8b5cf6;
-    --purple-600: #7c3aed;
-    --purple-700: #6d28d9;
-    --purple-800: #5b21b6;
-    --purple-900: #4c1d95;
+    /* Brand utama: #36005E */
+    --purple-50: #f7f1ff;
+    --purple-100: #ede1ff;
+    --purple-200: #dcc2ff;
+    --purple-300: #c59aff;
+    --purple-400: #9a61ff;
+
+    /* Variasi aksen mengarah ke #36005E */
+    --purple-500: #7f2fff;
+    --purple-600: #5d1aa8;
+    --purple-700: #47127e;
+    --purple-800: #36005E;
+    --purple-900: #2c004f;
+
     --white: #ffffff;
     --text-main: #333333;
     --text-muted: #666666;
     --bg-light: var(--purple-50);
 }
+
 
 /* === 2. RESET & GLOBAL STYLES === */
 html {

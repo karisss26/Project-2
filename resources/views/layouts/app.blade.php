@@ -11,21 +11,24 @@
     <style>
         /* Reset CSS Dasar */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { display: flex; height: 100vh; background-color: #f4f4f9; overflow: hidden; }
+        body { display: flex; height: 100vh; background-color: #f7f1ff; overflow: hidden; }
 
         /* ... (sisa CSS di bawahnya biarkan sama persis nggak usah diubah) ... */
 
-        /* --- SIDEBAR UNGU --- */
+
+        /* --- SIDEBAR BRAND UNGU (#36005E) --- */
         .sidebar {
             width: 260px;
-            background-color: #800080;
+            background-color: #36005E;
             color: #ffffff;
             display: flex;
             flex-direction: column;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             transition: width 0.3s ease; /* Animasi mulus saat dikecilkan */
+
             z-index: 10;
         }
+
 
         /* Saat sidebar mode kecil */
         .sidebar.collapsed { width: 80px; }
@@ -46,8 +49,9 @@
             background: none; border: none; color: white; font-size: 24px; cursor: pointer; outline: none;
             transition: transform 0.3s;
         }
-        .toggle-btn:hover { color: #E6E6FA; }
+        .toggle-btn:hover { color: #F7F1FF; }
         .sidebar.collapsed .toggle-btn { margin: 0 auto; }
+
 
         /* Area Menu */
         .menu-items { flex: 1; padding-top: 15px; overflow-y: auto; overflow-x: hidden; }
@@ -55,8 +59,9 @@
             display: flex; align-items: center; padding: 15px 20px; color: #ffffff; text-decoration: none;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.3s; white-space: nowrap;
         }
-        .sidebar a:hover { background-color: #4B0082; padding-left: 25px; border-left: 4px solid #E6E6FA; }
+        .sidebar a:hover { background-color: #47127e; padding-left: 25px; border-left: 4px solid #F7F1FF; }
         .sidebar.collapsed a { padding: 15px; justify-content: center; border-left: none; }
+
         .sidebar.collapsed a:hover { padding-left: 15px; }
 
         /* Ikon & Teks Menu */
@@ -67,14 +72,16 @@
         /* Tombol Logout di paling bawah */
         .logout-form { border-top: 1px solid rgba(255, 255, 255, 0.1); }
         .logout-btn {
-            width: 100%; display: flex; align-items: center; padding: 15px 20px; background-color: #4B0082;
+            width: 100%; display: flex; align-items: center; padding: 15px 20px; background-color: #36005E;
             color: white; border: none; cursor: pointer; font-size: 15px; transition: 0.3s; white-space: nowrap;
         }
-        .logout-btn:hover { background-color: #dc3545; }
+        .logout-btn:hover { background-color: #2c004f; }
+
         .sidebar.collapsed .logout-btn { padding: 15px; justify-content: center; }
 
         /* --- AREA KONTEN UTAMA --- */
-        .main-content { flex: 1; display: flex; flex-direction: column; transition: margin 0.3s ease; }
+        .main-content { flex: 1; display: flex; flex-direction: column; transition: margin 0.3s ease; transform: none !important; }
+
 
         /* --- HEADER PUTIH --- */
         .header {
@@ -116,8 +123,9 @@
                 <a href="{{ route('admin.users.index') }}">👥 Kelola Akun</a>
                 <a href="{{ route('admin.katalog.index') }}">📦 Kelola Katalog Produk</a>
                 <a href="{{ route('admin.layanan.index') }}">🩺 Kelola Layanan Klinik</a>
-                <a href="#" class="menu-panel-item">🛒 Aplikasi Kasir (POS)</a>
+                <a href="{{ route('admin.pos.index') }}" class="menu-panel-item">🛒 Aplikasi Kasir (POS)</a>
                 <a href="#" class="menu-panel-item">📊 Laporan Penjualan</a>
+
                 <a href="{{ route('admin.profil') }}">⚙️ Pengaturan Profil</a>
             </div>
 
@@ -128,7 +136,8 @@
             @endif
         </div>
 
-        <a href="{{ route('logout') }}" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s;" onmouseover="this.style.backgroundColor='#dc3545'" onmouseout="this.style.backgroundColor='transparent'">
+        <a href="{{ route('logout') }}" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s;" onmouseover="this.style.backgroundColor='#2c004f'" onmouseout="this.style.backgroundColor='transparent'">
+
             <span class="menu-icon">🚪</span>
             <span class="menu-text">Keluar</span>
         </a>
@@ -138,9 +147,10 @@
 
         <div class="header">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <img src="{{ Auth::user()->foto_profil ? asset('storage/' . Auth::user()->foto_profil) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&background=800080&color=fff' }}"
+                <img src="{{ Auth::user()->foto_profil ? asset('storage/' . Auth::user()->foto_profil) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&background=36005E&color=fff' }}"
                     alt="Foto Profil"
-                    style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #800080; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #36005E; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+
 
                 <span style="font-weight: bold; color: #333; font-size: 16px;">
                     Halo, {{ Auth::user()->name }}! 👋

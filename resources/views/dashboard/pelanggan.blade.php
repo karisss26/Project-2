@@ -170,7 +170,11 @@
                 </td>
                 <td>{{ $r->alasan_batal ?? '-' }}</td>
                 <td>
-                    @if($r->status != 'Dibatalkan' && $r->status != 'Selesai')
+                    @if($r->status === 'Dikonfirmasi')
+                        <a href="{{ route('reservasi.e-ticket.download', $r->id) }}" class="btn btn-sm" style="background:#2e1065; color:#fff; padding:8px 12px; border-radius:6px; display:inline-block; text-decoration:none; font-weight:bold;">
+                            Print E‑Ticket
+                        </a>
+                    @elseif($r->status != 'Dibatalkan' && $r->status != 'Selesai')
                         <form action="{{ route('reservasi.batal', $r->id) }}" method="POST" onsubmit="return mintaAlasanDP(event, this, '{{ $r->nama_layanan }}', '{{ $r->status }}')">
                             @csrf
                             <button type="submit" class="btn-batal">Batalkan</button>

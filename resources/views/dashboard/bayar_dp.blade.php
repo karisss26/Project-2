@@ -34,7 +34,7 @@
 
         <button type="submit" style="width: 100%; padding: 12px; background: #800080; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 4px 6px rgba(128, 0, 128, 0.2);">Konfirmasi Sudah Bayar</button>
 
-        <a href="{{ route('dashboard.pelanggan') }}" style="display: block; text-align: center; margin-top: 15px; color: #999; text-decoration: none; font-size: 14px;">Bayar Nanti Saja</a>
+        <a href="{{ route('dashboard.pelanggan') }}" style="display: block; text-align: center; margin-top: 15px; color: #999; text-decoration: none; font-size: 14px;"></a>
     </form>
 </div>
 @endsection

@@ -195,11 +195,17 @@ public function storeHewan(Request $request)
         // Biar angka di card "Pesanan Aktif" atas nggak ikut ngitung yang udah selesai
         $pesananDiproses = $pesananAktif->where('status', '!=', 'Selesai')->count();
 
-        // [TAMBAHAN BARU] Hitung total pendapatan khusus dari transaksi yang selesai
-        // (Pastikan nama kolom harganya 'total_harga' ya, kalau pakai nama lain tinggal disesuaikan)
-        $totalPemasukan = Transaksi::where('status', 'Selesai')->sum('total_harga');
+        // [TAMBAHAN BARU] Hitung total pendapatan dari produk + layanan yang selesai
+        // Produk: transaksi.status = 'Selesai'
+        $totalPemasukanProduk = Transaksi::where('status', 'Selesai')->sum('total_harga');
+
+        // Layanan: reservasi.status = 'Selesai' (kolom harga total ada di reservasi.harga_total)
+        $totalPemasukanLayanan = reservasi::where('status', 'Selesai')->sum('harga_total');
+
+        $totalPemasukan = ($totalPemasukanProduk ?? 0) + ($totalPemasukanLayanan ?? 0);
 
         $riwayatAktivitas = LogAktivitas::with('user')->orderBy('created_at', 'desc')->take(10)->get();
+
 
         // [PERBAIKAN] Variabel 'totalPemasukan' wajib dimasukkan ke compact() ini
         return view('dashboard.admin', compact('totalPengguna', 'menungguKonfirmasi', 'pesananDiproses', 'antreanPembayaran', 'pesananAktif', 'riwayatAktivitas', 'totalPemasukan'));
