@@ -7,9 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Produk extends Model
 {
-    use HasFactory;
-
-    protected $table = 'produk'; // Nama tabel di database
-    protected $guarded = ['id']; // Membiarkan semua kolom bisa diisi kecuali ID
-
+    protected $table = 'produk';
+    protected $guarded = []; // Ini biar semua kolom otomatis bisa diisi
 }

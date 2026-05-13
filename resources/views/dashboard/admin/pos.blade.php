@@ -102,11 +102,8 @@
 
             <input type="hidden" name="payment_method" id="payment_method" value="cash">
 
-            {{-- items harus array (akan di-parse server) --}}
+            {{-- Data items dikirim pakai JSON --}}
             <input type="hidden" name="items_json" id="items-json" value="[]">
-
-            <input type="hidden" name="items" id="items-hidden" value="[]">
-
 
             <div style="margin-bottom: 12px;">
                 <div style="font-weight: 900; color:#4c1d95; margin-bottom: 6px;">Metode bayar</div>
@@ -124,9 +121,6 @@
                 <div style="font-weight: 900; color:#4c1d95; margin-bottom: 6px;">Upload bukti pembayaran (opsional)</div>
                 <input type="file" name="bukti_bayar" accept="image/*" style="width:100%; padding: 10px; border:1px solid #ddd; border-radius: 10px;" />
             </div>
-
-            {{-- items JSON ke input hidden --}}
-            <input type="hidden" name="items" id="items-hidden" value="[]">
 
             <div class="summary-row"><span>Total</span><span class="total" id="total-display">Rp 0</span></div>
 
@@ -206,7 +200,7 @@
             tbody.appendChild(tr);
         });
 
-        document.getElementById('items-hidden').value = JSON.stringify(itemsArr);
+        document.getElementById('items-json').value = JSON.stringify(itemsArr);
         document.getElementById('total-display').innerText = formatIDR(total);
 
         if (cart.size === 0) {
@@ -225,12 +219,17 @@
     setPayment('cash');
 
     document.getElementById('pos-form').addEventListener('submit', function(e) {
-        // items-hidden sudah terisi
         if (cart.size === 0) {
             e.preventDefault();
             alert('Keranjang masih kosong.');
+            return;
         }
+
+        // Mencegah double submit (data ganda di database)
+        const btn = document.getElementById('checkout-btn');
+        btn.disabled = true;
+        btn.innerText = 'Memproses...';
+        btn.style.opacity = 0.6;
     });
 </script>
 @endsection
-

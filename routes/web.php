@@ -98,6 +98,9 @@ Route::post('/dashboard/dokter/simpan-rm', [DashboardController::class, 'simpanR
     // --- RUTE ADMIN & KASIR (Dinamis) ---
     Route::middleware(['role:admin,kasir'])->group(function () {
         Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
+        Route::get('/admin/laporan', [\App\Http\Controllers\DashboardSalesReportController::class, 'adminLaporanPenjualan'])->name('admin.laporan');
+
+
 
 
         // POS Kasir (Admin)

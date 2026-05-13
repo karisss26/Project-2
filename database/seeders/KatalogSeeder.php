@@ -154,7 +154,23 @@ class KatalogSeeder extends Seeder
 
         foreach ($dataProduk as $produk) {
             $produk['gambar'] = 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=400&auto=format&fit=crop';
-            Produk::create($produk);
+
+            // Idempotent: mencegah produk dobel jika seeder dijalankan ulang
+            // Stok dibuat random untuk kebutuhan data demo
+            $stokRandom = random_int(20, 200);
+
+            Produk::updateOrCreate(
+                [
+                    'nama_produk' => $produk['nama_produk'],
+                    'kategori' => $produk['kategori'],
+                ],
+                [
+                    'harga' => $produk['harga'],
+                    'deskripsi' => $produk['deskripsi'],
+                    'gambar' => $produk['gambar'],
+                    'stok' => $stokRandom,
+                ]
+            );
         }
 
         // DATA LAYANAN
@@ -165,7 +181,18 @@ class KatalogSeeder extends Seeder
         ];
 
         foreach ($dataLayanan as $layanan) {
-            Layanan::create($layanan);
+            // Idempotent layanan juga (hindari ganda jika seeder dijalankan ulang)
+            Layanan::updateOrCreate(
+                [
+                    'nama_layanan' => $layanan['nama_layanan'],
+                    'kategori' => $layanan['kategori'],
+                ],
+                [
+                    'harga' => $layanan['harga'],
+                    'deskripsi' => $layanan['deskripsi'],
+                    'gambar' => $layanan['gambar'],
+                ]
+            );
         }
     }
 }

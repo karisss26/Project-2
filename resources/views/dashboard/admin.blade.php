@@ -43,7 +43,11 @@
 
     <div class="grid-stats">
         <div class="stat-card">
-            <span class="title">Total Pemasukan</span>
+            <a href="{{ route('admin.laporan') }}" style="text-decoration:none; color: inherit;" aria-label="Buka Laporan Penjualan">
+                <span class="title">Total Pemasukan</span>
+            </a>
+
+
             <span class="angka">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</span>
         </div>
         <div class="stat-card"><span class="title">Menunggu Konfirmasi</span><span class="angka" style="color: #e67e22;">{{ $menungguKonfirmasi }}</span></div>

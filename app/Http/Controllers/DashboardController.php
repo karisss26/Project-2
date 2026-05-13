@@ -17,7 +17,7 @@ use App\Models\Transaksi;
 use App\Notifications\TransaksiNotification;
 class DashboardController extends Controller
 {
-public function pelanggan()
+    public function pelanggan()
 {
     $userId = Auth::id();
     $petCount = hewan::where('user_id', $userId)->count();
@@ -169,7 +169,13 @@ public function storeHewan(Request $request)
 
     public function admin()
     {
+
+
         $totalPengguna = User::where('role', 'pelanggan')->count();
+
+
+        // (Catatan) Halaman laporan penjualan admin ada di adminLaporanPenjualan().
+
 
         $reservasi = reservasi::with('user')->get();
         $transaksi = Transaksi::with('user')->get();

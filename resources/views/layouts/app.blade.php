@@ -124,7 +124,7 @@
                 <a href="{{ route('admin.katalog.index') }}">📦 Kelola Katalog Produk</a>
                 <a href="{{ route('admin.layanan.index') }}">🩺 Kelola Layanan Klinik</a>
                 <a href="{{ route('admin.pos.index') }}" class="menu-panel-item">🛒 Aplikasi Kasir (POS)</a>
-                <a href="#" class="menu-panel-item">📊 Laporan Penjualan</a>
+                <a href="{{ route('admin.laporan') }}" class="menu-panel-item">📊 Laporan Penjualan</a>
 
                 <a href="{{ route('admin.profil') }}">⚙️ Pengaturan Profil</a>
             </div>

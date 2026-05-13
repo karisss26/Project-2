@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-
 class PosKasirController extends Controller
 {
     public function index(Request $request)
@@ -31,8 +30,7 @@ class PosKasirController extends Controller
 
     public function checkout(Request $request)
     {
-        // items dari POS adalah array (hasil parse JS).
-        // Kalau form mengirim JSON string, parse dulu.
+        // Parse JSON kalau form POS ngirimnya pakai items_json
         if ($request->filled('items_json') && is_string($request->items_json) && empty($request->items)) {
             $parsed = json_decode($request->input('items_json'), true);
             if (!is_array($parsed)) {
@@ -45,7 +43,6 @@ class PosKasirController extends Controller
             'items' => 'required|array|min:1',
             'items.*.produk_id' => 'required|integer|exists:produk,id',
             'items.*.qty' => 'required|integer|min:1|max:999',
-
             'payment_method' => 'required|in:cash,transfer',
             'bukti_bayar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
@@ -63,7 +60,7 @@ class PosKasirController extends Controller
 
             $produk = $produks->get($produkId);
             if (!$produk) {
-                return back()->withInput()->with('error', 'Produk tidak ditemukan.');
+                return back()->withInput()->with('error', 'Ada produk yang tidak ditemukan.');
             }
 
             $hargaSatuan = (float)$produk->harga;
@@ -79,7 +76,8 @@ class PosKasirController extends Controller
 
         $buktiPath = null;
 
-        $statusAwal = 'Menunggu Pembayaran';
+        // Setup status awal sesuai pembayaran
+        $statusAwal = 'Selesai';
         if ($request->payment_method === 'transfer') {
             $statusAwal = 'Menunggu Konfirmasi Admin';
             if ($request->hasFile('bukti_bayar')) {
@@ -87,47 +85,54 @@ class PosKasirController extends Controller
             }
         }
 
-        DB::transaction(function () use ($totalHarga, $statusAwal, $buktiPath, $detailRows) {
-            // Lock row produk supaya stok konsisten saat ada transaksi paralel
-            $produkIds = collect($detailRows)->pluck('produk_id')->unique()->values()->all();
-            $produksLocked = Produk::whereIn('id', $produkIds)->lockForUpdate()->get()->keyBy('id');
+        // Pakai Try-Catch biar aplikasi gak crash kalau Exception ke-trigger
+        try {
+            DB::transaction(function () use ($totalHarga, $statusAwal, $buktiPath, $detailRows) {
+                // Lock row produk supaya stok konsisten
+                $produkIds = collect($detailRows)->pluck('produk_id')->unique()->values()->all();
+                $produksLocked = Produk::whereIn('id', $produkIds)->lockForUpdate()->get()->keyBy('id');
 
-            // Validasi stok & kurangi stok
-            foreach ($detailRows as $d) {
-                $produk = $produksLocked->get((int)$d['produk_id']);
-                if (!$produk) {
-                    throw new \Exception('Produk tidak ditemukan saat update stok.');
+                // Validasi stok & kurangi stok
+                foreach ($detailRows as $d) {
+                    $produk = $produksLocked->get((int)$d['produk_id']);
+                    if (!$produk) {
+                        throw new \Exception('Produk tidak ditemukan saat update stok.');
+                    }
+
+                    $qty = (int)$d['jumlah'];
+
+                    if ((int)$produk->stok < $qty) {
+                        throw new \Exception('Stok produk "' . $produk->nama_produk . '" tidak cukup!');
+                    }
+
+                    $produk->stok = (int)$produk->stok - $qty;
+                    $produk->save();
                 }
 
-                $qty = (int)$d['jumlah'];
-
-                if ((int)$produk->stok < $qty) {
-                    throw new \Exception('Stok produk tidak cukup: ' . (($produk->nama_produk ?? null) ?: $produk->id));
-                }
-
-                $produk->stok = (int)$produk->stok - $qty;
-                $produk->save();
-            }
-
-            // Buat transaksi + detail
-            $transaksi = Transaksi::create([
-                'user_id' => Auth::id(),
-                'total_harga' => $totalHarga,
-                'status' => $statusAwal,
-                'bukti_pembayaran' => $buktiPath,
-            ]);
-
-            foreach ($detailRows as $d) {
-                DetilTransaksiProduk::create([
-                    'transaksi_id' => $transaksi->id,
-                    'produk_id' => $d['produk_id'],
-                    'jumlah' => $d['jumlah'],
-                    'harga_satuan' => $d['harga_satuan'],
+                // Buat transaksi + detail
+                $transaksi = Transaksi::create([
+                    'user_id' => Auth::id(),
+                    'total_harga' => $totalHarga,
+                    'status' => $statusAwal,
+                    'bukti_pembayaran' => $buktiPath,
                 ]);
-            }
-        });
 
-        return redirect()->route('admin.transaksi.index')->with('success', 'Transaksi POS berhasil dibuat.');
+                // Insert child record satu per satu (Pengganti sync)
+                foreach ($detailRows as $d) {
+                    DetilTransaksiProduk::create([
+                        'transaksi_id' => $transaksi->id,
+                        'produk_id' => $d['produk_id'],
+                        'jumlah' => $d['jumlah'],
+                        'harga_satuan' => $d['harga_satuan'],
+                    ]);
+                }
+            });
+
+            return redirect()->route('admin.transaksi.index')->with('success', 'Transaksi POS berhasil dibuat.');
+
+        } catch (\Exception $e) {
+            // Kalau ada error (kayak stok habis), balikin pesannya ke halaman POS
+            return back()->withInput()->with('error', 'Gagal memproses transaksi: ' . $e->getMessage());
+        }
     }
 }
-
