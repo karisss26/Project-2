@@ -3,123 +3,121 @@
 @section('title', 'Dashboard Owner - Paw Center')
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: #4A148C; font-weight: 700;">Dashboard Owner 🐾</h2>
+        <span class="badge bg-purple" style="background: #8E24AA; padding: 10px;">Filter: {{ $modeDisplay }}</span>
+    </div>
 
-<style>
-    .grid-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
-    .stat-card { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #E6E6FA; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .stat-card h3 { color: #888; font-size: 14px; text-transform: uppercase; margin-bottom: 10px; }
-    .stat-card .angka { font-size: 24px; font-weight: bold; color: #333; }
-    .angka.uang { color: #800080; }
-
-    .section-container { background: #fff; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #E6E6FA; }
-    .btn-print { background: #800080; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 15px;}
-    .btn-print:hover { background: #600060; }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    table, th, td { border: 1px solid #ddd; }
-    th, td { padding: 12px; text-align: left; }
-    th { background-color: #f8f9fa; }
-
-    /* Styling khusus saat halaman di-print */
-    @media print {
-        body * { visibility: hidden; } /* Sembunyikan semua elemen */
-        .print-area, .print-area * { visibility: visible; } /* Tampilkan hanya area laporan */
-        .print-area { position: absolute; left: 0; top: 0; width: 100%; }
-        .no-print { display: none !important; } /* Sembunyikan tombol print dsb saat nge-print */
-    }
-</style>
-
-<button class="btn-print no-print" onclick="window.print()">🖨️ Cetak Laporan Operasional</button>
-
-<div class="print-area">
-    <h2 class="no-print" style="margin-bottom: 20px;">Ringkasan D&F Pet Shop</h2>
-
-    <div class="grid-dashboard">
-        <div class="stat-card">
-            <h3>Pendapatan Hari Ini</h3>
-            <div class="angka uang">Rp {{ number_format($pendapatanHariIni, 0, ',', '.') }}</div>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0" style="border-left: 5px solid #8E24AA;">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Pendapatan</h6>
+                    <h3 class="fw-bold">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
+                </div>
+            </div>
         </div>
-        <div class="stat-card">
-            <h3>Total Layanan Selesai</h3>
-            <div class="angka">{{ $layananSelesai }}</div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0" style="border-left: 5px solid #4A148C;">
+                <div class="card-body">
+                    <h6 class="text-muted">Omzet Bersih</h6>
+                    <h3 class="fw-bold">Rp {{ number_format($omzetBersih, 0, ',', '.') }}</h3>
+                </div>
+            </div>
         </div>
-        <div class="stat-card">
-            <h3>Produk Terjual</h3>
-            <div class="angka">{{ $produkTerjual }} Item</div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0" style="border-left: 5px solid #2E7D32;">
+                <div class="card-body">
+                    <h6 class="text-muted">Transaksi Selesai</h6>
+                    <h3 class="fw-bold">{{ $totalTransaksiSelesai }}</h3>
+                </div>
+            </div>
         </div>
-        <div class="stat-card">
-            <h3>Penghuni Pet Hotel</h3>
-            <div class="angka">{{ $petHotel }} Ekor</div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0" style="border-left: 5px solid #F57C00;">
+                <div class="card-body">
+                    <h6 class="text-muted">Produk Terjual</h6>
+                    <h3 class="fw-bold">{{ $totalQtySold }}</h3>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="section-container">
-        <h3 style="color: #333; margin-bottom: 15px;">Grafik Pendapatan 7 Hari Terakhir</h3>
-        <canvas id="revenueChart" height="100"></canvas>
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white"><strong>Tren Pendapatan ({{ $count }} {{ $modeDisplay }})</strong></div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="section-container">
-        <h3 style="color: #333; margin-bottom: 15px;">Laporan Operasional & Transaksi Terbaru</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID Transaksi</th>
-                    <th>Tanggal</th>
-                    <th>Pelanggan</th>
-                    <th>Status</th>
-                    <th>Total Pembayaran</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($laporanOperasional as $trx)
-                <tr>
-                    <td>#TRX-{{ $trx->id }}</td>
-                    <td>{{ $trx->created_at->format('d M Y H:i') }}</td>
-                    <td>{{ $trx->user->name ?? 'Anonim' }}</td>
-                    <td>
-                        <span style="padding: 5px 10px; border-radius: 4px; background: {{ $trx->status == 'Selesai' ? '#d4edda' : '#fff3cd' }};">
-                            {{ $trx->status }}
-                        </span>
-                    </td>
-                    <td>Rp {{ number_format($trx->total_harga ?? 0, 0, ',', '.') }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" style="text-align: center;">Belum ada data transaksi.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white"><strong>Komposisi Penjualan Produk</strong></div>
+                <div class="card-body">
+                    <canvas id="produkChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white"><strong>Komposisi Reservasi Layanan</strong></div>
+                <div class="card-body">
+                    <canvas id="layananChart"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    const chartLabels = {!! json_encode($chartData['labels']) !!};
-    const chartData = {!! json_encode($chartData['data']) !!};
-
-    const revenueChart = new Chart(ctx, {
-        type: 'line', // Bisa diganti 'bar' kalau mau bentuk batang
+    // 1. Line Chart Pendapatan
+    const ctxRev = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctxRev, {
+        type: 'line',
         data: {
-            labels: chartLabels,
+            labels: {!! json_encode($revenueLabels) !!},
             datasets: [{
                 label: 'Pendapatan (Rp)',
-                data: chartData,
-                borderColor: '#800080',
-                backgroundColor: 'rgba(128, 0, 128, 0.1)',
-                borderWidth: 2,
+                data: {!! json_encode($revenueData) !!},
+                borderColor: '#8E24AA',
+                backgroundColor: 'rgba(142, 36, 170, 0.1)',
                 fill: true,
-                tension: 0.3 // Bikin garisnya agak melengkung smooth
+                tension: 0.4
             }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+        }
+    });
+
+    // 2. Pie Chart Produk Terlaris
+    const ctxProd = document.getElementById('produkChart').getContext('2d');
+    new Chart(ctxProd, {
+        type: 'doughnut',
+        data: {
+            labels: {!! json_encode($pieLabels) !!},
+            datasets: [{
+                data: {!! json_encode($pieData) !!},
+                backgroundColor: ['#4A148C', '#8E24AA', '#AB47BC', '#CE93D8', '#F3E5F5']
+            }]
+        }
+    });
+
+    // 3. Pie Chart Layanan Terlaris
+    const ctxLay = document.getElementById('layananChart').getContext('2d');
+    new Chart(ctxLay, {
+        type: 'doughnut',
+        data: {
+            labels: {!! json_encode($topLayananPieLabels) !!},
+            datasets: [{
+                data: {!! json_encode($topLayananPieData) !!},
+                backgroundColor: ['#1B5E20', '#388E3C', '#4CAF50', '#81C784', '#C8E6C9']
+            }]
         }
     });
 </script>

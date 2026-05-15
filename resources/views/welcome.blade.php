@@ -60,7 +60,7 @@
                 <h1 class="hero-title">Jadwalkan Kunjungan & Penuhi Kebutuhan Hewan Peliharaan Kesayangan Anda di D&F Pet Shop</h1>
                 <p class="hero-desc">Sistem terpadu layanan reservasi klinik, rekam medis, pet hotel, dan e-commerce terlengkap di Subang.</p>
                 </div>
-            <div class="hero-img-container" style="background-image: url('https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=800&auto=format&fit=crop');"></div>
+            <div class="hero-img-container" style="background-image: url('{{ asset('storage/welcome/hero.jpg') }}');"></div>
         </div>
     </section>
 
@@ -68,7 +68,7 @@
         <div class="container">
             <h2 class="section-title">Profil D&F Petshop</h2>
             <div class="profil-content">
-                <div class="profil-img" style="background-image: url('https://images.unsplash.com/photo-1628009368231-7bb7cbcb8127?q=80&w=800&auto=format&fit=crop');"></div>
+                <div class="profil-img" style="background-image: url('{{ asset('storage/welcome/profil.jpg') }}');"></div>
                 <div class="profil-text">
                     <p>Kami memahami bahwa hewan peliharaan adalah bagian dari keluarga Anda. Oleh karena itu, kami berkomitmen untuk memberikan perawatan medis dengan penuh kasih sayang dan profesional.</p>
                     <ul>
@@ -88,15 +88,15 @@
         <div class="container">
             <h2 class="section-title" style="margin-bottom: 10px;">Lokasi D&F</h2>
             <p class="lokasi-desc">D&F Pet Shop memiliki dua cabang di Subang, siap melayani berbagai kebutuhan hewan peliharaan kesayangan Anda.</p>
-            <div class="maps-grid">
+<div class="maps-grid">
                 <a href="https://www.google.com/maps/search/?api=1&query=Jl.+DI.Panjaitan+No.24,+Soklat,+Kec.+Subang,+Kabupaten+Subang" target="_blank" class="map-card">
-                    <div class="map-img" style="background-image: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=600&auto=format&fit=crop');"></div>
+                    <div class="map-img" style="background-image: url('{{ asset('storage/lokasi/subang.jpg') }}');"></div>
                     <div class="map-label">D&F Pet Shop & Clinic Cabang 1<br>
                         <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">Jl. DI.Panjaitan No.24, Soklat, Kec. Subang</span>
                     </div>
                 </a>
                 <a href="https://www.google.com/maps/search/?api=1&query=Jl.+Ion+Martasasmita+No.3,+Rancasari,+Kec.+Pamanukan,+Kabupaten+Subang" target="_blank" class="map-card">
-                    <div class="map-img" style="background-image: url('https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?q=80&w=600&auto=format&fit=crop');"></div>
+                    <div class="map-img" style="background-image: url('{{ asset('storage/lokasi/pagaden.jpg') }}');"></div>
                     <div class="map-label">D&F Pet Shop Cabang 2<br>
                         <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">Jl. Ion Martasasmita No.3, Rancasari, Kec. Pamanukan</span>
                     </div>
@@ -105,74 +105,43 @@
         </div>
     </section>
 
-    <section class="layanan-produk" id="layanan-produk" style="padding: 60px 0;">
-        <div class="container">
-            <h2 class="section-title">Layanan & Produk Kami</h2>
-
-            <h3 class="sub-judul">Klinik & Perawatan</h3>
-            <div class="layanan-grid">
+<section id="layanan">
+    <div class="container">
+        <h2 class="sub-judul">Layanan Kami</h2>
+        <div class="layanan-grid">
+            @foreach($layanan as $item)
                 <div class="layanan-card">
-                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1606425271394-c3ca9aa1fc06?q=80&w=400&auto=format&fit=crop');"></div>
-                    <div class="layanan-info"><h3>Klinik Hewan</h3><p>Layanan konsultasi dan diagnosa medis hewan.</p></div>
+                    <img src="{{ $item->gambar ? asset('storage/' . $item->gambar) : asset('images/default-layanan.jpg') }}" alt="{{ $item->nama_layanan }}">
+                    <h3>{{ $item->nama_layanan }}</h3>
+                    <p>{{ Str::limit($item->deskripsi, 100) }}</p>
+                    <p class="harga">Rp {{ number_format($item->harga, 0, ',', '.') }}</p>
                 </div>
-                <div class="layanan-card">
-                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1576201836106-db1758fd1c97?q=80&w=400&auto=format&fit=crop');"></div>
-                    <div class="layanan-info"><h3>Vaksinasi</h3><p>Pencegahan penyakit menular dan virus berbahaya.</p></div>
-                </div>
-                <div class="layanan-card">
-                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1584015694208-410712f5a653?q=80&w=400&auto=format&fit=crop');"></div>
-                    <div class="layanan-info"><h3>Sterilisasi</h3><p>Tindakan operasi steril untuk mengontrol populasi.</p></div>
-                </div>
-                <div class="layanan-card">
-                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=400&auto=format&fit=crop');"></div>
-                    <div class="layanan-info"><h3>Pet Grooming</h3><p>Layanan mandi, potong kuku, dan perawatan bulu.</p></div>
-                </div>
-                <div class="layanan-card">
-                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?q=80&w=400&auto=format&fit=crop');"></div>
-                    <div class="layanan-info"><h3>Pet Hotel</h3><p>Penitipan hewan yang aman, nyaman, dan diawasi 24 jam.</p></div>
-                </div>
-                <div class="layanan-card">
-                    <div class="layanan-img" style="background-image: url('https://images.unsplash.com/photo-1606514482705-ebcc5eb93ba5?q=80&w=400&auto=format&fit=crop');"></div>
-                    <div class="layanan-info"><h3>Pet Shop</h3><p>Menjual makanan premium, aksesoris & kebutuhan.</p></div>
-                </div>
-            </div>
-
-            <h3 class="sub-judul">Produk Pilihan</h3>
-            <div class="produk-grid">
-                <div class="produk-card">
-                    <div class="produk-img" style="background-image: url('https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=400&auto=format&fit=crop');"></div>
-                    <div class="produk-info">
-                        <h3 class="produk-title">Ransel Astronot</h3>
-                        <span class="produk-price">Rp 350.000</span>
-                    </div>
-                </div>
-                <div class="produk-card">
-                    <div class="produk-img" style="background-image: url('https://images.unsplash.com/photo-1589924691995-400dc9ecc119?q=80&w=400&auto=format&fit=crop');"></div>
-                    <div class="produk-info">
-                        <h3 class="produk-title">Royal Canin Persian Adult 400g</h3>
-                        <span class="produk-price">Rp 85.000</span>
-                    </div>
-                </div>
-                <div class="produk-card">
-                    <div class="produk-img" style="background-image: url('https://images.unsplash.com/photo-1623366302587-bcaad5cfdb66?q=80&w=400&auto=format&fit=crop');"></div>
-                    <div class="produk-info">
-                        <h3 class="produk-title">Proplan Kitten 500g</h3>
-                        <span class="produk-price">Rp 85.000</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="btn-center" style="margin-top: 40px;">
-                <a href="{{ url('/katalog') }}" class="btn btn-dark" style="border-radius: 8px; padding: 12px 35px; text-decoration: none;">Lihat Semua Layanan & Produk</a>
-            </div>
+            @endforeach
         </div>
-    </section>
+    </div>
+</section>
+
+<section id="produk">
+    <div class="container">
+        <h2 class="sub-judul">Produk Unggulan</h2>
+        <div class="produk-grid">
+            @foreach($produk as $p)
+                <div class="produk-card">
+                    <img src="{{ $p->gambar ? asset('storage/' . $p->gambar) : asset('images/default-produk.jpg') }}" alt="{{ $p->nama_produk }}">
+                    <h3>{{ $p->nama_produk }}</h3>
+                    <p class="harga">Rp {{ number_format($p->harga, 0, ',', '.') }}</p>
+                    <p>Stok: {{ $p->stok }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
 
     <section class="dokter" id="dokter">
         <div class="container dokter-container">
             <h2 class="section-title">Dokter Kami</h2>
             <div class="dokter-row">
-                <div class="dokter-img" style="background-image: url('https://images.unsplash.com/photo-1594824436998-dd40e4f69d3c?q=80&w=300&auto=format&fit=crop');"></div>
+                <div class="dokter-img" style="background-image: url('{{ asset('storage/dokter/dokter1.jpg') }}');"></div>
                 <div class="dokter-info">
                     <h3>drh. Arifa Nurjayanti</h3>
                     <span>Dokter Hewan Kecil</span>
@@ -180,7 +149,7 @@
                 </div>
             </div>
             <div class="dokter-row reverse">
-                <div class="dokter-img" style="background-image: url('https://images.unsplash.com/photo-1612349317150-e410f624c427?q=80&w=300&auto=format&fit=crop'); background-position: top;"></div>
+                <div class="dokter-img" style="background-image: url('{{ asset('storage/dokter/dokter2.jpg') }}'); background-position: top;"></div>
                 <div class="dokter-info">
                     <h3>drh. Aditya Lanang W.</h3>
                     <span>Dokter Hewan Eksotik</span>

@@ -117,17 +117,23 @@
                     <span class="menu-icon">👤</span><span class="menu-text">Profil Saya</span>
                 </a>
 
-            @elseif(Auth::check() && in_array(Auth::user()->role, ['admin', 'kasir']))
+            @elseif(Auth::check() && in_array(Auth::user()->role, ['admin', 'kasir', 'owner']))
             <div class="panel-menu">
-                <a href="{{ route('dashboard.admin') }}">🏠 Dashboard</a>
-                <a href="{{ route('admin.users.index') }}">👥 Kelola Akun</a>
-                <a href="{{ route('admin.katalog.index') }}">📦 Kelola Katalog Produk</a>
-                <a href="{{ route('admin.layanan.index') }}">🩺 Kelola Layanan Klinik</a>
-                <a href="{{ route('admin.pos.index') }}" class="menu-panel-item">🛒 Aplikasi Kasir (POS)</a>
-                <a href="{{ route('admin.laporan') }}" class="menu-panel-item">📊 Laporan Penjualan</a>
+                @if(Auth::user()->role == 'owner')
+                    <a href="{{ route('dashboard.owner') }}">🏠 Dashboard</a>
+                    <a href="{{ route('owner.profil') }}">⚙️ Pengaturan Profil</a>
+                @else
+                    <a href="{{ route('dashboard.admin') }}">🏠 Dashboard</a>
+                    <a href="{{ route('admin.users.index') }}">👥 Kelola Akun</a>
+                    <a href="{{ route('admin.katalog.index') }}">📦 Kelola Katalog Produk</a>
+                    <a href="{{ route('admin.layanan.index') }}">🩺 Kelola Layanan Klinik</a>
+                    <a href="{{ route('admin.pos.index') }}" class="menu-panel-item">🛒 Aplikasi Kasir (POS)</a>
+                    <a href="{{ route('admin.laporan') }}" class="menu-panel-item">📊 Laporan Penjualan</a>
 
-                <a href="{{ route('admin.profil') }}">⚙️ Pengaturan Profil</a>
+                    <a href="{{ route('admin.profil') }}">⚙️ Pengaturan Profil</a>
+                @endif
             </div>
+
 
             @else
                 <a href="#">

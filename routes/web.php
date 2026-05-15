@@ -8,15 +8,20 @@ use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
 use App\Http\Controllers\Admin\PosKasirController;
 use App\Http\Controllers\ReservasiTicketController;
-
-
-
+use App\Models\Produk;
+use App\Models\Layanan;
 
 // =========================================================
 // 1. RUTE PUBLIK
 // =========================================================
+
 Route::get('/', function () {
-    return view('welcome');
+    // Ambil cuma 6 produk aja sesuai request kamu
+    $produk = Produk::take(6)->get();
+    // Ambil semua layanan
+    $layanan = Layanan::all();
+
+    return view('welcome', compact('produk', 'layanan'));
 })->name('home');
 
 Route::get('/katalog', [KatalogController::class, 'index'])->name('dashboard.katalog');
@@ -29,6 +34,11 @@ Route::get('/reservasi/{id}/e-ticket', [ReservasiTicketController::class, 'downl
 // 2. RUTE GUEST (Khusus yang BELUM login)
 // =========================================================
 Route::middleware(['guest'])->group(function () {
+
+    // Laravel expects these routes for reset-password token generation
+    // (used by SendsPasswordResetEmails)
+
+
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
@@ -37,6 +47,14 @@ Route::middleware(['guest'])->group(function () {
 
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
+
+    Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'updatePassword'])->name('password.update');
+
+    // (opsional) placeholder agar URL reset password tidak missing
+    Route::get('/password/reset/{token}', function ($token) {
+        return redirect()->route('password.request');
+    })->name('password.reset');
 });
 
 
@@ -149,8 +167,13 @@ Route::post('/dashboard/dokter/simpan-rm', [DashboardController::class, 'simpanR
 
     // --- RUTE OWNER ---
     Route::middleware(['role:owner'])->group(function () {
-        Route::get('/owner/dashboard', [DashboardController::class, 'owner'])->name('dashboard.owner');
+        Route::get('/owner/dashboard', [\App\Http\Controllers\DashboardSalesReportController::class, 'adminLaporanPenjualan'])->name('dashboard.owner');
+
+        // Pengaturan Profil untuk Owner (pakai view & controller yang sama)
+        Route::get('/owner/profil', [DashboardController::class, 'profil'])->name('owner.profil');
+        Route::post('/owner/profil/update', [DashboardController::class, 'updateProfil'])->name('owner.profil.update');
     });
+
 
     // --- RUTE CRUD HEWAN ---
     Route::post('/data-hewan/store', [DashboardController::class, 'storeHewan'])->name('hewan.store');

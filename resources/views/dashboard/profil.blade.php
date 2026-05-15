@@ -15,9 +15,21 @@
 
     @php
         $user = auth()->user();
-        $isAdminOrKasir = $user && in_array($user->role, ['admin', 'kasir']);
-        $formUpdateRoute = $isAdminOrKasir ? route('admin.profil.update') : route('profil.umum.update');
-        $profileSettingsRoute = $isAdminOrKasir ? route('admin.profil') : route('profil.umum');
+        $isAdminKasirOrOwner = $user && in_array($user->role, ['admin', 'kasir', 'owner']);
+        $isOwner = $user && $user->role === 'owner';
+
+        $formUpdateRoute = $isOwner
+            ? route('owner.profil.update')
+            : ($isAdminKasirOrOwner ? route('admin.profil.update') : route('profil.umum.update'));
+
+        $profileSettingsRoute = $isOwner
+            ? route('owner.profil')
+            : ($isAdminKasirOrOwner ? route('admin.profil') : route('profil.umum'));
+
+        // Pastikan hanya role yang sesuai yang bisa mengakses view ini.
+        // (role pelanggan diarahkan ke route profil umum)
+
+
     @endphp
 
     <form action="{{ $formUpdateRoute }}" method="POST" enctype="multipart/form-data">
