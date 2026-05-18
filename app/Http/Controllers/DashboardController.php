@@ -317,20 +317,22 @@ public function setujuiReservasi(Request $request, $id)
             'laporanOperasional'
         ));
     }
-        public function dokter()
-        {
-            // Kita ambil data reservasi yang statusnya sudah 'Dikonfirmasi' oleh Admin
-            // dan urutkan dari yang paling lama (biar antreannya benar)
-            $jadwalLayanan = reservasi::with(['user', 'hewan'])
-                ->whereIn('status', ['Dikonfirmasi', 'Diproses'])
-                ->orderBy('created_at', 'asc')
-                ->get();
+    public function dokter()
+    {
+        // Antrean reservasi yang udah dikonfirmasi admin
+        $jadwalLayanan = reservasi::with(['user', 'hewan'])
+            ->whereIn('status', ['Dikonfirmasi', 'Diproses'])
+            ->orderBy('created_at', 'asc')
+            ->get();
 
-            // Kita juga ambil riwayat rekam medis biar dokter bisa baca history pasien
-            $rekamMedis = \App\Models\RekamMedis::with(['hewan'])->latest()->take(10)->get();
+        // History rekam medis
+        $rekamMedis = \App\Models\RekamMedis::with(['hewan'])->latest()->take(10)->get();
 
-            return view('dashboard.dokter', compact('jadwalLayanan', 'rekamMedis'));
-        }
+        // Ambil data user yang role-nya dokter (buat nampilin 2 dokter)
+        $listDokter = User::where('role', 'dokter')->get();
+
+        return view('dashboard.dokter', compact('jadwalLayanan', 'rekamMedis', 'listDokter'));
+    }
 
         // Tambahkan method baru untuk simpan rekam medis
         public function simpanRekamMedis(Request $request)
