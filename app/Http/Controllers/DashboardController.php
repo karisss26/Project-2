@@ -124,7 +124,7 @@ public function storeHewan(Request $request)
     public function updateProfil(Request $request)
     {
         // 1. Ambil data user yang sedang login langsung dari database
-        $user = User::find(auth()->user()->id);
+        $user = User::findOrFail(auth()->id());
 
         // 2. Validasi semua input dari form profil.blade.php kamu
         $request->validate([
@@ -157,6 +157,7 @@ public function storeHewan(Request $request)
             if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
                 Storage::disk('public')->delete($user->foto_profil);
             }
+
             // Simpan foto baru
             $user->foto_profil = $request->file('foto_profil')->store('profil', 'public');
         }

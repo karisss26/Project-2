@@ -28,7 +28,8 @@
                 <ul class="nav-links">
                     <li><a href="#beranda">Beranda</a></li>
                     <li><a href="#tentang">Tentang Kami</a></li>
-                    <li><a href="#layanan-produk">Layanan & Produk</a></li>
+                    <li><a href="#layanan">Layanan</a></li>
+                    <li><a href="#produk">Produk</a></li>
                     <li><a href="#dokter">Dokter</a></li>
                     <li><a href="#kontak">Kontak</a></li>
                 </ul>
@@ -134,6 +135,11 @@
                 </div>
             @endforeach
         </div>
+        <div class="text-center mt-5">
+        <a href="{{ url('/katalog') }}" class="btn btn-primary">
+            Lihat Semua Produk
+        </a>
+    </div>
     </div>
 </section>
 

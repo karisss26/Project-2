@@ -20,7 +20,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // Tambahkan role di sini ya sayang
+        'role',
+        'status',
     ];
 
     /**
