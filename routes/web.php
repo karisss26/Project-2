@@ -105,7 +105,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:dokter'])->group(function () {
         Route::get('/dokter/dashboard', [DashboardController::class, 'dokter'])->name('dashboard.dokter');
         // Pastikan ini ada di dalam group middleware yang role-nya dokter
-Route::post('/dashboard/dokter/simpan-rm', [DashboardController::class, 'simpanRekamMedis'])->name('dokter.simpanRM');
+        Route::post('/dashboard/dokter/simpan-rm', [DashboardController::class, 'simpanRekamMedis'])->name('dokter.simpanRM');
+        Route::post('/dokter/reservasi/{id}/update-status', [DashboardController::class, 'updateStatus'])->name('dokter.reservasi.updateStatus');
     });
 
     // --- RUTE STAFF ---

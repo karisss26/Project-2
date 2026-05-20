@@ -3,15 +3,6 @@
 @section('title', 'Data Hewan Peliharaan')
 
 @section('content')
-<style>
-    .modal-custom { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-content { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 450px; }
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 14px; }
-    .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
-    .btn-save { width: 100%; padding: 12px; background: #800080; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-</style>
-
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h2 style="color: #800080;">🐾 Data Hewan Peliharaan</h2>
     <button onclick="openModal('modalTambah')" style="background: #800080; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">+ Tambah Anabul</button>
@@ -60,11 +51,11 @@
 </div>
 
 <div id="modalTambah" class="modal-custom">
-    <div class="modal-content">
+    <div class="modal-content-hewan">
         <h3 style="margin-bottom: 15px; color: #800080;">Tambah Anabul Baru</h3>
         <form action="{{ route('hewan.store') }}" method="POST">
             @csrf
-            <div class="form-group">
+            <div class="form-group-hewan">
                 <label>Nama Anabul</label>
                 <input type="text" name="nama_hewan" required placeholder="Contoh: Mochi">
             </div>
@@ -122,7 +113,7 @@
                     </optgroup>
                 </select>
             </div>
-            <button type="submit" class="btn-save">Simpan Anabul</button>
+            <button type="submit" class="btn-save-hewan">Simpan Anabul</button>
             <button type="button" onclick="closeModal('modalTambah')" style="width: 100%; background: none; border: none; color: #999; margin-top: 10px; cursor: pointer;">Batal</button>
         </form>
     </div>

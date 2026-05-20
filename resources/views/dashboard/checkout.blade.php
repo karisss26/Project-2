@@ -4,44 +4,6 @@
 
 @section('content')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<style>
-    .co-container { display: flex; gap: 30px; flex-wrap: wrap; }
-    .co-left { flex: 2; min-width: 300px; }
-    .co-right { flex: 1; min-width: 300px; background: #f8f9fa; padding: 25px; border-radius: 8px; border: 1px solid #E6E6FA; }
-
-    .section-box { background: white; padding: 20px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 20px; }
-.section-box h3 { color: #36005E; margin-bottom: 15px; font-size: 18px; border-bottom: 2px solid #F7F1FF; padding-bottom: 10px; }
-
-    .item-list { width: 100%; border-collapse: collapse; }
-    .item-list th, .item-list td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
-    .item-list th { color: #555; }
-    .item-price { text-align: right; font-weight: bold; }
-
-.total-box { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #ccc; display: flex; justify-content: space-between; font-size: 20px; font-weight: bold; color: #36005E; }
-.qris-box { text-align: center; margin: 20px 0; padding: 20px; background: white; border-radius: 8px; border: 1px dashed #36005E; }
-    .qris-box img { max-width: 200px; margin-bottom: 10px; }
-
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-    .form-group input[type="file"], .form-group input[type="datetime-local"], .form-group textarea, .form-group input[type="text"] { width: 100%; padding: 10px; background: white; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
-
-.btn-pay { width: 100%; padding: 15px; background: #36005E; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-.btn-pay:hover { background: #2c004f; }
-
-.qty-btn { background: #F7F1FF; color: #36005E; border: none; width: 25px; height: 25px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-.qty-btn:hover { background: #36005E; color: white; }
-    .remove-btn { background: none; border: none; color: #dc3545; font-size: 18px; cursor: pointer; transition: 0.2s; }
-    .remove-btn:hover { transform: scale(1.2); }
-    .qty-display { display: inline-block; width: 30px; text-align: center; font-weight: bold; }
-    .flex-center { display: flex; align-items: center; justify-content: center; gap: 5px; }
-
-    /* Map Style */
-    #map { height: 350px; width: 100%; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 15px; z-index: 1; }
-
-    .radio-group { display: flex; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px; border: 1px solid #eee; margin-bottom: 15px;}
-    .radio-group label { margin: 0; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: normal;}
-    .jarak-badge { display: inline-block; background: #e2e3e5; color: #333; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px; font-weight: normal;}
-</style>
 
 @if(session('success'))
     <div style="background-color: #d4edda; border-left: 5px solid #28a745; color: #155724; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
@@ -122,7 +84,7 @@
                     <label>Cari Lokasi / Klik di Peta</label>
                     <div style="display: flex; gap: 5px;">
                         <input id="search-input" type="text" placeholder="Ketik daerah (Contoh: Subang)">
-<button type="button" onclick="searchLocation()" style="background: #36005E; color: white; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer;">Cari</button>
+                        <button type="button" onclick="searchLocation()" style="background: var(--purple-800); color: white; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer;">Cari</button>
                     </div>
                 </div>
                 <div id="map"></div>

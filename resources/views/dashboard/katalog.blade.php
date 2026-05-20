@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Katalog - D&P Pet Shop</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ time() }}">
+
     <script>
         tailwind.config = {
             theme: {
@@ -14,7 +18,7 @@
                         ungu: {
                             DEFAULT: '#7c3aed',
                             gelap: '#6d28d9',
-                            tua: '#2e1065', // Warna ungu tua pet shop baru
+                            tua: '#2e1065',
                             muda: '#e9d5ff',
                             terang: '#f3e8ff',
                         }
@@ -23,87 +27,6 @@
             }
         }
     </script>
-    <style>
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        /* Style Navigasi Cepat Katalog (Pure CSS) */
-    .katalog-jump-nav {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin: 30px 0;
-    }
-
-    .jump-btn {
-        display: inline-flex;
-        align-items: center;
-        padding: 10px 25px;
-        background-color: #fff;
-        border: 2px solid #7c3aed; /* Warna ungu kamu */
-        color: #7c3aed;
-        border-radius: 30px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 15px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-    .jump-btn:hover {
-        background-color: #7c3aed;
-        color: #fff;
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(124, 58, 237, 0.2);
-    }
-
-    /* Efek smooth scroll */
-    html {
-        scroll-behavior: smooth;
-    }
-
-    /* --- Tombol Back to Top --- */
-    .btn-to-top {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background-color: #7c3aed; /* Warna ungu Paw Center */
-        color: white;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 20px;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
-        transition: all 0.3s ease;
-        z-index: 999;
-        /* Default disembunyiin dulu pas di posisi paling atas */
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(20px);
-    }
-
-    /* Class ini bakal ditambahin pakai JS pas layar di-scroll */
-    .btn-to-top.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-
-    .btn-to-top:hover {
-        background-color: #6d28d9;
-        transform: translateY(-5px);
-        box-shadow: 0 6px 15px rgba(124, 58, 237, 0.6);
-        color: white;
-    }
-    </style>
 </head>
 <body class="bg-gray-50 font-sans">
 

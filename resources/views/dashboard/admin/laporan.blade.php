@@ -5,32 +5,6 @@
 @section('content')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .admin-header h2 { color: var(--purple-900); font-weight: 700; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-
-    .admin-card { background: var(--white); padding: 22px; border-radius: 12px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05); border: 1px solid var(--purple-100); margin-bottom: 18px; }
-    .admin-card h3 { color: var(--purple-800); font-size: 18px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--purple-50); }
-
-    .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 18px; }
-    .stat-card { background: var(--white); padding: 18px; border-radius: 12px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05); border: 1px solid var(--purple-100); display: flex; flex-direction: column; gap: 8px; }
-    .stat-card .title { color: var(--text-muted); font-size: 14px; font-weight: 600; }
-    .stat-card .angka { font-size: 28px; font-weight: 800; color: var(--purple-600); }
-
-    .filter-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
-    .filter-row label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block; }
-    .form-control, .form-select { border: 1px solid var(--purple-200); border-radius: 10px; padding: 10px 12px; }
-    .btn-acc { background: var(--purple-600); color: white; padding: 10px 14px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; }
-
-    .admin-table { width: 100%; border-collapse: collapse; }
-    .admin-table th { background: var(--purple-50); color: var(--purple-900); padding: 12px 15px; text-align: left; font-size: 13px; }
-    .admin-table td { padding: 15px; border-bottom: 1px solid var(--purple-50); font-size: 13px; color: var(--text-main); vertical-align: top;}
-    .badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-
-    .muted { color: var(--text-muted); }
-</style>
-
 <div class="content">
     <div class="admin-header">
         <h2>Laporan Penjualan - Admin</h2>
@@ -163,8 +137,8 @@
             datasets: [{
                 label: 'Pendapatan (Rp)',
                 data: revenueSeries,
-                borderColor: '#800080',
-                backgroundColor: 'rgba(128, 0, 128, 0.12)',
+                borderColor: '#36005E', // Warna ungu utama Paw Center
+                backgroundColor: 'rgba(54, 0, 94, 0.12)',
                 borderWidth: 2,
                 fill: true,
                 tension: 0.3
@@ -183,8 +157,8 @@
     const pieCtx = document.getElementById('productPie').getContext('2d');
 
     const colors = [
-        '#800080','#6d28d9','#7c3aed','#a855f7','#9333ea',
-        '#5b21b6','#4c1d95','#7f1d1d','#b91c1c','#ef4444'
+        '#36005E','#47127e','#5d1aa8','#7f2fff','#9a61ff',
+        '#c59aff','#dcc2ff','#ede1ff','#7c3aed','#6d28d9'
     ];
 
     new Chart(pieCtx, {
@@ -203,4 +177,3 @@
     });
 </script>
 @endsection
-

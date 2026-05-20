@@ -3,47 +3,14 @@
 @section('title', 'POS Kasir')
 
 @section('content')
-<style>
-    .pos-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px; }
-    @media (max-width: 1000px) { .pos-layout { grid-template-columns: 1fr; } }
-
-    .section { background: #fff; border-radius: 12px; border: 1px solid #E6E6FA; padding: 18px; }
-    .section h3 { margin: 0 0 12px; color: #36005E; font-size: 18px; border-bottom: 2px dashed #F7F1FF; padding-bottom: 10px; }
-
-    .product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    @media (max-width: 680px) { .product-grid { grid-template-columns: 1fr; } }
-
-    .product-card { border: 1px solid #eee; border-radius: 12px; padding: 12px; }
-    .product-name { font-weight: 800; color: #4c1d95; }
-    .product-meta { font-size: 12px; color: #6b7280; margin-top: 3px; }
-
-    .btn { padding: 10px 12px; border-radius: 10px; border: none; cursor: pointer; font-weight: 800; }
-    .btn-add { background: #36005E; color: #fff; width: 100%; margin-top: 10px; }
-
-    .qty-controls { display:flex; gap: 8px; align-items:center; justify-content: flex-end; }
-    .qty-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid #E6E6FA; background: #F7F1FF; cursor:pointer; font-weight:900; }
-
-    .table { width: 100%; border-collapse: collapse; }
-    .table th, .table td { padding: 10px 6px; border-bottom: 1px solid #f1f1f1; font-size: 13px; }
-    .table th { text-align: left; color: #4c1d95; }
-
-    .summary-row { display:flex; justify-content: space-between; margin: 8px 0; font-size: 14px; }
-    .total { font-size: 18px; font-weight: 900; color: #36005E; }
-
-    .btn-primary { background: #36005E; color: white; width: 100%; padding: 14px; border-radius: 12px; }
-    .btn-secondary { background: #6b7280; color: white; width: 100%; padding: 12px; border-radius: 12px; }
-
-    .empty-state { color:#6b7280; font-size: 14px; padding: 14px; border: 1px dashed #e5e7eb; border-radius: 12px; }
-</style>
-
 <div class="pos-layout">
-    <div class="section">
+    <div class="pos-section">
         <h3>🧾 Produk</h3>
 
         <form method="GET" action="{{ route('admin.pos.index') }}" style="margin-bottom: 14px;">
             <div style="display:flex; gap:10px; align-items:center;">
-                <input type="text" name="search" value="{{ $query }}" placeholder="Cari produk / kategori..." style="flex:1; padding: 12px 14px; border: 1px solid #ddd; border-radius: 10px;" />
-                <button class="btn" style="background:#36005E; color:#fff; padding: 12px 16px; border-radius:10px;" type="submit">Cari</button>
+                <input type="text" name="search" value="{{ $query }}" placeholder="Cari produk / kategori..." style="flex:1; padding: 12px 14px; border: 1px solid var(--purple-200); border-radius: 10px; outline: none;" />
+                <button class="btn-pos" style="background: var(--purple-800); color:#fff; padding: 12px 16px;" type="submit">Cari</button>
             </div>
         </form>
 
@@ -55,7 +22,7 @@
                     <div class="product-meta">Harga: Rp {{ number_format($p->harga, 0, ',', '.') }}</div>
 
                     <input type="hidden" class="product-id" value="{{ $p->id }}">
-                    <button type="button" class="btn btn-add" onclick="addItem({{ $p->id }}, '{{ addslashes($p->nama_produk) }}', {{ (float)$p->harga }})">+ Tambah</button>
+                    <button type="button" class="btn-pos btn-add" onclick="addItem({{ $p->id }}, '{{ addslashes($p->nama_produk) }}', {{ (float)$p->harga }})">+ Tambah</button>
                 </div>
             @empty
                 <div class="empty-state">Produk tidak ditemukan.</div>
@@ -63,7 +30,7 @@
         </div>
     </div>
 
-    <div class="section">
+    <div class="pos-section">
         <h3>🧺 Keranjang & Pembayaran</h3>
 
         @if(session('success'))
@@ -76,13 +43,12 @@
                 ❌ {{ session('error') }}
             </div>
         @endif
-
         @error('items')
             <div style="background:#f8d7da; border-left:5px solid #dc3545; padding: 12px 14px; border-radius: 10px; color:#721c24; font-weight:800; margin-bottom: 12px;">{{ $message }}</div>
         @enderror
 
-        <div style="max-height: 360px; overflow:auto; border: 1px solid #f1f1f1; border-radius: 12px;">
-            <table class="table">
+        <div style="max-height: 360px; overflow:auto; border: 1px solid var(--purple-50); border-radius: 12px;">
+            <table class="pos-table">
                 <thead>
                     <tr>
                         <th>Item</th>
@@ -101,12 +67,10 @@
             @csrf
 
             <input type="hidden" name="payment_method" id="payment_method" value="cash">
-
-            {{-- Data items dikirim pakai JSON --}}
             <input type="hidden" name="items_json" id="items-json" value="[]">
 
             <div style="margin-bottom: 12px;">
-                <div style="font-weight: 900; color:#4c1d95; margin-bottom: 6px;">Metode bayar</div>
+                <div style="font-weight: 900; color: var(--purple-900); margin-bottom: 6px;">Metode bayar</div>
                 <div style="display:flex; gap:10px; flex-direction: column;">
                     <label style="display:flex; gap:10px; align-items:center;">
                         <input type="radio" name="payment_method_radio" value="cash" checked onclick="setPayment('cash')"> 💵 Tunai / COD
@@ -118,16 +82,16 @@
             </div>
 
             <div id="transfer-area" style="display:none; margin-bottom: 12px;">
-                <div style="font-weight: 900; color:#4c1d95; margin-bottom: 6px;">Upload bukti pembayaran (opsional)</div>
-                <input type="file" name="bukti_bayar" accept="image/*" style="width:100%; padding: 10px; border:1px solid #ddd; border-radius: 10px;" />
+                <div style="font-weight: 900; color: var(--purple-900); margin-bottom: 6px;">Upload bukti pembayaran (opsional)</div>
+                <input type="file" name="bukti_bayar" accept="image/*" style="width:100%; padding: 10px; border:1px solid var(--purple-200); border-radius: 10px;" />
             </div>
 
-            <div class="summary-row"><span>Total</span><span class="total" id="total-display">Rp 0</span></div>
+            <div class="summary-row"><span>Total</span><span class="total-price" id="total-display">Rp 0</span></div>
 
-            <button type="submit" class="btn-primary btn" id="checkout-btn" disabled style="opacity:0.6;">Buat Transaksi</button>
+            <button type="submit" class="btn-pos-primary" id="checkout-btn" disabled style="opacity:0.6;">Buat Transaksi</button>
         </form>
 
-        <button type="button" class="btn-secondary btn" style="margin-top: 10px;" onclick="clearCart()">Kosongkan</button>
+        <button type="button" class="btn-pos-secondary" style="margin-top: 10px;" onclick="clearCart()">Kosongkan</button>
     </div>
 </div>
 
@@ -187,14 +151,14 @@
                 <td>${row.nama}</td>
                 <td style="text-align:right;">
                     <div class="qty-controls">
-                        <button type="button" class="qty-btn" onclick="changeQty(${row.produk_id}, -1)">-</button>
+                        <button type="button" class="pos-qty-btn" onclick="changeQty(${row.produk_id}, -1)">-</button>
                         <span style="min-width:28px; text-align:center; font-weight:900;">${row.qty}</span>
-                        <button type="button" class="qty-btn" onclick="changeQty(${row.produk_id}, 1)">+</button>
+                        <button type="button" class="pos-qty-btn" onclick="changeQty(${row.produk_id}, 1)">+</button>
                     </div>
                 </td>
-                <td style="text-align:right; font-weight:900; color:#36005E;">${formatIDR(subtotal)}</td>
+                <td style="text-align:right; font-weight:900; color:var(--purple-800);">${formatIDR(subtotal)}</td>
                 <td style="text-align:right;">
-                    <button type="button" class="qty-btn" onclick="changeQty(${row.produk_id}, -999)">🗑️</button>
+                    <button type="button" class="pos-qty-btn" onclick="changeQty(${row.produk_id}, -999)">🗑️</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -225,7 +189,6 @@
             return;
         }
 
-        // Mencegah double submit (data ganda di database)
         const btn = document.getElementById('checkout-btn');
         btn.disabled = true;
         btn.innerText = 'Memproses...';

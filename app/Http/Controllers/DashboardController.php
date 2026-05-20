@@ -317,45 +317,29 @@ public function setujuiReservasi(Request $request, $id)
             'laporanOperasional'
         ));
     }
-    public function dokter()
+public function dokter()
     {
-        // Antrean reservasi yang udah dikonfirmasi admin
-        $jadwalLayanan = reservasi::with(['user', 'hewan'])
-            ->whereIn('status', ['Dikonfirmasi', 'Diproses'])
+        // 1. Antrean reservasi yang baru dikonfirmasi admin (Belum diperiksa)
+        $antreanPemeriksaan = reservasi::with(['user', 'hewan'])
+            ->where('status', 'Dikonfirmasi')
             ->orderBy('created_at', 'asc')
             ->get();
 
-        // History rekam medis
+        // 2. Pasien yang sedang dalam proses pemeriksaan
+        $pasienDiperiksa = reservasi::with(['user', 'hewan'])
+            ->where('status', 'Diproses')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // History rekam medis (opsional)
         $rekamMedis = \App\Models\RekamMedis::with(['hewan'])->latest()->take(10)->get();
 
-        // Ambil data user yang role-nya dokter (buat nampilin 2 dokter)
+        // Ambil data user yang role-nya dokter
         $listDokter = User::where('role', 'dokter')->get();
 
-        return view('dashboard.dokter', compact('jadwalLayanan', 'rekamMedis', 'listDokter'));
+        // Pastikan variabel yang di-compact sama dengan yang dipanggil di blade
+        return view('dashboard.dokter', compact('antreanPemeriksaan', 'pasienDiperiksa', 'rekamMedis', 'listDokter'));
     }
-
-        // Tambahkan method baru untuk simpan rekam medis
-        public function simpanRekamMedis(Request $request)
-        {
-            $request->validate([
-                'hewan_id' => 'required',
-                'diagnosa' => 'required',
-                'keluhan' => 'required',
-                'tindakan' => 'required'
-            ]);
-
-            // Simpan ke database (Sesuaikan field-nya dengan migrasi kamu ya)
-            \App\Models\RekamMedis::create([
-                'hewan_id' => $request->hewan_id,
-                'user_id' => auth()->id(), // Dokter yang menangani
-                'keluhan' => $request->keluhan,
-                'diagnosa' => $request->diagnosa,
-                'tindakan' => $request->tindakan,
-                'tanggal_periksa' => now(),
-            ]);
-
-            return redirect()->back()->with('success', 'Rekam medis berhasil diperbarui!');
-        }
     public function staff() { return view('dashboard.staff'); }
     public function dataHewan()
     {
