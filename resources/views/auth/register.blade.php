@@ -51,8 +51,21 @@
                 <input type="email" name="email" required value="{{ old('email') }}" placeholder="email@contoh.com">
             </div>
             <div class="form-group">
-                <label>Kata Sandi</label>
-                <input type="password" name="password" required placeholder="Minimal 8 karakter">
+                <label for="password">Kata Sandi</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">&#x1F512;</span>
+                    <input type="password" id="password" name="password" required placeholder="••••••••">
+                    <span class="toggle-password" onclick="toggleVisibility('password', this)" title="Lihat Password" style="cursor: pointer;">👁️</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password-confirm">Konfirmasi Kata Sandi</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">&#x1F512;</span>
+                    <input type="password" id="password-confirm" name="password_confirmation" required placeholder="••••••••">
+                    <span class="toggle-password" onclick="toggleVisibility('password-confirm', this)" title="Lihat Password" style="cursor: pointer;">👁️</span>
+                </div>
             </div>
             <button type="submit">Daftar Sekarang</button>
         </form>
@@ -61,5 +74,21 @@
             <p>Sudah punya akun? <a href="{{ route('login') }}">Masuk di sini</a></p>
         </div>
     </div>
+    <script>
+    function toggleVisibility(inputId, iconElement) {
+        // Ambil input berdasarkan ID yang dikirim
+        const passwordInput = document.getElementById(inputId);
+
+        // Cek tipe input saat ini
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+
+        // Ubah tipe input (buka/tutup sensor)
+        passwordInput.setAttribute('type', type);
+
+        // Ubah ikon mata sesuai seperti di login.blade.php
+        iconElement.textContent = type === 'password' ? '👁️' : '🙈';
+    }
+    </script>
+
 </body>
 </html>
