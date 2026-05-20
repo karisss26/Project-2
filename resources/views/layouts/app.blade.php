@@ -28,6 +28,9 @@
                 <a href="{{ route('pelanggan.hewan') }}">
                     <span class="menu-icon">🐶</span><span class="menu-text">Data Hewan</span>
                 </a>
+                <a href="{{ route('pelanggan.rekam_medis') }}">
+                    <span class="menu-icon">🩺</span><span class="menu-text">Rekam Medis</span>
+                </a>
                 <a href="{{ route('profil.umum') }}">
                     <span class="menu-icon">👤</span><span class="menu-text">Profil Saya</span>
                 </a>
@@ -60,6 +63,12 @@
                     </a>
                     <a href="{{ route('admin.pos.index') }}">
                         <span class="menu-icon">🛒</span><span class="menu-text">Aplikasi Kasir (POS)</span>
+                    </a>
+                    <a href="{{ route('admin.riwayat_pesanan') }}">
+                        <span class="menu-icon">🛍️</span><span class="menu-text">Riwayat Pesanan</span>
+                    </a>
+                    <a href="{{ route('admin.riwayat_layanan') }}">
+                        <span class="menu-icon">📅</span><span class="menu-text">Riwayat Layanan</span>
                     </a>
                     <a href="{{ route('admin.laporan') }}">
                         <span class="menu-icon">📊</span><span class="menu-text">Laporan Penjualan</span>

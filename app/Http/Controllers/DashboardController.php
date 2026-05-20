@@ -15,35 +15,51 @@ use App\Notifications\ReservasiNotification;
 use App\Models\DetilTransaksiProduk;
 use App\Models\Transaksi;
 use App\Notifications\TransaksiNotification;
+
 class DashboardController extends Controller
 {
     public function pelanggan()
-{
-    $userId = Auth::id();
-    $petCount = hewan::where('user_id', $userId)->count();
-    $cartCount = count(session('cart', []));
+    {
+        $userId = Auth::id();
+        $petCount = hewan::where('user_id', $userId)->count();
+        $cartCount = count(session('cart', []));
 
-    // Data untuk tabel 1: Reservasi Layanan
-    $reservasiLayanan = reservasi::where('user_id', $userId)
-                                              ->orderBy('created_at', 'desc')
-                                              ->get();
+        // Data untuk tabel 1: Reservasi Layanan
+        $reservasiLayanan = reservasi::where('user_id', $userId)
+                                                  ->orderBy('created_at', 'desc')
+                                                  ->get();
 
-    // Data untuk tabel 2: Pembelian Produk
-    $pembelianProduk = Transaksi::where('user_id', $userId)
-                                            ->orderBy('created_at', 'desc')
-                                            ->get();
+        // Data untuk tabel 2: Pembelian Produk
+        $pembelianProduk = Transaksi::where('user_id', $userId)
+                                                ->orderBy('created_at', 'desc')
+                                                ->get();
 
-    // Hitung reservasi aktif (dicek admin atau disetujui)
-    $activeReservationsCount = $reservasiLayanan->whereIn('status', ['Menunggu Konfirmasi Admin', 'Dikonfirmasi'])->count();
+        // Hitung reservasi aktif (dicek admin atau disetujui)
+        $activeReservationsCount = $reservasiLayanan->whereIn('status', ['Menunggu Konfirmasi Admin', 'Dikonfirmasi'])->count();
 
-    return view('dashboard.pelanggan', compact(
-        'petCount',
-        'activeReservationsCount',
-        'cartCount',
-        'reservasiLayanan',
-        'pembelianProduk'
-    ));
-}
+        return view('dashboard.pelanggan', compact(
+            'petCount',
+            'activeReservationsCount',
+            'cartCount',
+            'reservasiLayanan',
+            'pembelianProduk'
+        ));
+    }
+
+    public function layanan()
+    {
+        // Narik data jadwal dari database (mengabaikan status batal/selesai)
+        $bookedSlots = reservasi::whereNotIn('status', ['Dibatalkan', 'Selesai'])
+            ->get(['tanggal', 'waktu'])
+            ->groupBy('tanggal')
+            ->map(function ($items) {
+                // Ubah list jam menjadi array murni
+                return $items->pluck('waktu')->toArray();
+            });
+
+        // Tampilkan view form dan lempar data jadwal penuh
+        return view('dashboard.layanan', compact('bookedSlots'));
+    }
 
     public function batalkan(Request $request, $id)
     {
@@ -62,7 +78,7 @@ class DashboardController extends Controller
         return redirect()->back()->with('success', 'Reservasi berhasil dibatalkan.');
     }
 
-public function storeHewan(Request $request)
+    public function storeHewan(Request $request)
     {
         // 1. Ambil semua request, TAPI kecualikan umur_angka dan umur_satuan
         $data = $request->except(['umur_angka', 'umur_satuan']);
@@ -170,18 +186,13 @@ public function storeHewan(Request $request)
 
     public function admin()
     {
-
-
         $totalPengguna = User::where('role', 'pelanggan')->count();
 
-
-        // (Catatan) Halaman laporan penjualan admin ada di adminLaporanPenjualan().
-
-
+        // Ambil data dasar dari database
         $reservasi = reservasi::with('user')->get();
         $transaksi = Transaksi::with('user')->get();
 
-        // [BARU] Bongkar keranjang belanja produk buat ditampilin ke Admin
+        // Bongkar keranjang belanja produk buat ditampilin ke Admin
         foreach($transaksi as $trx) {
             $trx->detail_belanja = DetilTransaksiProduk::where('transaksi_id', $trx->id)->get();
             foreach($trx->detail_belanja as $detail) {
@@ -190,35 +201,57 @@ public function storeHewan(Request $request)
             }
         }
 
+        // Gabungan data utama biar logic counter di atasnya ga rusak
         $semuaPesanan = $reservasi->concat($transaksi)->sortByDesc('created_at');
 
         $antreanPembayaran = $semuaPesanan->whereIn('status', ['Menunggu', 'Menunggu Pembayaran', 'Menunggu Konfirmasi Admin', 'Pending']);
-
-        // Tambahan status "Menunggu Kurir", "Pesanan Diantar", dan "Selesai"
         $pesananAktif = $semuaPesanan->whereIn('status', ['Dikonfirmasi', 'Diproses', 'Menunggu Jadwal', 'Menunggu Kurir', 'Pesanan Diantar', 'Selesai']);
 
         $menungguKonfirmasi = $antreanPembayaran->count();
-
-        // Biar angka di card "Pesanan Aktif" atas nggak ikut ngitung yang udah selesai
         $pesananDiproses = $pesananAktif->where('status', '!=', 'Selesai')->count();
 
-        // [TAMBAHAN BARU] Hitung total pendapatan dari produk + layanan yang selesai
-        // Produk: transaksi.status = 'Selesai'
-        $totalPemasukanProduk = Transaksi::where('status', 'Selesai')->sum('total_harga');
+        // 1. Antrean - Layanan Klinik vs Produk Belanja
+        $antreanLayanan = $antreanPembayaran->filter(function($item) {
+            return $item instanceof \App\Models\reservasi;
+        });
+        $antreanProduk = $antreanPembayaran->filter(function($item) {
+            return $item instanceof \App\Models\Transaksi;
+        });
 
-        // Layanan: reservasi.status = 'Selesai' (kolom harga total ada di reservasi.harga_total)
+        // 2. Pesanan Aktif - Layanan Klinik vs Produk Belanja
+        $aktifLayanan = $pesananAktif->filter(function($item) {
+            return $item instanceof \App\Models\reservasi;
+        });
+        $aktifProduk = $pesananAktif->filter(function($item) {
+            return $item instanceof \App\Models\Transaksi;
+        });
+
+        // Hitung pendapatan awal
+        $totalPemasukanProduk = Transaksi::where('status', 'Selesai')->sum('total_harga');
         $totalPemasukanLayanan = reservasi::where('status', 'Selesai')->sum('harga_total');
 
         $totalPemasukan = ($totalPemasukanProduk ?? 0) + ($totalPemasukanLayanan ?? 0);
 
-        $riwayatAktivitas = LogAktivitas::with('user')->orderBy('created_at', 'desc')->take(10)->get();
+        // [PERBAIKAN] Mengubah take(10)->get() menjadi paginate(10)
+        $riwayatAktivitas = LogAktivitas::with('user')->orderBy('created_at', 'desc')->paginate(10);
 
-
-        // [PERBAIKAN] Variabel 'totalPemasukan' wajib dimasukkan ke compact() ini
-        return view('dashboard.admin', compact('totalPengguna', 'menungguKonfirmasi', 'pesananDiproses', 'antreanPembayaran', 'pesananAktif', 'riwayatAktivitas', 'totalPemasukan'));
+        // Kirim variabel lama PLUS variabel baru hasil pemisahan kita
+        return view('dashboard.admin', compact(
+            'totalPengguna',
+            'menungguKonfirmasi',
+            'pesananDiproses',
+            'antreanPembayaran',
+            'pesananAktif',
+            'riwayatAktivitas',
+            'totalPemasukan',
+            'antreanLayanan',
+            'antreanProduk',
+            'aktifLayanan',
+            'aktifProduk'
+        ));
     }
 
-public function setujuiReservasi(Request $request, $id)
+    public function setujuiReservasi(Request $request, $id)
     {
         // Cek apakah dia produk atau reservasi
         $pesanan = ($request->tipe == 'transaksi')
@@ -268,26 +301,26 @@ public function setujuiReservasi(Request $request, $id)
     }
 
     public function uploadBukti(Request $request, $id)
-{
-    $request->validate([
-        'bukti_pembayaran_dp' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-    ]);
-
-    $reservasi = reservasi::findOrFail($id);
-
-    if ($request->hasFile('bukti_pembayaran_dp')) {
-        // Simpan file ke folder storage/app/public/bukti_dp
-        $path = $request->file('bukti_pembayaran_dp')->store('bukti_dp', 'public');
-
-        // Update status dan simpan nama filenya
-        $reservasi->update([
-            'bukti_pembayaran_dp' => $path,
-            'status' => 'Menunggu Konfirmasi Admin'
+    {
+        $request->validate([
+            'bukti_pembayaran_dp' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
-    }
 
-    return redirect()->route('dashboard.pelanggan')->with('success', 'Bukti pembayaran berhasil diunggah, silakan tunggu konfirmasi admin.');
-}
+        $reservasi = reservasi::findOrFail($id);
+
+        if ($request->hasFile('bukti_pembayaran_dp')) {
+            // Simpan file ke folder storage/app/public/bukti_dp
+            $path = $request->file('bukti_pembayaran_dp')->store('bukti_dp', 'public');
+
+            // Update status dan simpan nama filenya
+            $reservasi->update([
+                'bukti_pembayaran_dp' => $path,
+                'status' => 'Menunggu Konfirmasi Admin'
+            ]);
+        }
+
+        return redirect()->route('dashboard.pelanggan')->with('success', 'Bukti pembayaran berhasil diunggah, silakan tunggu konfirmasi admin.');
+    }
 
     public function owner()
     {
@@ -317,7 +350,8 @@ public function setujuiReservasi(Request $request, $id)
             'laporanOperasional'
         ));
     }
-public function dokter()
+    
+    public function dokter()
     {
         // 1. Antrean reservasi yang baru dikonfirmasi admin (Belum diperiksa)
         $antreanPemeriksaan = reservasi::with(['user', 'hewan'])
@@ -340,7 +374,9 @@ public function dokter()
         // Pastikan variabel yang di-compact sama dengan yang dipanggil di blade
         return view('dashboard.dokter', compact('antreanPemeriksaan', 'pasienDiperiksa', 'rekamMedis', 'listDokter'));
     }
+    
     public function staff() { return view('dashboard.staff'); }
+    
     public function dataHewan()
     {
         // Ambil data hewan khusus milik pelanggan yang sedang login
@@ -349,5 +385,56 @@ public function dokter()
         // Bawa datanya ke halaman view
         return view('dashboard.hewan', compact('semua_hewan'));
     }
+    
     public function profil() { return view('dashboard.profil'); }
+
+    // Menu Riwayat Belanja Produk
+    public function riwayatPesananAdmin(Request $request)
+    {
+        $search = $request->get('search');
+
+        $pembelianProduk = Transaksi::with('user') // Pakai with user biar tau ini punya siapa
+            ->when($search, function($query, $search) {
+                return $query->where('id', 'LIKE', "%{$search}%")
+                            ->orWhere('status', 'LIKE', "%{$search}%");
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return view('dashboard.riwayat_pesanan', compact('pembelianProduk', 'search'));
+    }
+
+    // Menu Riwayat Reservasi Klinik/Layanan
+    public function riwayatLayananAdmin(Request $request)
+    {
+        $search = $request->get('search');
+
+        // Kita ambil data reservasi beserta data user-nya (eager loading)
+        $reservasiLayanan = reservasi::with('user')
+            ->when($search, function($query, $search) {
+                return $query->where('id', 'LIKE', "%{$search}%")
+                             ->orWhere('nama_layanan', 'LIKE', "%{$search}%")
+                             ->orWhere('pet_name', 'LIKE', "%{$search}%")
+                             ->orWhere('status', 'LIKE', "%{$search}%")
+                             // Tambahan: Bisa cari berdasarkan nama pelanggan juga
+                             ->orWhereHas('user', function($q) use ($search) {
+                                 $q->where('name', 'LIKE', "%{$search}%");
+                             });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(15); // Admin biasanya butuh data lebih banyak per halaman, aku set 15 ya
+
+        return view('dashboard.riwayat_layanan', compact('reservasiLayanan', 'search'));
+    }
+
+    public function rekamMedisPelanggan()
+    {
+        // Tarik data reservasi yang statusnya udah dikonfirmasi admin ke atas
+        $riwayatMedis = reservasi::where('user_id', Auth::id())
+            ->whereIn('status', ['Dikonfirmasi', 'Menunggu Jadwal', 'Diproses', 'Selesai'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return view('dashboard.rekam_medis_pelanggan', compact('riwayatMedis'));
+    }
 }

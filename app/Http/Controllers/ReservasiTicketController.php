@@ -20,8 +20,8 @@ class ReservasiTicketController extends Controller
         }
 
         // E-ticket hanya saat sudah disetujui admin
-        if ($reservasi->status !== 'Dikonfirmasi') {
-            abort(403, 'E-ticket belum tersedia (menunggu konfirmasi admin).');
+        if ($reservasi->status !== 'Menunggu Jadwal') {
+            abort(403, 'E-ticket belum tersedia.');
         }
 
         /** @var PDF $pdf */

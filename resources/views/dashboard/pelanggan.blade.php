@@ -16,270 +16,186 @@
 @endif
 
 <style>
-    /* CSS Bawaan Kamu */
     .grid-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
     .stat-card { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #800080; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .stat-card h3 { color: #555; font-size: 16px; margin-bottom: 5px; }
-    .stat-card .angka { font-size: 28px; font-weight: bold; color: #800080; }
-    .btn-batal { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s; }
-    .btn-batal:hover { background: #a71d2a; transform: scale(1.05); }
-    .btn-katalog { display: inline-block; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    .btn-katalog:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
-
-    /* Tambahan CSS Buat Badge Status */
-    .badge-status { padding: 5px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block;}
-    .status-menunggu-pembayaran { background: #ffeeba; color: #856404; }
-    .status-menunggu-konfirmasi { background: #d1ecf1; color: #0c5460; }
-    .status-dikonfirmasi { background: #d4edda; color: #155724; }
-    .status-dibatalkan { background: #f8d7da; color: #721c24; }
-    .status-default { background: #e2e3e5; color: #383d41; }
-
-    /* TAMBAHAN STYLE BUAT TABEL BIAR CAKEP */
-    .table-container {
-        background: #ffffff;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.08);
-        margin-bottom: 30px;
-        overflow-x: auto; /* Biar ngga nabrak kalo layarnya kecil */
-    }
-    .table-header-title {
-        color: #6d28d9;
-        font-weight: 700;
-        font-size: 18px;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .custom-table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 800px; /* Biar kolomnya lega dan list produk ngga kelipet */
-    }
-    .custom-table th {
-        background: #f3e8ff; /* ungu terang */
-        color: #4c1d95;
-        padding: 14px 16px;
-        text-align: left;
-        font-size: 14px;
-        font-weight: 600;
-        border-bottom: 2px solid #e9d5ff;
-    }
-    .custom-table td {
-        padding: 16px;
-        border-bottom: 1px solid #f3f4f6;
-        font-size: 14px;
-        color: #374151;
-        vertical-align: middle;
-    }
-    .custom-table tr:hover {
-        background-color: #faf5ff;
-    }
-    .badge {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        display: inline-block;
-    }
-    .badge-gray { background: #f3f4f6; color: #4b5563; }
-    .badge-orange { background: #fef3c7; color: #d97706; }
-    .badge-green { background: #d1fae5; color: #059669; }
-    .badge-red { background: #fee2e2; color: #dc2626; }
-
-    .product-list {
-        margin: 0;
-        padding-left: 20px;
-        color: #4b5563;
-    }
-    .product-list li {
-        margin-bottom: 4px;
-        list-style-type: disc;
-    }
-    .btn-batal {
-        background: #dc2626;
-        color: white;
-        border: none;
-        padding: 8px 14px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: 0.3s;
-        font-size: 12px;
-    }
-    .btn-batal:hover { background: #b91c1c; }
+    .stat-card h3 { color: #555; font-size: 16px; margin-bottom: 10px; margin-top:0; }
+    .stat-card .angka { font-size: 24px; font-weight: bold; color: #800080; }
+    .section-box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 25px; border: 1px solid #f1f5f9; }
+    .section-box h3 { margin-top: 0; margin-bottom: 20px; color: #1e1b4b; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+    .table-responsive { overflow-x: auto; }
+    .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+    .data-table th { background: #f8fafc; color: #64748b; font-weight: 600; padding: 12px 16px; border-bottom: 2px solid #edf2f7; }
+    .data-table td { padding: 16px; border-bottom: 1px solid #edf2f7; color: #334155; vertical-align: middle; }
+    .badge-status { padding: 6px 12px; border-radius: 50px; font-size: 12px; font-weight: 600; display: inline-block; }
+    .status-menunggu { background: #fef3c7; color: #d97706; }
+    .status-aktif { background: #e0f2fe; color: #0284c7; }
+    .status-selesai { background: #dcfce7; color: #16a34a; }
+    .status-batal { background: #fee2e2; color: #dc2626; }
+    .btn-sm { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; display: inline-block; transition: all 0.2s; }
+    .btn-primary { background: #800080; color: white; border: none; }
+    .btn-primary:hover { background: #600060; }
+    .btn-danger { background: #ef4444; color: white; border: none; cursor: pointer; }
+    .btn-danger:hover { background: #dc2626; }
 </style>
 
-<div class="grid-dashboard">
-    <div class="stat-card">
-        <h3>Hewan Peliharaan Saya</h3>
-        <div class="angka">{{ $petCount }} Anabul</div>
+<div class="content">
+    <div style="margin-bottom: 25px;">
+        <h2 style="margin:0; color: #1e1b4b;">Selamat Datang Kembali, {{ Auth::user()->name }}! 👋</h2>
+        <p style="margin:5px 0 0 0; color: #64748b;">Pantau kondisi anabul dan status belanjamu di dashboard Paw Center.</p>
     </div>
 
-    <div class="stat-card">
-        <h3>Reservasi Aktif</h3>
-        <div class="angka">{{ $activeReservationsCount ?? 0 }} Jadwal</div>
+    <div class="grid-dashboard">
+        <div class="stat-card"><h3>Total Hewan Kamu</h3><span class="angka">{{ $petCount }}</span></div>
+        <div class="stat-card"><h3>Reservasi Aktif</h3><span class="angka">{{ $activeReservationsCount }}</span></div>
+        <div class="stat-card"><h3>Total Transaksi Belanja</h3><span class="angka">{{ count($pembelianProduk) }}</span></div>
     </div>
 
-    <div class="stat-card">
-        <h3>Keranjang Belanja</h3>
-        <div class="angka">{{ $cartCount }} Item</div>
-
-        @if($cartCount > 0)
-            <a href="{{ route('dashboard.checkout') }}" style="display: inline-block; margin-top: 10px; background: #800080; color: white; padding: 6px 15px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: bold;">Bayar Sekarang 🛒</a>
-        @endif
-    </div>
-</div>
-
-<div class="table-container">
-    <div class="table-header-title">
-        🏥 Riwayat Reservasi Layanan
-    </div>
-    <table class="custom-table">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Layanan</th>
-                <th>Tanggal & Waktu</th>
-                <th>Metode Bayar</th>
-                <th>Status</th>
-                <th>Alasan Batal</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($reservasiLayanan as $index => $r)
-            <tr>
-                <td>{{ $index + 1 }}</td>
-                <td><strong>{{ $r->nama_layanan }}</strong></td>
-                <td>{{ \Carbon\Carbon::parse($r->tanggal_reservasi)->format('d M Y') }} <br> <span style="color:#6b7280; font-size:12px;">{{ $r->waktu_reservasi }} WIB</span></td>
-                <td>
-                    <span class="badge badge-gray">
-                        {{ $r->metode_pembayaran ?? 'Bayar di Klinik' }}
-                    </span>
-                </td>
-                <td>
-                    @if($r->status == 'Menunggu' || $r->status == 'Pending')
-                        <span class="badge badge-orange">Menunggu</span>
-                    @elseif($r->status == 'Disetujui' || $r->status == 'Dikonfirmasi')
-                        <span class="badge badge-green">Disetujui</span>
-                    @else
-                        <span class="badge badge-red">{{ $r->status }}</span>
-                    @endif
-                </td>
-                <td>{{ $r->alasan_batal ?? '-' }}</td>
-                <td>
-                    @if($r->status === 'Dikonfirmasi')
-                        <a href="{{ route('reservasi.e-ticket.download', $r->id) }}" class="btn btn-sm" style="background:#2e1065; color:#fff; padding:8px 12px; border-radius:6px; display:inline-block; text-decoration:none; font-weight:bold;">
-                            Print E‑Ticket
-                        </a>
-                    @elseif($r->status != 'Dibatalkan' && $r->status != 'Selesai')
-                        <form action="{{ route('reservasi.batal', $r->id) }}" method="POST" onsubmit="return mintaAlasanDP(event, this, '{{ $r->nama_layanan }}', '{{ $r->status }}')">
-                            @csrf
-                            <button type="submit" class="btn-batal">Batalkan</button>
-                        </form>
-                    @else
-                        <span style="color:#9ca3af; font-size:12px;">Tidak ada aksi</span>
-                    @endif
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="7" style="text-align: center; padding: 30px; color: #9ca3af;">Belum ada riwayat reservasi.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
-
-<div class="table-container">
-    <div class="table-header-title">
-        🛍️ Riwayat Pembelian Produk
-    </div>
-    <table class="custom-table">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>ID Transaksi</th>
-                <th>Produk yang Dibeli</th>
-                <th>Total</th>
-                <th>Metode Bayar</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($pembelianProduk as $index => $t)
-            <tr>
-                <td>{{ $index + 1 }}</td>
-                <td><strong>#TRX-{{ $t->id }}</strong></td>
-                <td>
-                    <ul class="product-list">
-                        @foreach($t->detilProduk as $detail)
-                            <li>
-                            {{ $detail->produk->nama_produk }} 
-                            <br>
-                            <small style="color: #6b7280;">
-                                {{ $detail->jumlah }}x @ Rp {{ number_format($detail->produk->harga, 0, ',', '.') }}
-                            </small>
-                            </li>
-                        @endforeach
-                    </ul>
-
+    <div class="section-box">
+        <h3>🩺 Riwayat Jadwal Layanan & Klinik</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID Booking</th>
+                        <th>Layanan</th>
+                        <th>Nama Anabul</th>
+                        <th>Jadwal Kunjungan</th>
+                        <th>Status</th>
+                        <th>Aksi / Tiket</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($reservasiLayanan as $r)
+                    <tr>
+                        <td><strong>#RES-{{ $r->id }}</strong></td>
+                        <td>{{ $r->nama_layanan }}</td>
+                        <td><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-weight:600;">🐱 {{ $r->pet_name }}</span></td>
+                        <td>
+                            @if(!empty($r->tanggal))
+                                {{ \Carbon\Carbon::parse($r->tanggal)->format('d M Y') }}<br>
+                                <small style="color:#64748b;">{{ \Carbon\Carbon::parse($r->waktu)->format('H:i') }} WIB</small>
+                            @else
+                                <span style="color:red;">-</span>
+                            @endif
                         </td>
-                <td style="color: #6d28d9; font-weight: bold;">Rp {{ number_format($t->total_harga, 0, ',', '.') }}</td>
-                    <td>
-                        <span class="badge badge-gray">
-                            {{ $t->bukti_pembayaran ? 'Transfer Bank' : 'Bayar Cash' }}
-                        </span>
-                    </td>
-                <td>
-                    @if($t->status == 'Selesai')
-                        <span class="badge badge-green">Selesai</span>
-                    @else
-                        <span class="badge badge-orange">{{ $t->status }}</span>
-                    @endif
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 30px; color: #9ca3af;">Belum ada riwayat pembelian produk.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+                        <td>
+                            <span class="badge-status 
+                                {{ $r->status == 'Selesai' ? 'status-selesai' : '' }}
+                                {{ in_array($r->status, ['Dikonfirmasi', 'Menunggu Jadwal']) ? 'status-aktif' : '' }}
+                                {{ $r->status == 'Menunggu Konfirmasi Admin' ? 'status-menunggu' : '' }}
+                                {{ $r->status == 'Dibatalkan' ? 'status-batal' : '' }}
+                            ">
+                                {{ $r->status }}
+                            </span>
+                        </td>
+                        <td>
+                            @if($r->status === 'Menunggu Jadwal')
+                                <a href="{{ route('reservasi.e-ticket.download', $r->id) }}" class="btn-sm btn-primary">
+                                    Print E‑Ticket
+                                </a>
+                            @endif
+
+                            @if($r->status === 'Menunggu Pembayaran')
+                                <a href="{{ route('reservasi.bayar', $r->id) }}" class="btn-sm" style="background:#f59e0b; color:white;">
+                                    Upload DP
+                                </a>
+                            @endif
+
+                            @if(in_array($r->status, ['Menunggu Pembayaran', 'Menunggu Konfirmasi Admin', 'Dikonfirmasi', 'Menunggu Jadwal']))
+                                <form action="{{ route('reservasi.batal', $r->id) }}" method="POST" style="display:inline;" onsubmit="return mintaAlasanDP(event, this, '{{ $r->nama_layanan }}', '{{ $r->status }}')">
+                                    @csrf
+                                    <button type="submit" class="btn-sm btn-danger" style="margin-left: 5px;">Batal</button>
+                                </form>
+                            @else
+                                <span style="color:#94a3b8; font-size:12px;">Tidak ada aksi</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="6" style="text-align: center; padding: 30px; color: #9ca3af;">Belum ada riwayat booking klinik/layanan.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>🛍️ Riwayat Transaksi Belanja Produk</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID Transaksi</th>
+                        <th>Tgl Checkout</th>
+                        <th>Total Belanja</th>
+                        <th>Metode Pengiriman</th>
+                        <th>Status Pesanan</th>
+                        <th>Bukti Bayar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($pembelianProduk as $t)
+                    <tr>
+                        <td><strong>#TRX-{{ $t->id }}</strong></td>
+                        <td>{{ $t->created_at->format('d M Y, H:i') }}</td>
+                        <td><span style="font-weight:600; color:#16a34a;">Rp {{ number_format($t->total_harga, 0, ',', '.') }}</span></td>
+                        
+                        <td>
+                            @if(isset($t->metode_pengiriman) && $t->metode_pengiriman == 'pickup')
+                                <span style="color: #4c1d95; font-weight: bold;">📍 Ambil Sendiri</span><br>
+                                <small style="color: #64748b;">Rencana Ambil: {{ !empty($t->tanggal_ambil) ? \Carbon\Carbon::parse($t->tanggal_ambil)->format('d M Y') : '-' }}</small>
+                            @else
+                                <span style="color: #0284c7; font-weight: bold;">🚚 Dikirim Kurir</span>
+                            @endif
+                        </td>
+
+                        <td>
+                            <span class="badge-status
+                                {{ $t->status == 'Selesai' ? 'status-selesai' : '' }}
+                                {{ in_array($t->status, ['Dikonfirmasi', 'Diproses', 'Menunggu Diambil', 'Menunggu Jadwal', 'Menunggu Kurir', 'Pesanan Diantar']) ? 'status-aktif' : '' }}
+                                {{ in_array($t->status, ['Menunggu Pembayaran', 'Menunggu Konfirmasi Admin']) ? 'status-menunggu' : '' }}
+                                {{ $t->status == 'Dibatalkan' ? 'status-batal' : '' }}
+                            ">
+                                {{ $t->status == 'Menunggu Jadwal' ? 'Menunggu Diambil' : $t->status }}
+                            </span>
+                        </td>
+                        <td>
+                            @if($t->bukti_pembayaran)
+                                <a href="{{ asset('storage/' . $t->bukti_pembayaran) }}" target="_blank" class="btn-sm" style="background:#e2e8f0; color:#334155;">Lihat Struk</a>
+                            @else
+                                <span style="color:#94a3b8; font-size:12px;">COD / Tanpa Bukti</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="6" style="text-align: center; padding: 30px; color: #9ca3af;">Belum ada riwayat pembelian produk.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
     function mintaAlasanDP(event, form, namaLayanan, status) {
-        // Stop form biar ga langsung submit
         event.preventDefault();
-
-        let pesan = `Apakah kamu yakin ingin membatalkan jadwal ${namaLayanan} ini?\n\n`;
-
-        // Kasih warning khusus kalau udah bayar/disetujui
-        if (status === 'Disetujui' || status === 'Dikonfirmasi' || status === 'Menunggu Konfirmasi Admin') {
-            pesan += "⚠️ PERINGATAN: Karena reservasi sudah masuk tahap proses, uang DP yang sudah dibayarkan TIDAK DAPAT DIKEMBALIKAN (Hangus).\n\n";
+        let pesan = `Apakah kamu yakin ingin membatalkan jadwal ${namaLayanan} ini?\\n\\n`;
+        if (status === 'Disetujui' || status === 'Dikonfirmasi' || status === 'Menunggu Konfirmasi Admin' || status === 'Menunggu Jadwal') {
+            pesan += "⚠️ PERINGATAN: Karena reservasi sudah masuk tahap proses, uang DP yang sudah dibayarkan TIDAK DAPAT DIKEMBALIKAN (Hangus).\\n\\n";
         }
-
         pesan += "Silakan masukkan alasan pembatalan:";
-
-        // Munculin pop-up input
         let alasan = prompt(pesan);
-
-        // Kalau diisi dan klik OK
         if (alasan !== null && alasan.trim() !== '') {
             let inputAlasan = document.createElement('input');
             inputAlasan.type = 'hidden';
             inputAlasan.name = 'alasan_batal';
             inputAlasan.value = alasan;
-
             form.appendChild(inputAlasan);
-            form.submit(); // Lanjut kirim ke controller
+            form.submit();
         } else if (alasan !== null) {
-            // Kalau klik OK tapi dikosongin
-            alert('Gagal membatalkan. Alasan pembatalan WAJIB diisi!');
+            alert('Gagal membatalkan. Alasan pembatalan wajib diisi ya!');
         }
+        return false;
     }
 </script>
 @endsection

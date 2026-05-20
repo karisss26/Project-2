@@ -16,4 +16,13 @@ class Transaksi extends Model
     public function detilProduk() {
         return $this->hasMany(DetilTransaksiProduk::class, 'transaksi_id');
     }
+
+    protected $fillable = [
+        'user_id', 
+        'total_harga', 
+        'status', 
+        'bukti_pembayaran', 
+        'metode_pengiriman', // Tambahin ini
+        'tanggal_ambil'      // Tambahin ini
+    ];
 }

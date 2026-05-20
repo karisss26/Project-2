@@ -10,17 +10,25 @@ use App\Models\hewan; // Tambahan model hewan
 
 class KatalogController extends Controller
 {
-    public function index()
+public function index()
     {
         $produk = Produk::all();
         $layanan = Layanan::all();
 
-        // Ambil data hewan khusus punya pelanggan yang lagi login
         $hewan_user = [];
         if (Auth::check()) {
             $hewan_user = hewan::where('user_id', Auth::id())->get();
         }
 
-        return view('dashboard.katalog', compact('produk', 'layanan', 'hewan_user'));
+        // [TAMBAHAN] Tarik jadwal yang sudah terisi khusus untuk dikirim ke kalender katalog
+        $bookedSlots = \App\Models\reservasi::whereNotIn('status', ['Dibatalkan', 'Selesai'])
+            ->get(['tanggal', 'waktu'])
+            ->groupBy('tanggal')
+            ->map(function ($items) {
+                return $items->pluck('waktu')->toArray();
+            });
+
+        // Jangan lupa passing 'bookedSlots'
+        return view('dashboard.katalog', compact('produk', 'layanan', 'hewan_user', 'bookedSlots'));
     }
 }

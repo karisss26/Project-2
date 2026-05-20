@@ -90,10 +90,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/cart/update', [CheckoutController::class, 'updateCart'])->name('cart.update');
         Route::post('/cart/remove', [CheckoutController::class, 'removeFromCart'])->name('cart.remove');
 
+        Route::get('/pelanggan/rekam-medis', [App\Http\Controllers\DashboardController::class, 'rekamMedisPelanggan'])->name('pelanggan.rekam_medis');
+
         Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
 
         Route::post('/dashboard/reservasi/{id}/batal', [DashboardController::class, 'batalkan'])->name('reservasi.batal');
-        Route::view('/layanan-produk', 'dashboard.layanan')->name('pelanggan.layanan');
+        Route::get('/layanan-produk', [DashboardController::class, 'layanan'])->name('pelanggan.layanan');
         Route::post('/reservasi/proses', [CheckoutController::class, 'prosesReservasi'])->name('reservasi.proses');
         Route::get('/reservasi/bayar/{id}', [CheckoutController::class, 'bayarDp'])->name('reservasi.bayar');
         Route::post('/reservasi/konfirmasi/{id}', [DashboardController::class, 'konfirmasiPembayaran'])->name('reservasi.konfirmasi');
@@ -119,13 +121,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
         Route::get('/admin/laporan', [\App\Http\Controllers\DashboardSalesReportController::class, 'adminLaporanPenjualan'])->name('admin.laporan');
 
-
-
-
         // POS Kasir (Admin)
         Route::get('/admin/pos', [PosKasirController::class, 'index'])->name('admin.pos.index');
         Route::post('/admin/pos/checkout', [PosKasirController::class, 'checkout'])->name('admin.pos.checkout');
 
+        Route::get('/admin/riwayat-pesanan', [DashboardController::class, 'riwayatPesananAdmin'])->name('admin.riwayat_pesanan');
+        Route::get('/admin/riwayat-layanan', [DashboardController::class, 'riwayatLayananAdmin'])->name('admin.riwayat_layanan');
 
         Route::post('/admin/reservasi/setujui/{id}', [DashboardController::class, 'setujuiReservasi'])->name('admin.reservasi.setujui');
         Route::post('/admin/reservasi/tolak/{id}', [DashboardController::class, 'tolakReservasi'])->name('admin.reservasi.tolak');

@@ -98,10 +98,10 @@
                 </div>
             </div>
 
-            <div id="pickup_area">
+            <div id="pickup_area" style="display: none;">
                 <div class="form-group">
-                    <label>Pilih Waktu Pengambilan</label>
-                    <input type="datetime-local" name="pickup_time" id="pickup_time" form="form-checkout">
+                    <label>Pilih Tanggal Pengambilan <span style="color:red;">*</span></label>
+                    <input type="date" name="tanggal_ambil" id="input_tanggal_ambil" min="{{ date('Y-m-d') }}" form="form-checkout">
                 </div>
             </div>
         </div>

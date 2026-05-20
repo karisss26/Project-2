@@ -263,50 +263,87 @@
                 <input type="hidden" name="layanan_id" id="modalLayananId">
                 <input type="hidden" name="nama_layanan" id="modalNamaLayananInput">
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Layanan</label>
-                    <input type="text" id="modalLayanan" disabled class="w-full px-4 py-2 bg-ungu-terang/30 border border-ungu-muda rounded-xl text-ungu font-semibold focus:outline-none cursor-not-allowed">
+                <div id="step-1">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Layanan</label>
+                        <input type="text" id="modalLayanan" disabled class="w-full px-4 py-2 bg-ungu-terang/30 border border-ungu-muda rounded-xl text-ungu font-semibold focus:outline-none cursor-not-allowed">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Harga (Bayar di Klinik)</label>
+                        <input type="text" id="modalHarga" disabled class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 font-semibold focus:outline-none cursor-not-allowed">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Anabul Kamu <span class="text-red-500">*</span></label>
+                        <select name="nama_hewan" id="input_hewan" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
+                            <option value="" disabled selected>-- Pilih Hewan Peliharaan --</option>
+                            @auth
+                                @forelse($hewan_user as $hewan)
+                                    <option value="{{ $hewan->nama_hewan }}">{{ $hewan->nama_hewan }} ({{ $hewan->jenis_hewan }})</option>
+                                @empty
+                                    <option value="" disabled>Belum ada hewan. Tambah di Dashboard dulu ya!</option>
+                                @endforelse
+                            @endauth
+                        </select>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Keluhan / Catatan Medis (Opsional)</label>
+                        <textarea name="keluhan" rows="2" placeholder="Contoh: Kucing saya muntah-muntah sejak semalam..." class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda"></textarea>
+                    </div>
+
+                    <button type="button" id="btnNext" class="w-full bg-ungu text-white font-semibold py-3 rounded-xl hover:bg-ungu-gelap transition-colors flex items-center justify-center gap-2">
+                        Pilih Jadwal Kunjungan <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Harga (Bayar di Klinik)</label>
-                    <input type="text" id="modalHarga" disabled class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 font-semibold focus:outline-none cursor-not-allowed">
-                </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Reservasi</label>
-                    <input type="date" name="tanggal_reservasi" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
-                </div>
+                <div id="step-2" style="display: none;">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Reservasi / Check-in <span class="text-red-500">*</span></label>
+                        <input type="date" name="tanggal_reservasi" id="input_tanggal" min="{{ date('Y-m-d') }}" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
+                    </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Waktu</label>
-                    <select name="waktu_reservasi" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
-                        <option value="" disabled selected>Pilih Waktu</option>
-                        <option value="09:00:00">09:00 WIB</option>
-                        <option value="10:00:00">10:00 WIB</option>
-                        <option value="13:00:00">13:00 WIB</option>
-                        <option value="15:00:00">15:00 WIB</option>
-                    </select>
-                </div>
+                    <div class="mb-4" id="wrap_waktu">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Waktu Kunjungan <span class="text-red-500">*</span></label>
+                        <select name="waktu_reservasi" id="input_waktu" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
+                            <option value="" disabled selected>-- Pilih Jam --</option>
+                            <option value="15:00:00">15:00 WIB</option>
+                            <option value="16:00:00">16:00 WIB</option>
+                            <option value="17:00:00">17:00 WIB</option>
+                            <option value="18:00:00">18:00 WIB</option>
+                            <option value="19:00:00">19:00 WIB</option>
+                            <option value="20:00:00">20:00 WIB</option>
+                            <option value="14:00:00" id="opt_hotel" style="display: none;">14:00 WIB</option>
+                        </select>
+                    </div>
 
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Anabul Kamu</label>
-                    <select name="nama_hewan" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
-                        <option value="" disabled selected>Pilih Hewan Peliharaan</option>
-                        @auth
-                            @forelse($hewan_user as $hewan)
-                                <option value="{{ $hewan->nama_hewan }}">{{ $hewan->nama_hewan }} ({{ $hewan->jenis_hewan }})</option>
-                            @empty
-                                <option value="" disabled>Belum ada hewan. Tambah di Dashboard dulu ya!</option>
-                            @endforelse
-                        @endauth
-                    </select>
-                </div>
+                    <div id="wrap_hotel_info" style="display: none;">
+                        <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-xl text-blue-800">
+                            <p class="text-sm font-bold mb-1"><i class="fas fa-info-circle mr-1"></i> Info Pet Hotel</p>
+                            <ul class="text-sm list-disc list-inside space-y-1">
+                                <li><strong>Check-in:</strong> Mulai pukul 14:00 WIB</li>
+                                <li><strong>Check-out:</strong> Maksimal pukul 12:00 WIB</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Check-out <span class="text-red-500">*</span></label>
+                            <input type="date" name="tanggal_checkout" id="input_tgl_checkout" min="{{ date('Y-m-d') }}" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
+                            <small class="text-gray-500 mt-1 block">Tentukan kapan anabul akan dijemput pulang.</small>
+                        </div>
+                    </div>
 
-                <button type="submit" class="w-full bg-ungu text-white font-semibold py-3 rounded-xl hover:bg-ungu-gelap transition-colors flex items-center justify-center gap-2">
-                    <i class="fas fa-calendar-check"></i>
-                    Booking Sekarang
-                </button>
+                    <div class="flex gap-3">
+                        <button type="button" id="btnBack" class="w-1/3 bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-300 transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </button>
+                        <button type="submit" class="w-2/3 bg-ungu text-white font-semibold py-3 rounded-xl hover:bg-ungu-gelap transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-calendar-check"></i> Booking Sekarang
+                        </button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
@@ -584,6 +621,101 @@
             behavior: "smooth"
         });
     }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const step1 = document.getElementById('step-1');
+        const step2 = document.getElementById('step-2');
+        const btnNext = document.getElementById('btnNext');
+        const btnBack = document.getElementById('btnBack');
+        
+        const inputHewan = document.getElementById('input_hewan');
+        const namaLayananInput = document.getElementById('modalNamaLayananInput');
+        
+        const wrapWaktu = document.getElementById('wrap_waktu');
+        const inputWaktu = document.getElementById('input_waktu');
+        const optHotel = document.getElementById('opt_hotel');
+        
+        const wrapHotelInfo = document.getElementById('wrap_hotel_info');
+        const inputTglCheckout = document.getElementById('input_tgl_checkout');
+
+        // LOGIC 1: Tombol NEXT (Pindah ke Halaman 2)
+        btnNext.addEventListener('click', function() {
+            if (!inputHewan.value) {
+                alert("Pilih anabulnya dulu ya sebelum lanjut!");
+                return;
+            }
+
+            step1.style.display = 'none';
+            step2.style.display = 'block';
+
+            const namaLayanan = namaLayananInput.value.toLowerCase();
+            const isHotel = namaLayanan.includes('penitipan') || namaLayanan.includes('hotel');
+
+            if (isHotel) {
+                // Tampilan Khusus Pet Hotel
+                wrapHotelInfo.style.display = 'block';
+                inputTglCheckout.required = true;
+                
+                wrapWaktu.style.display = 'none';
+                inputWaktu.required = false; 
+                optHotel.style.display = 'block'; // Aktifkan opsi jam 14
+                inputWaktu.value = '14:00:00'; // Otomatis set jam check-in ke DB
+            } else {
+                // Tampilan Layanan Biasa (Grooming / Klinik)
+                wrapHotelInfo.style.display = 'none';
+                inputTglCheckout.required = false;
+                
+                wrapWaktu.style.display = 'block';
+                inputWaktu.required = true;
+                optHotel.style.display = 'none';
+                if(inputWaktu.value === '14:00:00') inputWaktu.value = ''; // Reset jam
+            }
+        });
+
+        // LOGIC 2: Tombol BACK (Kembali ke Halaman 1)
+        btnBack.addEventListener('click', function() {
+            step2.style.display = 'none';
+            step1.style.display = 'block';
+        });
+
+        // LOGIC 3: Kunci Jam yang Sudah Dibooking & Min Date Checkout
+        const bookedSlots = @json($bookedSlots ?? []);
+        const tanggalInput = document.getElementById('input_tanggal');
+
+        tanggalInput.addEventListener('change', function() {
+            let selectedDate = this.value; 
+            let timeOptions = inputWaktu.querySelectorAll('option');
+            const namaLayanan = namaLayananInput.value.toLowerCase();
+            const isHotel = namaLayanan.includes('penitipan') || namaLayanan.includes('hotel');
+            
+            // Set minimal tanggal checkout = tanggal check-in
+            inputTglCheckout.min = selectedDate; 
+
+            // Reset opsi jam
+            timeOptions.forEach(opt => {
+                opt.disabled = false;
+                if (opt.value && opt.value !== '14:00:00') {
+                    opt.text = opt.value.substring(0, 5) + " WIB";
+                }
+            });
+
+            // Kunci jadwal klinik HANYA JIKA BUKAN LAYANAN HOTEL (karena hotel kandangnya banyak)
+            if (bookedSlots[selectedDate] && !isHotel) {
+                let takenTimes = bookedSlots[selectedDate]; 
+                timeOptions.forEach(opt => {
+                    if (opt.value && opt.value !== '14:00:00') {
+                        let isBooked = takenTimes.some(time => time.startsWith(opt.value.substring(0, 5)));
+                        if (isBooked) {
+                            opt.disabled = true;
+                            opt.text = opt.value.substring(0, 5) + " WIB (Sudah Penuh)";
+                        }
+                    }
+                });
+            }
+        });
+    });
 </script>
 </body>
 </html>

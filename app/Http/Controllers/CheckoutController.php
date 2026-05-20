@@ -120,13 +120,18 @@ class CheckoutController extends Controller
             $statusAwal = 'Menunggu Konfirmasi Admin'; // Status langsung naik jadi nunggu dicek
         }
 
-        DB::transaction(function () use ($cart, $totalHarga, $buktiPath, $statusAwal) {
+// Pastikan ada $request di dalam kurung use() ini!
+// Tambahkan $request di dalam kurung use()
+        DB::transaction(function () use ($request, $cart, $totalHarga, $buktiPath, $statusAwal) {
             // 1. Simpan Transaksi Utama
             $transaksi = Transaksi::create([
                 'user_id' => Auth::id(),
                 'total_harga' => $totalHarga,
                 'status' => $statusAwal,
                 'bukti_pembayaran' => $buktiPath,
+                // Tambahkan 2 baris ini untuk menyimpan data pengiriman
+                'metode_pengiriman' => $request->delivery_method, 
+                'tanggal_ambil' => $request->delivery_method == 'pickup' ? $request->tanggal_ambil : null, 
             ]);
 
             // 2. Simpan Detil Belanjaannya

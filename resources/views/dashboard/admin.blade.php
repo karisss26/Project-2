@@ -21,112 +21,132 @@
     </div>
 
     <div class="admin-card">
-        <h3>Antrean Konfirmasi Pembayaran</h3>
+        <h3 style="color: #6d28d9;">🩺 Antrean Konfirmasi Reservasi Layanan</h3>
         <div style="overflow-x: auto;">
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Pelanggan</th>
-                        <th>Rincian Belanja</th>
-                        <th>Bukti</th>
+                        <th>ID Reservasi</th>
+                        <th>Tgl Dibuat</th>
+                        <th>Nama Pelanggan</th>
+                        <th>Nama Anabul</th>
+                        <th>Layanan Dipilih</th>
+                        <th>Jadwal Layanan</th>
+                        <th>Bukti DP</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($antreanPembayaran as $antrean)
+                    @forelse($antreanLayanan as $antrean)
                     <tr>
-                        <td>#{{ $antrean->nama_layanan ? 'RES' : 'TRX' }}-{{ $antrean->id }}</td>
+                        <td><strong>#RES-{{ $antrean->id }}</strong></td>
+                        <td><small>{{ \Carbon\Carbon::parse($antrean->created_at)->format('d M Y, H:i') }} WIB</small></td>
                         <td>{{ $antrean->user->name ?? 'User' }}</td>
+                        <td><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-weight:600; color: #4c1d95;">🐱 {{ $antrean->pet_name ?? '-' }}</span></td>
+                        <td><strong>🏥 {{ $antrean->nama_layanan }}</strong></td>
                         <td>
-                            @if($antrean->nama_layanan)
-                                <strong>🏥 {{ $antrean->nama_layanan }}</strong>
+                            @if(!empty($antrean->tanggal))
+                                {{ \Carbon\Carbon::parse($antrean->tanggal)->format('d M Y') }}<br>
+                                <small style="color: #6b7280;">{{ \Carbon\Carbon::parse($antrean->waktu)->format('H:i') }} WIB</small>
                             @else
-                                <strong>📦 Produk:</strong>
-                                <ul class="detail-list">
-                                    @foreach($antrean->detail_belanja as $detail)
-                                        <li>{{ $detail->nama_produk }} (x{{ $detail->jumlah }})</li>
-                                    @endforeach
-                                </ul>
+                                <span style="color: #dc2626; font-size: 12px; font-weight: bold;">⚠️ Tanggal Kosong</span>
                             @endif
                         </td>
                         <td>
-                            @php $path = $antrean->bukti_pembayaran_dp ?? $antrean->bukti_pembayaran; @endphp
-                            @if($path)
-                                <a href="{{ asset('storage/' . $path) }}" target="_blank" style="background: var(--purple-900); color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px;">Lihat Struk</a>
+                            @if($antrean->bukti_pembayaran_dp)
+                                <a href="{{ asset('storage/' . $antrean->bukti_pembayaran_dp) }}" target="_blank" style="background: var(--purple-900); color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px;">Lihat Bukti</a>
                             @else
-                                <span style="color: red; font-size: 11px;">Belum Bayar</span>
+                                <span style="color: red; font-size: 11px;">Belum Bayar DP</span>
                             @endif
                         </td>
                         <td>
                             <div style="display: flex; gap: 5px;">
                                 <form action="{{ route('admin.reservasi.setujui', $antrean->id) }}" method="POST">
                                     @csrf
-                                    <input type="hidden" name="tipe" value="{{ $antrean->nama_layanan ? 'reservasi' : 'transaksi' }}">
+                                    <input type="hidden" name="tipe" value="reservasi">
                                     <button type="submit" class="btn-sm btn-acc" style="background: #28a745; color: white;">Setujui</button>
                                 </form>
                                 <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST">
                                     @csrf
-                                    <input type="hidden" name="tipe" value="{{ $antrean->nama_layanan ? 'reservasi' : 'transaksi' }}">
+                                    <input type="hidden" name="tipe" value="reservasi">
                                     <button type="submit" class="btn-sm btn-tolak">Tolak</button>
                                 </form>
                             </div>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" style="text-align: center;">Tidak ada antrean.</td></tr>
+                    <tr><td colspan="8" style="text-align: center; color: #888;">Tidak ada antrean reservasi klinik.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="admin-card">
-        <h3>Kelola Status Pesanan Aktif</h3>
+    <div class="admin-card" style="margin-top: 25px;">
+        <h3 style="color: #6d28d9;">🛍️ Antrean Konfirmasi Pesanan Produk</h3>
         <div style="overflow-x: auto;">
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Pelanggan</th>
-                        <th>Jenis</th>
-                        <th>Update Status</th>
+                        <th>ID Transaksi</th>
+                        <th>Tgl Dibuat</th>
+                        <th>Nama Pelanggan</th>
+                        <th>Rincian Belanja</th>
+                        <th>Bukti Transfer</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($pesananAktif as $pesanan)
+                    @forelse($antreanProduk as $antrean)
                     <tr>
-                        <td>#{{ $pesanan->nama_layanan ? 'RES' : 'TRX' }}-{{ $pesanan->id }}</td>
-                        <td>{{ $pesanan->user->name ?? 'User' }}</td>
-                        <td>{{ $pesanan->nama_layanan ?? 'Pembelian Produk' }}</td>
+                        <td><strong>#TRX-{{ $antrean->id }}</strong></td>
+                        <td><small>{{ \Carbon\Carbon::parse($antrean->created_at)->format('d M Y, H:i') }} WIB</small></td>
+                        <td>{{ $antrean->user->name ?? 'User' }}</td>
                         <td>
-                            <form action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}" method="POST" style="display: flex; gap: 5px;">
-                                @csrf
-                                <input type="hidden" name="tipe" value="{{ $pesanan->nama_layanan ? 'reservasi' : 'transaksi' }}">
-                                <select name="status" class="status-select">
-                                    <option value="Dikonfirmasi" {{ $pesanan->status == 'Dikonfirmasi' ? 'selected' : '' }}>Dikonfirmasi</option>
-                                    @if($pesanan->nama_layanan)
-                                        <option value="Menunggu Jadwal" {{ $pesanan->status == 'Menunggu Jadwal' ? 'selected' : '' }}>Menunggu Jadwal</option>
-                                    @else
-                                        <option value="Menunggu Jadwal" {{ $pesanan->status == 'Menunggu Jadwal' ? 'selected' : '' }}>Menunggu Diambil</option>
-                                        <option value="Menunggu Kurir" {{ $pesanan->status == 'Menunggu Kurir' ? 'selected' : '' }}>Menunggu Kurir</option>
-                                        <option value="Pesanan Diantar" {{ $pesanan->status == 'Pesanan Diantar' ? 'selected' : '' }}>Diantar</option>
-                                    @endif
-                                    <option value="Selesai" {{ $pesanan->status == 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                                </select>
-                                <button type="submit" class="btn-sm btn-acc">Update</button>
-                            </form>
+                            <ul class="detail-list" style="margin: 0; padding-left: 15px;">
+                                @foreach($antrean->detail_belanja as $detail)
+                                    <li>{{ $detail->nama_produk }} (x{{ $detail->jumlah }})</li>
+                                @endforeach
+                            </ul>
+                            <div style="margin-top: 8px; font-size: 11px; background: #f3e8ff; padding: 6px; border-radius: 6px; color: #4c1d95; font-weight: bold; display: inline-block;">
+                                @if(isset($antrean->metode_pengiriman) && $antrean->metode_pengiriman == 'pickup')
+                                    📍 Ambil di Toko: {{ !empty($antrean->tanggal_ambil) ? \Carbon\Carbon::parse($antrean->tanggal_ambil)->format('d M Y') : '-' }}
+                                @else
+                                    🚚 Dikirim Kurir (Delivery)
+                                @endif
+                            </div>
+                        </td>
+                        <td>
+                            @if($antrean->bukti_pembayaran)
+                                <a href="{{ asset('storage/' . $antrean->bukti_pembayaran) }}" target="_blank" style="background: var(--purple-900); color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px;">Lihat Struk</a>
+                            @else
+                                <span style="color: red; font-size: 11px;">Belum Transfer</span>
+                            @endif
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <form action="{{ route('admin.reservasi.setujui', $antrean->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="tipe" value="transaksi">
+                                    <button type="submit" class="btn-sm btn-acc" style="background: #28a745; color: white;">Setujui</button>
+                                </form>
+                                <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="tipe" value="transaksi">
+                                    <button type="submit" class="btn-sm btn-tolak">Tolak</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="4" style="text-align: center;">Kosong.</td></tr>
+                    <tr><td colspan="6" style="text-align: center; color: #888;">Tidak ada antrean pesanan produk.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
-
-    <div class="admin-card">
+    
+    <div class="admin-card" style="margin-top: 25px;">
         <h3>Riwayat Aktivitas Sistem</h3>
         <ul class="activity-list">
             @forelse($riwayatAktivitas as $log)
@@ -137,9 +157,13 @@
                     </span>
                 </li>
             @empty
-                <li class="activity-desc">Belum ada catatan.</li>
+                <li class="activity-desc">Belum ada catatan aktivitas.</li>
             @endforelse
         </ul>
+        
+        <div style="margin-top: 20px; display: flex; justify-content: center;">
+            {{ $riwayatAktivitas->links() }}
+        </div>
     </div>
 </div>
 @endsection
