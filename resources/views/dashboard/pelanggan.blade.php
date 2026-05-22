@@ -117,6 +117,9 @@
                 </tbody>
             </table>
         </div>
+        <div class="mt-4">
+            {{ $reservasiLayanan->links() }}
+        </div>
     </div>
 
     <div class="section-box">
@@ -173,6 +176,9 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div class="mt-4">
+        {{ $pembelianProduk->links() }}
     </div>
 </div>
 

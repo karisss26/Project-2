@@ -189,7 +189,7 @@
             <p style="color: var(--text-muted); font-size: 15px; max-width: 600px; margin: 0 auto 30px; line-height: 1.6;">
                 Jika Anda memiliki pertanyaan seputar layanan klinik, stok produk pet shop, atau butuh tindakan darurat, silakan hubungi kami melalui WhatsApp.
             </p>
-            <a href="https://wa.me/6285603320626" target="_blank" class="btn" style="background-color: #36005E; color: #ffffff; border: 1px solid #2c004f; border-radius: 30px; padding: 12px 30px; font-weight: 500; text-decoration: none; display: inline-block;">
+            <a href="https://wa.me/6281223372450" target="_blank" class="btn" style="background-color: #36005E; color: #ffffff; border: 1px solid #2c004f; border-radius: 30px; padding: 12px 30px; font-weight: 500; text-decoration: none; display: inline-block;">
 
                 Hubungi Via WhatsApp
             </a>
@@ -215,14 +215,15 @@
                 <div class="footer-col">
                     <h4>Hubungi Kami</h4>
                     <ul>
-                        <li>📍 Jl. Otto Iskandardinata No. 12, Subang</li>
-                        <li>📞 0812-3456-7890</li>
+                        <li>📍 Jl. DI.Panjaitan No.24, Soklat, Kec. Subang, Kab. Subang, Jawa Barat </li>
+                        <li>📍 Jl. Ion Martasasmita No. 3, Rancasari, Kec. Pamanukan, Kab. Subang, Jawa Barat</li>
+                        <li>📞 0812-2337-2450</li>
                         <li>✉️ cs@dnfpetshop.com</li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                © 2026 Paw Center by D&F Pet Shop. All rights reserved.
+                © 2026 Paw Center by ALTALOGI. All rights reserved.
             </div>
         </div>
     </footer>

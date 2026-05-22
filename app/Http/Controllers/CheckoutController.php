@@ -151,12 +151,14 @@ class CheckoutController extends Controller
 
         return redirect()->route('dashboard.pelanggan')->with('success', 'Pesanan berhasil dibuat! Menunggu konfirmasi.');
     }
-    public function prosesReservasi(Request $request)
+public function prosesReservasi(Request $request)
     {
         $request->validate([
             'layanan_id' => 'required',
             'nama_layanan' => 'required',
             'tanggal_reservasi' => 'required|date',
+            // Tambahin validasi tanggal keluar opsional tapi harus lebih/sama dengan tgl masuk
+            'tanggal_keluar' => 'nullable|date|after_or_equal:tanggal_reservasi', 
             'waktu_reservasi' => 'required',
             'nama_hewan' => 'required'
         ]);
@@ -174,6 +176,7 @@ class CheckoutController extends Controller
             'user_id' => Auth::id(),
             'nama_layanan' => $request->nama_layanan,
             'tanggal' => $request->tanggal_reservasi,
+            'tanggal_keluar' => $request->tanggal_keluar, // NAH INI DIA TERSANGKANYA YANG KETINGGALAN SAYANG!
             'waktu' => $request->waktu_reservasi,
             'pet_name' => $request->nama_hewan,
             'harga_total' => $harga_total,
@@ -186,7 +189,6 @@ class CheckoutController extends Controller
         // Arahkan ke halaman upload struk DP
         return redirect()->route('reservasi.bayar', $reservasi->id);
     }
-
     // 7. Menampilkan halaman upload struk DP
     public function bayarDp($id)
     {

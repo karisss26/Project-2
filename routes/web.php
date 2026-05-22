@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\PosKasirController;
 use App\Http\Controllers\ReservasiTicketController;
 use App\Models\Produk;
 use App\Models\Layanan;
+use App\Http\Controllers\DokterController;
 
 // =========================================================
 // 1. RUTE PUBLIK
@@ -37,7 +38,6 @@ Route::middleware(['guest'])->group(function () {
 
     // Laravel expects these routes for reset-password token generation
     // (used by SendsPasswordResetEmails)
-
 
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -68,7 +68,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profil-saya', [DashboardController::class, 'profil'])->name('profil.umum');
     Route::post('/profil-saya/update', [DashboardController::class, 'updateProfil'])->name('profil.umum.update');
 
-        // Rute untuk menandai notifikasi sudah dibaca
+    // Rute untuk menandai notifikasi sudah dibaca
     Route::get('/notifikasi/read/{id}', function($id) {
         // Cari notifikasi berdasarkan ID
         $notif = auth()->user()->notifications()->find($id);
@@ -103,17 +103,81 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/reservasi/upload/{id}', [DashboardController::class, 'uploadBukti'])->name('reservasi.upload');
     });
 
-    // --- RUTE DOKTER ---
-    Route::middleware(['role:dokter'])->group(function () {
-        Route::get('/dokter/dashboard', [DashboardController::class, 'dokter'])->name('dashboard.dokter');
-        // Pastikan ini ada di dalam group middleware yang role-nya dokter
-        Route::post('/dashboard/dokter/simpan-rm', [DashboardController::class, 'simpanRekamMedis'])->name('dokter.simpanRM');
-        Route::post('/dokter/reservasi/{id}/update-status', [DashboardController::class, 'updateStatus'])->name('dokter.reservasi.updateStatus');
+    // === ROUTE KHUSUS DOKTER ===
+    Route::middleware(['auth', 'role:dokter'])->group(function () {
+        // Dashboard Utama Dokter
+        Route::get('/dashboard/dokter', [DashboardController::class, 'dokter'])->name('dashboard.dokter');
+
+        // Group Prefix Dokter
+        Route::prefix('dokter')->name('dokter.')->group(function () {
+            
+            // Pemeriksaan
+            Route::get('/pemeriksaan', [DokterController::class, 'pemeriksaanIndex'])->name('pemeriksaan.index');
+            Route::get('/pemeriksaan/{id}', [DokterController::class, 'pemeriksaanDetail'])->name('pemeriksaan.show');
+            
+            // --- INI RUTE SATU-SATUNYA UNTUK SIMPAN RM ---
+            Route::post('/simpan-rm', [DashboardController::class, 'simpanRM'])->name('simpanRM');
+            
+            // --- INI RUTE SATU-SATUNYA UNTUK MULAI PERIKSA ---
+            Route::post('/mulai-periksa/{id}', [DashboardController::class, 'mulaiPeriksa'])->name('mulaiPeriksa');
+
+            // Rekam Medis
+            Route::get('/rekam-medis', [DokterController::class, 'rekamMedisIndex'])->name('rekam-medis.index');
+            Route::get('/rekam-medis/{id}', [DokterController::class, 'rekamMedisDetail'])->name('rekam-medis.detail');
+            Route::get('/rekam-medis/{id}/pdf', [DokterController::class, 'rekamMedisPdf'])->name('rekam-medis.pdf');
+            
+            // Laporan
+            Route::get('/laporan', [DokterController::class, 'laporanIndex'])->name('laporan.index');
+            Route::get('/laporan/print', [DokterController::class, 'laporanPrint'])->name('laporan.print');
+            
+            // Opsi Rekam Medis (Dropdown Dinamis)
+            Route::get('/opsi-rekam-medis', [DokterController::class, 'opsiRmIndex'])->name('opsi-rm.index');
+            Route::post('/opsi-rekam-medis', [DokterController::class, 'opsiRmStore'])->name('opsi-rm.store');
+            Route::put('/opsi-rekam-medis/{id}', [DokterController::class, 'opsiRmUpdate'])->name('opsi-rm.update');
+            Route::delete('/opsi-rekam-medis/{id}', [DokterController::class, 'opsiRmDestroy'])->name('opsi-rm.destroy');
+            
+            // API Endpoint buat TomSelect dan Live Polling
+            Route::get('/api/opsi-rm', [DokterController::class, 'opsiRmApi'])->name('opsi-rm.api');
+        });
     });
+
+    // API Realtime (Bisa diakses dari JS)
+    Route::middleware(['auth'])->get('/api/dokter/reservasi-realtime', [DokterController::class, 'reservasiRealtime'])->name('api.dokter.reservasi-realtime');
 
     // --- RUTE STAFF ---
     Route::middleware(['role:staff'])->group(function () {
         Route::get('/staff/dashboard', [DashboardController::class, 'staff'])->name('dashboard.staff');
+
+        // Rute baru buat menu Pantau Semua Stok di sidebar
+        Route::get('/staff/stok', [DashboardController::class, 'semuaStok'])->name('staff.stok');
+
+        Route::get('/dashboard/pesanan/grooming', [DashboardController::class, 'pesananGrooming'])
+         ->name('dashboard.pesanan.grooming');
+         
+        Route::get('/dashboard/pesanan/hotel', [DashboardController::class, 'pesananHotel'])
+         ->name('dashboard.pesanan.hotel');
+
+        // Rute untuk staff update status pet hotel
+        Route::post('/staff/pesanan/{id}/update-status', [DashboardController::class, 'updateStatus'])->name('staff.pesanan.updateStatus');
+    });
+
+    // --- RUTE GABUNGAN ADMIN, KASIR, & STAFF (Akses CRUD Katalog & Layanan) ---
+    Route::middleware(['role:admin,kasir,staff'])->group(function () {
+        // Kelola Katalog Produk (CRUD)
+        Route::prefix('kelola/katalog')->name('admin.katalog.')->group(function() {
+            Route::get('/', [App\Http\Controllers\Admin\ProdukController::class, 'index'])->name('index');
+            Route::post('/store', [App\Http\Controllers\Admin\ProdukController::class, 'store'])->name('store');
+            Route::put('/update/{id}', [App\Http\Controllers\Admin\ProdukController::class, 'update'])->name('update');
+            Route::delete('/delete/{id}', [App\Http\Controllers\Admin\ProdukController::class, 'destroy'])->name('destroy');
+        });
+
+        // Kelola Layanan Klinik (CRUD)
+        Route::prefix('kelola/layanan')->name('admin.layanan.')->group(function() {
+            Route::get('/', [App\Http\Controllers\Admin\LayananController::class, 'index'])->name('index');
+            Route::post('/store', [App\Http\Controllers\Admin\LayananController::class, 'store'])->name('store');
+            Route::put('/update/{id}', [App\Http\Controllers\Admin\LayananController::class, 'update'])->name('update');
+            Route::delete('/delete/{id}', [App\Http\Controllers\Admin\LayananController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // --- RUTE ADMIN & KASIR (Dinamis) ---

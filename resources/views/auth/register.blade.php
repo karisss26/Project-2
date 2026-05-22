@@ -61,12 +61,15 @@
                     <span class="auth-toggle-password" onclick="toggleVisibility('password-confirm', this)" title="Lihat Password">👁️</span>
                 </div>
             </div>
-
             <button type="submit" class="auth-button">Daftar Sekarang</button>
         </form>
-
-        <div class="auth-card-footer">
-            <p>Sudah punya akun? <a href="{{ route('login') }}">Masuk di sini</a></p>
+        <div class="mt-4 text-center">
+            <p class="text-sm text-gray-600">
+                Sudah punya akun? 
+                <a href="{{ route('login') }}" class="text-ungu-gelap font-semibold hover:underline">
+                    Login di sini
+                </a>
+            </p>
         </div>
     </div>
 

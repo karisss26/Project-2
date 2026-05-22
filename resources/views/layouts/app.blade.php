@@ -35,6 +35,48 @@
                     <span class="menu-icon">👤</span><span class="menu-text">Profil Saya</span>
                 </a>
 
+            {{-- --- MENU STAFF --- --}}
+            @elseif(Auth::check() && Auth::user()->role == 'staff')
+                <a href="{{ route('dashboard.staff') }}">
+                    <span class="menu-icon">🏠</span><span class="menu-text">Dashboard</span>
+                </a>
+                
+                {{-- Menu Tambahan buat Staff --}}
+                <a href="{{ route('dashboard.pesanan.hotel') }}">
+                    <span class="menu-icon">🏨</span><span class="menu-text">Pesanan Pet Hotel</span>
+                </a>
+                <a href="{{ route('dashboard.pesanan.grooming') }}">
+                    <span class="menu-icon">✂️</span><span class="menu-text">Antrean Grooming</span>
+                </a>
+                <a href="{{ route('staff.stok') }}">
+                    <span class="menu-icon">📊</span><span class="menu-text">Pantau Semua Stok</span>
+                </a>
+                <a href="{{ route('admin.katalog.index') }}">
+                    <span class="menu-icon">📦</span><span class="menu-text">Kelola Katalog Produk</span>
+                </a>
+                <a href="{{ route('admin.layanan.index') }}">
+                    <span class="menu-icon">🩺</span><span class="menu-text">Kelola Layanan Klinik</span>
+                </a>
+                
+                <a href="{{ route('profil.umum') }}">
+                    <span class="menu-icon">👤</span><span class="menu-text">Profil Saya</span>
+                </a>
+            
+            {{-- --- MENU DOKTER --- --}}
+            @elseif(Auth::check() && Auth::user()->role == 'dokter')
+                <a href="{{ route('dashboard.dokter') }}">
+                    <span class="menu-icon">🏠</span><span class="menu-text">Dashboard Dokter</span>
+                </a>
+                <a href="{{ route('dokter.pemeriksaan.index') }}">
+                    <span class="menu-icon">🩺</span><span class="menu-text">Pemeriksaan</span>
+                </a>
+                <a href="{{ route('dokter.rekam-medis.index') }}">
+                    <span class="menu-icon">📝</span><span class="menu-text">Rekam Medis</span>
+                </a>
+                <a href="{{ route('profil.umum') }}">
+                    <span class="menu-icon">👤</span><span class="menu-text">Profil Saya</span>
+                </a>
+            
             {{-- --- MENU ADMIN, KASIR, & OWNER --- --}}
             @elseif(Auth::check() && in_array(Auth::user()->role, ['admin', 'kasir', 'owner']))
 

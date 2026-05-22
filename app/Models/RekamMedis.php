@@ -2,25 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RekamMedis extends Model
 {
-    // Kasih tau Laravel nama tabelnya (sesuaiin sama migration kamu ya)
-    protected $table = 'rekam_medis';
+    use HasFactory;
+    
+    // Sambungin ke nama tabel kamu yang ada di phpMyAdmin
+    protected $table = 'rekam_medis'; 
+    protected $guarded = []; // Biar semua kolom bisa diisi otomatis
 
-    // Biar semua kolom bisa diisi (mass assignment)
-    protected $guarded = [];
-
-    // Relasi ke model hewan (biar $rm->hewan->nama_hewan nggak error)
-    public function hewan()
-    {
+    // Relasi balik ke tabel-tabel lain
+    public function user() {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+    public function hewan() {
         return $this->belongsTo(hewan::class, 'hewan_id');
     }
-
-    // Relasi ke user/dokter yang menangani
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
+    public function reservasi() {
+        return $this->belongsTo(reservasi::class, 'reservasi_id');
     }
 }

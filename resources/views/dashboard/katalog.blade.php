@@ -330,7 +330,7 @@
                         
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Check-out <span class="text-red-500">*</span></label>
-                            <input type="date" name="tanggal_checkout" id="input_tgl_checkout" min="{{ date('Y-m-d') }}" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
+                            <input type="date" name="tanggal_keluar" id="input_tgl_checkout" min="{{ date('Y-m-d') }}" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
                             <small class="text-gray-500 mt-1 block">Tentukan kapan anabul akan dijemput pulang.</small>
                         </div>
                     </div>
