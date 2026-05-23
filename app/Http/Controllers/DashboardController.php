@@ -259,6 +259,17 @@ class DashboardController extends Controller
                     ? Transaksi::findOrFail($id)
                     : reservasi::findOrFail($id);
 
+        // Jika pesanan produk dan statusnya belum 'Dikonfirmasi', kurangi stok
+        if ($request->tipe == 'transaksi' && $pesanan->status !== 'Dikonfirmasi') {
+            foreach ($pesanan->detilProduk as $detail) {
+                $produk = Produk::find($detail->produk_id);
+                if ($produk) {
+                    $produk->stok -= $detail->jumlah;
+                    $produk->save();
+                }
+            }
+        }
+
         $pesanan->update(['status' => 'Dikonfirmasi']);
 
         // Kirim notifikasi sesuai tipe pesanannya sayang
@@ -276,6 +287,17 @@ class DashboardController extends Controller
         $pesanan = ($request->tipe == 'transaksi')
                     ? Transaksi::findOrFail($id)
                     : reservasi::findOrFail($id);
+
+        // Jika pesanan produk dan statusnya sudah 'Dikonfirmasi', kembalikan stok
+        if ($request->tipe == 'transaksi' && $pesanan->status === 'Dikonfirmasi') {
+            foreach ($pesanan->detilProduk as $detail) {
+                $produk = Produk::find($detail->produk_id);
+                if ($produk) {
+                    $produk->stok += $detail->jumlah;
+                    $produk->save();
+                }
+            }
+        }
 
         $pesanan->update(['status' => 'Dibatalkan']);
 
