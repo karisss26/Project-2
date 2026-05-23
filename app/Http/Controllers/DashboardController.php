@@ -377,7 +377,7 @@ public function dokter()
         $totalRekamMedis = \App\Models\reservasi::where('status', 'Selesai')->where($excludeStaff)->count();
 
         $jadwalLayanan = \App\Models\reservasi::with(['user', 'hewan'])->where($excludeStaff)->orderBy('created_at', 'desc')->take(10)->get();
-        $rekamMedis = \App\Models\reservasi::with(['user', 'hewan'])->where('status', 'Selesai')->where($excludeStaff)->orderBy('updated_at', 'desc')->take(5)->get();
+        $rekamMedis = \App\Models\reservasi::with(['user', 'hewan', 'rekamMedis'])->where('status', 'Selesai')->where($excludeStaff)->orderBy('updated_at', 'desc')->take(5)->get();
 
         return view('dokter.dashboard', compact('antrean', 'totalPemeriksaan', 'totalRekamMedis', 'jadwalLayanan', 'rekamMedis'));
     }
@@ -395,32 +395,41 @@ public function dokter()
     }
 
 public function simpanRM(Request $request)
-{
-    // 1. Validasi
-    $request->validate([
-        'reservasi_id' => 'required',
-        'diagnosa' => 'required',
-        'tindakan' => 'required',
-    ]);
+    {
+        // 1. Validasi
+        $request->validate([
+            'reservasi_id' => 'required',
+            'diagnosa'     => 'required',
+            'tindakan'     => 'required',
+            'nama_dokter'  => 'required', // Wajib pilih dokter dari dropdown
+            'catatan'      => 'nullable',
+        ]);
 
-    $reservasi = \App\Models\reservasi::findOrFail($request->reservasi_id);
+        $reservasi = \App\Models\reservasi::findOrFail($request->reservasi_id);
 
-    // 2. Simpan ke tabel rekam_medis
-    \App\Models\RekamMedis::create([
-        'reservasi_id'    => $reservasi->id,
-        'user_id'         => $reservasi->user_id,
-        'hewan_id'        => $reservasi->hewan_id,
-        'diagnosa'        => $request->diagnosa,
-        'tindakan'        => $request->tindakan,
-        'tanggal_periksa' => now(), 
-    ]);
+        // Cari data hewan_id asli biar nggak N/A
+        $hewan = \App\Models\hewan::where('nama_hewan', $reservasi->pet_name)
+                                  ->where('user_id', $reservasi->user_id)
+                                  ->first();
 
-    // 3. Update status reservasi jadi Selesai
-    $reservasi->status = 'Selesai';
-    $reservasi->save();
+        // 2. Simpan ke tabel rekam_medis
+        \App\Models\RekamMedis::create([
+            'reservasi_id'    => $reservasi->id,
+            'user_id'         => \Auth::id(), // Akun yang login
+            'nama_dokter'     => $request->nama_dokter, // 🔥 TARIK NAMA DARI DROPDOWN
+            'hewan_id'        => $hewan->id ?? null,
+            'diagnosa'        => $request->diagnosa,
+            'tindakan'        => $request->tindakan,
+            'catatan'         => $request->catatan,
+            'tanggal_periksa' => now(),
+        ]);
 
-    return back()->with('success', 'Rekam medis berhasil dicatat!');
-}
+        // 3. Update status reservasi jadi Selesai
+        $reservasi->status = 'Selesai';
+        $reservasi->save();
+
+        return back()->with('success', 'Rekam medis berhasil dicatat!');
+    }
 public function staff()
     {
         // 1. Ambil produk dengan stok menipis (Stok <= 5)
@@ -457,7 +466,7 @@ public function staff()
 
         return view('dashboard.staff', compact('produkKritis', 'petHotel', 'grooming', 'totalProduk', 'totalLayanan', 'jumlahHotelAktif', 'jumlahGroomingAktif'));
     }
-    
+
     // Method baru khusus halaman Semua Stok
     public function semuaStok()
     {

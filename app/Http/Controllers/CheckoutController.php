@@ -130,8 +130,8 @@ class CheckoutController extends Controller
                 'status' => $statusAwal,
                 'bukti_pembayaran' => $buktiPath,
                 // Tambahkan 2 baris ini untuk menyimpan data pengiriman
-                'metode_pengiriman' => $request->delivery_method, 
-                'tanggal_ambil' => $request->delivery_method == 'pickup' ? $request->tanggal_ambil : null, 
+                'metode_pengiriman' => $request->delivery_method,
+                'tanggal_ambil' => $request->delivery_method == 'pickup' ? $request->tanggal_ambil : null,
             ]);
 
             // 2. Simpan Detil Belanjaannya
@@ -157,32 +157,50 @@ public function prosesReservasi(Request $request)
             'layanan_id' => 'required',
             'nama_layanan' => 'required',
             'tanggal_reservasi' => 'required|date',
-            // Tambahin validasi tanggal keluar opsional tapi harus lebih/sama dengan tgl masuk
-            'tanggal_keluar' => 'nullable|date|after_or_equal:tanggal_reservasi', 
+            'tanggal_keluar' => 'nullable|date|after_or_equal:tanggal_reservasi',
             'waktu_reservasi' => 'required',
             'nama_hewan' => 'required'
         ]);
 
-        // Ambil data layanan dari database biar harganya akurat dan aman
+        // 1. Ambil data layanan dari database biar harganya akurat
         $layanan = Layanan::findOrFail($request->layanan_id);
 
-        // Perhitungan DP 30%
         $harga_total = $layanan->harga;
-        $dp = $harga_total * 0.30; // 30 persen
+        $nama_layanan_lower = strtolower($request->nama_layanan);
+
+        // 2. LOGIC KHUSUS PET HOTEL: Hitung Harga x Jumlah Malam
+        if (str_contains($nama_layanan_lower, 'hotel') || str_contains($nama_layanan_lower, 'penitipan')) {
+            $check_in = \Carbon\Carbon::parse($request->tanggal_reservasi);
+            // Kalau misal tanggal keluarnya kosong, otomatis dihitung 1 hari
+            $check_out = $request->tanggal_keluar ? \Carbon\Carbon::parse($request->tanggal_keluar) : $check_in->copy()->addDay();
+
+            $jumlah_malam = $check_in->diffInDays($check_out);
+
+            // Jaga-jaga kalau check-in & check-out di hari yang sama, minimal dihitung 1 malam
+            if ($jumlah_malam == 0) {
+                $jumlah_malam = 1;
+            }
+
+            $harga_total = $layanan->harga * $jumlah_malam;
+        }
+
+        // 3. Perhitungan DP 20%
+        $dp = $harga_total * 0.20; // 20 persen
         $sisa_bayar = $harga_total - $dp;
 
-        // Simpan ke database
+        // 4. Simpan ke database
         $reservasi = reservasi::create([
             'user_id' => Auth::id(),
             'nama_layanan' => $request->nama_layanan,
             'tanggal' => $request->tanggal_reservasi,
-            'tanggal_keluar' => $request->tanggal_keluar, // NAH INI DIA TERSANGKANYA YANG KETINGGALAN SAYANG!
+            'tanggal_keluar' => $request->tanggal_keluar,
             'waktu' => $request->waktu_reservasi,
             'pet_name' => $request->nama_hewan,
+            'keluhan' => $request->keluhan,
             'harga_total' => $harga_total,
             'dp' => $dp,
             'sisa_bayar' => $sisa_bayar,
-            'status' => 'Menunggu Pembayaran', // Status berubah
+            'status' => 'Menunggu Pembayaran',
             'alasan_batal' => null
         ]);
 
