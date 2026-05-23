@@ -130,6 +130,7 @@
                     <tr>
                         <th>ID Transaksi</th>
                         <th>Tgl Checkout</th>
+                        <th>Rincian Produk</th>
                         <th>Total Belanja</th>
                         <th>Metode Pengiriman</th>
                         <th>Status Pesanan</th>
@@ -141,6 +142,13 @@
                     <tr>
                         <td><strong>#TRX-{{ $t->id }}</strong></td>
                         <td>{{ $t->created_at->format('d M Y, H:i') }}</td>
+                        <td>
+                            <ul class="detail-list" style="margin: 0; padding-left: 15px; font-size: 13px;">
+                                @foreach($t->detail_belanja as $detail)
+                                    <li>{{ $detail->nama_produk }} <strong>(x{{ $detail->jumlah }})</strong></li>
+                                @endforeach
+                            </ul>
+                        </td>
                         <td><span style="font-weight:600; color:#16a34a;">Rp {{ number_format($t->total_harga, 0, ',', '.') }}</span></td>
                         
                         <td>
@@ -171,7 +179,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" style="text-align: center; padding: 30px; color: #9ca3af;">Belum ada riwayat pembelian produk.</td></tr>
+                    <tr><td colspan="7" style="text-align: center; padding: 30px; color: #9ca3af;">Belum ada riwayat pembelian produk.</td></tr>
                     @endforelse
                 </tbody>
             </table>

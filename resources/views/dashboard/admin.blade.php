@@ -103,9 +103,9 @@
                         <td><small>{{ \Carbon\Carbon::parse($antrean->created_at)->format('d M Y, H:i') }} WIB</small></td>
                         <td>{{ $antrean->user->name ?? 'User' }}</td>
                         <td>
-                            <ul class="detail-list" style="margin: 0; padding-left: 15px;">
+                            <ul class="detail-list" style="margin: 0; padding-left: 15px; font-size: 13px;">
                                 @foreach($antrean->detail_belanja as $detail)
-                                    <li>{{ $detail->nama_produk }} (x{{ $detail->jumlah }})</li>
+                                    <li>{{ $detail->nama_produk }} <strong>(x{{ $detail->jumlah }})</strong></li>
                                 @endforeach
                             </ul>
                             <div style="margin-top: 8px; font-size: 11px; background: #f3e8ff; padding: 6px; border-radius: 6px; color: #4c1d95; font-weight: bold; display: inline-block;">
