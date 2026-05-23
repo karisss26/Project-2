@@ -24,25 +24,41 @@ class DashboardController extends Controller
         $petCount = hewan::where('user_id', $userId)->count();
         $cartCount = count(session('cart', []));
 
-        // Data untuk tabel 1: Reservasi Layanan
-        $reservasiLayanan = reservasi::where('user_id', $userId)
-                                                  ->orderBy('created_at', 'desc')
-                                                  ->paginate(5);;
+        // 1. Data Khusus Pet Hotel (Mencari yang namanya mengandung 'hotel' atau 'penitipan')
+        $petHotel = reservasi::where('user_id', $userId)
+            ->where(function($query) {
+                $query->where('nama_layanan', 'LIKE', '%hotel%')
+                      ->orWhere('nama_layanan', 'LIKE', '%penitipan%');
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(5, ['*'], 'hotel_page'); // Custom page name agar halamannya tidak tabrakan
 
-        // Data untuk tabel 2: Pembelian Produk
+        // 2. Data Khusus Layanan Lain (Bukan hotel dan bukan penitipan)
+        $layananLain = reservasi::where('user_id', $userId)
+            ->where(function($query) {
+                $query->where('nama_layanan', 'NOT LIKE', '%hotel%')
+                      ->where('nama_layanan', 'NOT LIKE', '%penitipan%');
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(5, ['*'], 'layanan_page'); // Custom page name
+
+        // Data untuk tabel Pembelian Produk
         $pembelianProduk = Transaksi::where('user_id', $userId)
-                                                ->with('detilProduk')
-                                                ->orderBy('created_at', 'desc')
-                                                ->paginate(5);;
+            ->with('detilProduk')
+            ->orderBy('created_at', 'desc')
+            ->paginate(5, ['*'], 'produk_page');
 
-        // Hitung reservasi aktif (dicek admin atau disetujui)
-        $activeReservationsCount = $reservasiLayanan->whereIn('status', ['Menunggu Konfirmasi Admin', 'Dikonfirmasi'])->count();
+        // Hitung reservasi aktif langsung dari query DB (Karena $reservasiLayanan sudah dipecah)
+        $activeReservationsCount = reservasi::where('user_id', $userId)
+            ->whereIn('status', ['Menunggu Konfirmasi Admin', 'Dikonfirmasi'])
+            ->count();
 
         return view('dashboard.pelanggan', compact(
             'petCount',
             'activeReservationsCount',
             'cartCount',
-            'reservasiLayanan',
+            'petHotel',         // Mengirim variabel Pet Hotel
+            'layananLain',      // Mengirim variabel Layanan Lain
             'pembelianProduk'
         ));
     }
@@ -223,13 +239,18 @@ class DashboardController extends Controller
         $aktifLayanan = $pesananAktif->filter(function($item) {
             return $item instanceof reservasi;
         });
+        
         $aktifProduk = $pesananAktif->filter(function($item) {
             return $item instanceof Transaksi;
         });
 
         // Hitung pendapatan awal
         $totalPemasukanProduk = Transaksi::where('status', 'Selesai')->sum('total_harga');
-        $totalPemasukanLayanan = reservasi::where('status', 'Selesai')->sum('harga_total');
+        // Query lama:
+// $totalPemasukanLayanan = reservasi::where('status', 'Selesai')->sum('harga_total');
+
+// UBAH MENJADI:
+$totalPemasukanLayanan = reservasi::where('status', 'Selesai')->sum('harga_total') + reservasi::where('status', 'Selesai')->sum('biaya_tambahan');
 
         $totalPemasukan = ($totalPemasukanProduk ?? 0) + ($totalPemasukanLayanan ?? 0);
 
@@ -397,24 +418,42 @@ public function dokter()
                   ->where('nama_layanan', 'NOT LIKE', '%penitipan%');
         };
 
-        // Ambil data pasien medis yang belum selesai
-        $antrean = reservasi::with(['user', 'hewan'])
+        // 1. Antrean Konsultasi Dokter
+        $antreanKonsultasi = reservasi::with(['user', 'hewan'])
             ->whereIn('status', ['Menunggu Jadwal', 'Dikonfirmasi', 'Diproses'])
             ->where($excludeStaff)
+            ->where('nama_layanan', 'LIKE', '%konsultasi%')
             ->orderBy('tanggal', 'asc')
             ->orderBy('waktu', 'asc')
             ->get();
 
-        // Cuma butuh 2 metrik ini aja
-        $totalPemeriksaan = $antrean->count();
+        // 2. Antrean Vaksinasi (dan layanan medis lain selain konsultasi)
+        $antreanVaksinasi = reservasi::with(['user', 'hewan'])
+            ->whereIn('status', ['Menunggu Jadwal', 'Dikonfirmasi', 'Diproses'])
+            ->where($excludeStaff)
+            ->where('nama_layanan', 'NOT LIKE', '%konsultasi%')
+            ->orderBy('tanggal', 'asc')
+            ->orderBy('waktu', 'asc')
+            ->get();
+
+        // Perhitungan Total
+        $totalPemeriksaan = $antreanKonsultasi->count() + $antreanVaksinasi->count();
+        $totalVaksinasi = $antreanVaksinasi->count(); // <--- Variabel baru untuk dashboard
         $totalRekamMedis = reservasi::where('status', 'Selesai')->where($excludeStaff)->count();
 
         $jadwalLayanan = reservasi::with(['user', 'hewan'])->where($excludeStaff)->orderBy('created_at', 'desc')->take(10)->get();
         $rekamMedis = reservasi::with(['user', 'hewan', 'rekamMedis'])->where('status', 'Selesai')->where($excludeStaff)->orderBy('updated_at', 'desc')->take(5)->get();
 
-        return view('dokter.dashboard', compact('antrean', 'totalPemeriksaan', 'totalRekamMedis', 'jadwalLayanan', 'rekamMedis'));
+        return view('dokter.dashboard', compact(
+            'antreanKonsultasi', 
+            'antreanVaksinasi',  
+            'totalPemeriksaan', 
+            'totalVaksinasi', // <--- Dikirim ke view
+            'totalRekamMedis', 
+            'jadwalLayanan', 
+            'rekamMedis'
+        ));
     }
-
     // --- TAMBAHIN DUA FUNGSI INI ---
 
     public function mulaiPeriksa($id)
@@ -428,41 +467,47 @@ public function dokter()
     }
 
 public function simpanRM(Request $request)
-    {
-        // 1. Validasi
-        $request->validate([
-            'reservasi_id' => 'required',
-            'diagnosa'     => 'required',
-            'tindakan'     => 'required',
-            'nama_dokter'  => 'required', // Wajib pilih dokter dari dropdown
-            'catatan'      => 'nullable',
-        ]);
+{
+    // 1. Validasi input
+    $request->validate([
+        'reservasi_id'   => 'required',
+        'diagnosa'       => 'required',
+        'tindakan'       => 'required',
+        'nama_dokter'    => 'required',
+        'catatan'        => 'nullable',
+        'biaya_tambahan' => 'nullable|numeric|min:0', // Validasi biaya tambahan
+    ]);
 
-        $reservasi = reservasi::findOrFail($request->reservasi_id);
+    $reservasi = reservasi::findOrFail($request->reservasi_id);
 
-        // Cari data hewan_id asli biar nggak N/A
-        $hewan = hewan::where('nama_hewan', $reservasi->pet_name)
-                                  ->where('user_id', $reservasi->user_id)
-                                  ->first();
+    // Ambil nilai biaya tambahan (jika kosong, set jadi 0)
+    $biayaTambahan = $request->biaya_tambahan ?? 0;
 
-        // 2. Simpan ke tabel rekam_medis
-        \App\Models\RekamMedis::create([
-            'reservasi_id'    => $reservasi->id,
-            'user_id'         => Auth::id(), // Akun yang login
-            'nama_dokter'     => $request->nama_dokter, // 🔥 TARIK NAMA DARI DROPDOWN
-            'hewan_id'        => $hewan->id ?? null,
-            'diagnosa'        => $request->diagnosa,
-            'tindakan'        => $request->tindakan,
-            'catatan'         => $request->catatan,
-            'tanggal_periksa' => now(),
-        ]);
+    // Cari data hewan_id asli biar nggak N/A
+    $hewan = hewan::where('nama_hewan', $reservasi->pet_name)
+                  ->where('user_id', $reservasi->user_id)
+                  ->first();
 
-        // 3. Update status reservasi jadi Selesai
-        $reservasi->status = 'Selesai';
-        $reservasi->save();
+    // 2. Simpan ke tabel rekam_medis
+    \App\Models\RekamMedis::create([
+        'reservasi_id'    => $reservasi->id,
+        'user_id'         => $reservasi->user_id, // Gunakan ID pemilik hewan
+        'nama_dokter'     => $request->nama_dokter,
+        'hewan_id'        => $hewan->id ?? null,
+        'diagnosa'        => $request->diagnosa,
+        'tindakan'        => $request->tindakan,
+        'catatan'         => $request->catatan,
+        'tanggal_periksa' => now(),
+    ]);
 
-        return back()->with('success', 'Rekam medis berhasil dicatat!');
-    }
+    // 3. Update data reservasi (Biaya Tambahan & Sisa Bayar)
+    $reservasi->biaya_tambahan = $biayaTambahan;
+    $reservasi->sisa_bayar     = $reservasi->sisa_bayar + $biayaTambahan; // Sisa bayar bertambah sesuai biaya tambahan
+    $reservasi->status         = 'Selesai';
+    $reservasi->save();
+
+    return back()->with('success', 'Rekam medis dan biaya tambahan berhasil dicatat!');
+}
 public function staff()
     {
         // 1. Ambil produk dengan stok menipis (Stok <= 5)
@@ -563,7 +608,7 @@ public function staff()
         $riwayatMedis = reservasi::where('user_id', Auth::id())
             ->whereIn('status', ['Dikonfirmasi', 'Menunggu Jadwal', 'Diproses', 'Selesai'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(5);
 
         return view('dashboard.rekam_medis_pelanggan', compact('riwayatMedis'));
     }

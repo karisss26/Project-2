@@ -25,27 +25,17 @@
     .btn-finish { background: #36005E; }
     .btn-finish:hover { background: #2c004f; }
 
-    .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
+    /* Kotak Statistik 3 Kolom */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
     @media (max-width: 768px) { .stat-grid { grid-template-columns: 1fr; } }
     .stat-box { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #E6E6FA; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 15px; }
     .stat-icon { font-size: 30px; background: #f7f1ff; padding: 15px; border-radius: 10px; color: #36005E; }
     .stat-text h4 { margin: 0; font-size: 24px; color: #333; }
     .stat-text p { margin: 0; color: #888; font-size: 13px; }
 
-/* Pop-up Modal Update RM */
+    /* Pop-up Modal Update RM */
     .modal-rm { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
-
-    .modal-rm-content {
-        background: white;
-        margin: 3% auto; /* <-- UBAH DI SINI: Dari 10% ganti jadi 3% atau 5% */
-        padding: 25px;
-        border-radius: 12px;
-        width: 90%;
-        max-width: 500px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        max-height: 90vh; /* <-- TAMBAHIN INI: Biar tinggi pop-up maksimal 90% dari layar */
-        overflow-y: auto; /* <-- TAMBAHIN INI: Biar kalau layarnya kekecilan, isi modalnya bisa di-scroll tanpa motong tombol */
-    }
+    .modal-rm-content { background: white; margin: 3% auto; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
 </style>
 
 <div class="welcome-banner">
@@ -59,25 +49,34 @@
     </div>
 @endif
 
+{{-- KOTAK STATISTIK --}}
 <div class="stat-grid">
-    <div class="stat-box">
+    <div class="stat-box" style="border-left: 4px solid #36005E;">
         <div class="stat-icon">🩺</div>
         <div class="stat-text">
             <h4>{{ $totalPemeriksaan }}</h4>
             <p>Total Antrean Aktif</p>
         </div>
     </div>
-    <div class="stat-box">
-        <div class="stat-icon">📝</div>
+    <div class="stat-box" style="border-left: 4px solid #be185d;">
+        <div class="stat-icon" style="color: #be185d; background: #fce7f3;">💉</div>
+        <div class="stat-text">
+            <h4>{{ $totalVaksinasi }}</h4>
+            <p>Antrean Vaksinasi</p>
+        </div>
+    </div>
+    <div class="stat-box" style="border-left: 4px solid #10b981;">
+        <div class="stat-icon" style="color: #10b981; background: #d1fae5;">📝</div>
         <div class="stat-text">
             <h4>{{ $totalRekamMedis }}</h4>
-            <p>Total Rekam Medis (Selesai)</p>
+            <p>Rekam Medis (Selesai)</p>
         </div>
     </div>
 </div>
 
+{{-- TABEL 1: ANTREAN KONSULTASI DOKTER --}}
 <div class="card-dokter">
-    <h3 style="margin-bottom: 15px; color:#36005E;">📅 Jadwal Praktik & Antrean Pasien</h3>
+    <h3 style="margin-bottom: 15px; color:#36005E;">🩺 Antrean Konsultasi Dokter</h3>
     <div class="table-responsive">
         <table>
             <thead>
@@ -91,40 +90,37 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($antrean as $item)
+                @forelse($antreanKonsultasi as $item)
                 <tr>
                     <td>
                         <strong>{{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}</strong><br>
                         <small style="color: #666;">{{ \Carbon\Carbon::parse($item->waktu)->format('H:i') }} WIB</small>
                     </td>
                     <td>
-                        <strong>{{ $item->nama_hewan ?? $item->pet_name ?? 'Hewan' }}</strong><br>
-                        <small style="color: #888; text-transform: capitalize;">{{ $item->jenis_hewan ?? $item->jenis ?? $item->pet_type ?? '-' }}</small>
+                        <strong>{{ $item->pet_name }}</strong>
                     </td>
-                    <td>{{ $item->user->name ?? 'User Tidak Diketahui' }}</td>
-                    <td>{{ $item->keluhan ?? $item->nama_layanan ?? '-' }}</td>
+                    <td>{{ $item->user->name ?? 'N/A' }}</td>
+                    <td>{{ $item->nama_layanan }}</td>
                     <td>
-                        <span class="status-badge
-                            {{ $item->status == 'Diproses' ? 'badge-diproses' : '' }}
-                            {{ $item->status == 'Dikonfirmasi' ? 'badge-dikonfirmasi' : '' }}
-                            {{ $item->status == 'Menunggu Jadwal' ? 'badge-menunggu-jadwal' : '' }}">
+                        <span class="status-badge {{ $item->status == 'Diproses' ? 'badge-diproses' : 'badge-menunggu-jadwal' }}">
                             {{ $item->status }}
                         </span>
                     </td>
                     <td>
-                        @if($item->status == 'Menunggu Jadwal' || $item->status == 'Dikonfirmasi')
+                        @if($item->status != 'Diproses')
                             <form action="{{ route('dokter.mulaiPeriksa', $item->id) }}" method="POST" style="display: inline;">
                                 @csrf
                                 <button type="submit" class="btn-action btn-start">🩺 Mulai Periksa</button>
                             </form>
-                        @elseif($item->status == 'Diproses')
-                            <button type="button" class="btn-action btn-finish" onclick="openRMModal('{{ $item->id }}', '{{ $item->nama_hewan ?? $item->pet_name }}')">✅ Selesai Periksa</button>
+                        @else
+                            {{-- addslashes penting buat nahan error kalo nama hewannya ada tanda kutip --}}
+                            <button type="button" class="btn-action btn-finish" onclick="openRMModal('{{ $item->id }}', '{{ addslashes($item->pet_name) }}')">✅ Isi Rekam Medis</button>
                         @endif
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 20px; color: #888;">Belum ada antrean pasien saat ini.</td>
+                    <td colspan="6" style="text-align: center; padding: 20px; color: #888;">Belum ada antrean konsultasi saat ini.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -132,6 +128,60 @@
     </div>
 </div>
 
+{{-- TABEL 2: ANTREAN VAKSINASI --}}
+<div class="card-dokter">
+    <h3 style="margin-bottom: 15px; color:#be185d;">💉 Antrean Vaksinasi & Tindakan Medis</h3>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Jadwal</th>
+                    <th>Pasien (Hewan)</th>
+                    <th>Owner</th>
+                    <th>Keluhan / Layanan</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($antreanVaksinasi as $item)
+                <tr>
+                    <td>
+                        <strong>{{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}</strong><br>
+                        <small style="color: #666;">{{ \Carbon\Carbon::parse($item->waktu)->format('H:i') }} WIB</small>
+                    </td>
+                    <td>
+                        <strong>{{ $item->pet_name }}</strong>
+                    </td>
+                    <td>{{ $item->user->name ?? 'N/A' }}</td>
+                    <td>{{ $item->nama_layanan }}</td>
+                    <td>
+                        <span class="status-badge {{ $item->status == 'Diproses' ? 'badge-diproses' : 'badge-menunggu-jadwal' }}">
+                            {{ $item->status }}
+                        </span>
+                    </td>
+                    <td>
+                        @if($item->status != 'Diproses')
+                            <form action="{{ route('dokter.mulaiPeriksa', $item->id) }}" method="POST" style="display: inline;">
+                                @csrf
+                                <button type="submit" class="btn-action btn-start">🩺 Mulai Periksa</button>
+                            </form>
+                        @else
+                            <button type="button" class="btn-action btn-finish" onclick="openRMModal('{{ $item->id }}', '{{ addslashes($item->pet_name) }}')">✅ Isi Rekam Medis</button>
+                        @endif
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px; color: #888;">Belum ada antrean vaksinasi saat ini.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{-- POP-UP REKAM MEDIS --}}
 <div id="rmUpdateModal" class="modal-rm">
     <div class="modal-rm-content">
         <h3 id="modalTitle" style="color:#36005E; margin-bottom:15px;">Form Rekam Medis</h3>
@@ -143,7 +193,9 @@
                 <label style="font-size:13px; color:#666; font-weight:bold; display:block; margin-bottom:5px;">Dokter yang Menangani</label>
                 <select name="nama_dokter" style="width:100%; border:1px solid #ddd; border-radius:8px; padding:10px; font-size:14px;" required>
                     <option value="" disabled selected>-- Pilih Dokter --</option>
-                    <option value="Arifa">drh. Arifa</option> <option value="Agung">drh. Agung</option> </select>
+                    <option value="Arifa">drh. Arifa</option> 
+                    <option value="Agung">drh. Agung</option> 
+                </select>
             </div>
 
             <div style="margin-bottom:15px;">
@@ -154,6 +206,11 @@
             <div style="margin-bottom:15px;">
                 <label style="font-size:13px; color:#666; font-weight:bold; display:block; margin-bottom:5px;">Tindakan / Terapi Obat</label>
                 <textarea name="tindakan" style="width:100%; border:1px solid #ddd; border-radius:8px; padding:10px; font-size:14px; resize:vertical;" rows="3" required placeholder="Misal: Injeksi vitamin, resep amoxicillin tablet 2x1"></textarea>
+            </div>
+
+            <div style="margin-bottom:15px;">
+                <label style="font-size:13px; color:#666; font-weight:bold; display:block; margin-bottom:5px;">Biaya Tambahan (Opsional)</label>
+                <input type="number" name="biaya_tambahan" min="0" style="width:100%; border:1px solid #ddd; border-radius:8px; padding:10px; font-size:14px;" placeholder="Contoh: 25000 (Kosongkan jika tidak ada)">
             </div>
 
             <div style="margin-bottom:20px;">
@@ -177,6 +234,7 @@
         document.getElementById('rmUpdateModal').style.display = 'none';
     }
 
+    // Biar pop-up nutup kalo user ngeklik di luar kotak form
     window.onclick = function(event) {
         const modal = document.getElementById('rmUpdateModal');
         if (event.target == modal) {
