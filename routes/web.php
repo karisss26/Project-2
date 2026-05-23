@@ -229,6 +229,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/admin/transaksi/{id}/status', [AdminTransaksiController::class, 'updateStatus'])->name('admin.transaksi.update');
 
         Route::post('/admin/pesanan/{id}/update-status', [App\Http\Controllers\DashboardController::class, 'updateStatus'])->name('admin.pesanan.updateStatus');
+
+        // Rute untuk fix stok historis
+        Route::get('/admin/stok/fix-historic', [App\Http\Controllers\Admin\StokFixController::class, 'fixHistoric'])->name('admin.stok.fix-historic');
     });
 
     // --- RUTE OWNER ---

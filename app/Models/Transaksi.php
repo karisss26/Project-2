@@ -22,7 +22,8 @@ class Transaksi extends Model
         'total_harga', 
         'status', 
         'bukti_pembayaran', 
-        'metode_pengiriman', // Tambahin ini
-        'tanggal_ambil'      // Tambahin ini
+        'metode_pengiriman',
+        'tanggal_ambil',
+        'stok_dikurangi'
     ];
 }

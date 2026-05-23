@@ -270,7 +270,12 @@ class DashboardController extends Controller
             }
         }
 
-        $pesanan->update(['status' => 'Dikonfirmasi']);
+        // Update status dan mark stok sudah dikurangi (untuk transaksi produk)
+        $updateData = ['status' => 'Dikonfirmasi'];
+        if ($request->tipe == 'transaksi') {
+            $updateData['stok_dikurangi'] = true;
+        }
+        $pesanan->update($updateData);
 
         // Kirim notifikasi sesuai tipe pesanannya sayang
         if($request->tipe != 'transaksi'){
@@ -288,8 +293,8 @@ class DashboardController extends Controller
                     ? Transaksi::findOrFail($id)
                     : reservasi::findOrFail($id);
 
-        // Jika pesanan produk dan statusnya sudah 'Dikonfirmasi', kembalikan stok
-        if ($request->tipe == 'transaksi' && $pesanan->status === 'Dikonfirmasi') {
+        // Jika pesanan produk dan statusnya sudah 'Dikonfirmasi' dan stok sudah dikurangi, kembalikan stok
+        if ($request->tipe == 'transaksi' && $pesanan->status === 'Dikonfirmasi' && $pesanan->stok_dikurangi) {
             foreach ($pesanan->detilProduk as $detail) {
                 $produk = Produk::find($detail->produk_id);
                 if ($produk) {
@@ -299,7 +304,12 @@ class DashboardController extends Controller
             }
         }
 
-        $pesanan->update(['status' => 'Dibatalkan']);
+        // Update status dan mark stok sudah dikembalikan
+        $updateData = ['status' => 'Dibatalkan'];
+        if ($request->tipe == 'transaksi') {
+            $updateData['stok_dikurangi'] = false;
+        }
+        $pesanan->update($updateData);
 
         // Kirim notifikasi penolakan
         if($request->tipe != 'transaksi'){
