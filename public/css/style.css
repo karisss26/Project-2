@@ -1845,9 +1845,14 @@ footer {
     align-items: center;
     min-height: 100vh;
     background-color: var(--purple-50);
-    overflow: hidden;
+    /* Hapus overflow: hidden; dan ganti dengan overflow-y: auto; */
+    overflow-y: auto;
+    /* Tambahkan padding agar form tidak menempel di ujung atas/bawah layar saat di-scroll */
+    padding: 2rem 1rem;
     margin: 0;
+    box-sizing: border-box;
 }
+
 .auth-card {
     background: var(--white);
     padding: 3rem 2.5rem;
@@ -1857,6 +1862,8 @@ footer {
     max-width: 440px;
     text-align: center;
     border: 1px solid var(--purple-100);
+    /* Tambahkan margin: auto; untuk mencegah bagian atas terpotong oleh flexbox saat layar kecil */
+    margin: auto;
 }
 .auth-header {
     margin-bottom: 2rem;
