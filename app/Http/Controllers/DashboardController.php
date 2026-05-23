@@ -31,6 +31,7 @@ class DashboardController extends Controller
 
         // Data untuk tabel 2: Pembelian Produk
         $pembelianProduk = Transaksi::where('user_id', $userId)
+                                                ->with('detilProduk')
                                                 ->orderBy('created_at', 'desc')
                                                 ->paginate(5);;
 
@@ -343,7 +344,7 @@ class DashboardController extends Controller
         ];
 
         // Data untuk tabel laporan operasional
-        $laporanOperasional = Transaksi::with('user')->orderBy('created_at', 'desc')->take(10)->get();
+        $laporanOperasional = Transaksi::with('user', 'detilProduk')->orderBy('created_at', 'desc')->take(10)->get();
 
         return view('dashboard.owner', compact(
             'pendapatanHariIni',
@@ -490,7 +491,7 @@ public function staff()
     {
         $search = $request->input('search');
 
-        $pembelianProduk = Transaksi::with('user') // Pakai with user biar tau ini punya siapa
+        $pembelianProduk = Transaksi::with('user', 'detilProduk') // Pakai with user biar tau ini punya siapa, dan detilProduk buat tampil produknya
             ->when($search, function($query, $search) {
                 return $query->where('id', 'LIKE', "%{$search}%")
                             ->orWhere('status', 'LIKE', "%{$search}%");

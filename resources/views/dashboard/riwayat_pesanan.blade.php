@@ -40,11 +40,11 @@
                         <td>{{ $pesanan->user->name ?? 'User' }}</td>
                         <td>
                             <ul class="detail-list" style="margin: 0; padding-left: 15px;">
-                                @if(isset($pesanan->detail_belanja))
-                                    @foreach($pesanan->detail_belanja as $detail)
-                                        <li>{{ $detail->nama_produk }} (x{{ $detail->jumlah }})</li>
-                                    @endforeach
-                                @endif
+                                @forelse($pesanan->detilProduk ?? [] as $detail)
+                                    <li>{{ $detail->nama_produk ?? $detail->produk->nama_produk ?? 'Produk' }} (x{{ $detail->jumlah }})</li>
+                                @empty
+                                    <li>Tidak ada detail produk</li>
+                                @endforelse
                             </ul>
                             
                             <div style="margin-top: 8px; font-size: 11px; background: #e0f2fe; padding: 6px; border-radius: 6px; color: #0369a1; font-weight: bold; display: inline-block;">

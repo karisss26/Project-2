@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Produk;
 use App\Models\Layanan;
-use App\Models\reservasi; // Wajib dipanggil biar bisa nge-save
+use App\Models\reservasi;
 use App\Models\Transaksi;
 use App\Models\DetilTransaksiProduk;
 
@@ -117,11 +117,9 @@ class CheckoutController extends Controller
         // Kalau bayar pakai Transfer dan ada file yang diupload
         if ($request->payment_method == 'transfer' && $request->hasFile('bukti_bayar')) {
             $buktiPath = $request->file('bukti_bayar')->store('bukti_pembayaran', 'public');
-            $statusAwal = 'Menunggu Konfirmasi Admin'; // Status langsung naik jadi nunggu dicek
+            $statusAwal = 'Menunggu Konfirmasi Admin';
         }
 
-// Pastikan ada $request di dalam kurung use() ini!
-// Tambahkan $request di dalam kurung use()
         DB::transaction(function () use ($request, $cart, $totalHarga, $buktiPath, $statusAwal) {
             // 1. Simpan Transaksi Utama
             $transaksi = Transaksi::create([

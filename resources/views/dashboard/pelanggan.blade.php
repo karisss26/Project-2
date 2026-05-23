@@ -144,9 +144,11 @@
                         <td>{{ $t->created_at->format('d M Y, H:i') }}</td>
                         <td>
                             <ul class="detail-list" style="margin: 0; padding-left: 15px; font-size: 13px;">
-                                @foreach($t->detail_belanja as $detail)
-                                    <li>{{ $detail->nama_produk }} <strong>(x{{ $detail->jumlah }})</strong></li>
-                                @endforeach
+                                @forelse($t->detilProduk ?? [] as $detail)
+                                    <li>{{ $detail->nama_produk ?? $detail->produk->nama_produk ?? 'Produk' }} <strong>(x{{ $detail->jumlah }})</strong></li>
+                                @empty
+                                    <li>Tidak ada detail produk</li>
+                                @endforelse
                             </ul>
                         </td>
                         <td><span style="font-weight:600; color:#16a34a;">Rp {{ number_format($t->total_harga, 0, ',', '.') }}</span></td>
