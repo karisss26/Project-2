@@ -212,18 +212,18 @@ class DashboardController extends Controller
 
         // 1. Antrean - Layanan Klinik vs Produk Belanja
         $antreanLayanan = $antreanPembayaran->filter(function($item) {
-            return $item instanceof \App\Models\reservasi;
+            return $item instanceof reservasi;
         });
         $antreanProduk = $antreanPembayaran->filter(function($item) {
-            return $item instanceof \App\Models\Transaksi;
+            return $item instanceof Transaksi;
         });
 
         // 2. Pesanan Aktif - Layanan Klinik vs Produk Belanja
         $aktifLayanan = $pesananAktif->filter(function($item) {
-            return $item instanceof \App\Models\reservasi;
+            return $item instanceof reservasi;
         });
         $aktifProduk = $pesananAktif->filter(function($item) {
-            return $item instanceof \App\Models\Transaksi;
+            return $item instanceof Transaksi;
         });
 
         // Hitung pendapatan awal
@@ -288,14 +288,14 @@ class DashboardController extends Controller
         return back()->with('success', 'Pesanan ditolak.');
     }
 
-    public function updateStatus(\Illuminate\Http\Request $request, $id)
+    public function updateStatus(Request $request, $id)
     {
         // Ngecek tipe request dari hidden input di blade
         // Kalau tipenya 'transaksi' (dari POS/Kasir) panggil model Transaksi
         // Kalau bukan (atau dari Pet Hotel/Staff), panggil model reservasi
         $pesanan = ($request->tipe == 'transaksi')
-                    ? \App\Models\Transaksi::findOrFail($id)
-                    : \App\Models\reservasi::findOrFail($id);
+                    ? Transaksi::findOrFail($id)
+                    : reservasi::findOrFail($id);
 
         // Update statusnya (Diproses / Selesai)
         $pesanan->status = $request->status;
@@ -365,7 +365,7 @@ public function dokter()
         };
 
         // Ambil data pasien medis yang belum selesai
-        $antrean = \App\Models\reservasi::with(['user', 'hewan'])
+        $antrean = reservasi::with(['user', 'hewan'])
             ->whereIn('status', ['Menunggu Jadwal', 'Dikonfirmasi', 'Diproses'])
             ->where($excludeStaff)
             ->orderBy('tanggal', 'asc')
@@ -374,10 +374,10 @@ public function dokter()
 
         // Cuma butuh 2 metrik ini aja
         $totalPemeriksaan = $antrean->count();
-        $totalRekamMedis = \App\Models\reservasi::where('status', 'Selesai')->where($excludeStaff)->count();
+        $totalRekamMedis = reservasi::where('status', 'Selesai')->where($excludeStaff)->count();
 
-        $jadwalLayanan = \App\Models\reservasi::with(['user', 'hewan'])->where($excludeStaff)->orderBy('created_at', 'desc')->take(10)->get();
-        $rekamMedis = \App\Models\reservasi::with(['user', 'hewan', 'rekamMedis'])->where('status', 'Selesai')->where($excludeStaff)->orderBy('updated_at', 'desc')->take(5)->get();
+        $jadwalLayanan = reservasi::with(['user', 'hewan'])->where($excludeStaff)->orderBy('created_at', 'desc')->take(10)->get();
+        $rekamMedis = reservasi::with(['user', 'hewan', 'rekamMedis'])->where('status', 'Selesai')->where($excludeStaff)->orderBy('updated_at', 'desc')->take(5)->get();
 
         return view('dokter.dashboard', compact('antrean', 'totalPemeriksaan', 'totalRekamMedis', 'jadwalLayanan', 'rekamMedis'));
     }
@@ -387,7 +387,7 @@ public function dokter()
     public function mulaiPeriksa($id)
     {
         // Cari data reservasi berdasarkan ID, lalu ubah statusnya
-        $reservasi = \App\Models\reservasi::findOrFail($id);
+        $reservasi = reservasi::findOrFail($id);
         $reservasi->status = 'Diproses';
         $reservasi->save();
 
@@ -405,17 +405,17 @@ public function simpanRM(Request $request)
             'catatan'      => 'nullable',
         ]);
 
-        $reservasi = \App\Models\reservasi::findOrFail($request->reservasi_id);
+        $reservasi = reservasi::findOrFail($request->reservasi_id);
 
         // Cari data hewan_id asli biar nggak N/A
-        $hewan = \App\Models\hewan::where('nama_hewan', $reservasi->pet_name)
+        $hewan = hewan::where('nama_hewan', $reservasi->pet_name)
                                   ->where('user_id', $reservasi->user_id)
                                   ->first();
 
         // 2. Simpan ke tabel rekam_medis
         \App\Models\RekamMedis::create([
             'reservasi_id'    => $reservasi->id,
-            'user_id'         => \Auth::id(), // Akun yang login
+            'user_id'         => Auth::id(), // Akun yang login
             'nama_dokter'     => $request->nama_dokter, // 🔥 TARIK NAMA DARI DROPDOWN
             'hewan_id'        => $hewan->id ?? null,
             'diagnosa'        => $request->diagnosa,
@@ -433,10 +433,10 @@ public function simpanRM(Request $request)
 public function staff()
     {
         // 1. Ambil produk dengan stok menipis (Stok <= 5)
-        $produkKritis = \App\Models\Produk::where('stok', '<=', 5)->get();
+        $produkKritis = Produk::where('stok', '<=', 5)->get();
 
         // 2. Ambil data Pet Hotel (Status: Menunggu Jadwal & Diproses SAJA)
-        $petHotel = \App\Models\reservasi::with(['user', 'hewan'])
+        $petHotel = reservasi::with(['user', 'hewan'])
             ->where(function($query) {
                 $query->where('nama_layanan', 'LIKE', '%hotel%')
                       ->orWhere('nama_layanan', 'LIKE', '%penitipan%');
@@ -446,22 +446,22 @@ public function staff()
             ->paginate(5, ['*'], 'hotel_page');
 
         // 3. Ambil data Grooming (Status: Menunggu Jadwal & Diproses SAJA)
-        $grooming = \App\Models\reservasi::with(['user', 'hewan'])
+        $grooming = reservasi::with(['user', 'hewan'])
             ->where('nama_layanan', 'LIKE', '%grooming%')
             ->whereIn('status', ['Menunggu Jadwal', 'Diproses']) // Cuma yang belum selesai
             ->orderBy('id', 'desc')
             ->paginate(5, ['*'], 'grooming_page');
 
         // 4. Summary (Hitung total yang AKTIF saja)
-        $totalProduk = \App\Models\Produk::count();
+        $totalProduk = Produk::count();
         $totalLayanan = \App\Models\Layanan::count();
 
         // Mengambil jumlah aktif dari DB langsung biar akurat
-        $jumlahHotelAktif = \App\Models\reservasi::where(function($q) {
+        $jumlahHotelAktif = reservasi::where(function($q) {
                 $q->where('nama_layanan', 'LIKE', '%hotel%')->orWhere('nama_layanan', 'LIKE', '%penitipan%');
             })->whereIn('status', ['Menunggu Jadwal', 'Diproses'])->count();
 
-        $jumlahGroomingAktif = \App\Models\reservasi::where('nama_layanan', 'LIKE', '%grooming%')
+        $jumlahGroomingAktif = reservasi::where('nama_layanan', 'LIKE', '%grooming%')
             ->whereIn('status', ['Menunggu Jadwal', 'Diproses'])->count();
 
         return view('dashboard.staff', compact('produkKritis', 'petHotel', 'grooming', 'totalProduk', 'totalLayanan', 'jumlahHotelAktif', 'jumlahGroomingAktif'));
@@ -470,7 +470,7 @@ public function staff()
     // Method baru khusus halaman Semua Stok
     public function semuaStok()
     {
-        $semuaProduk = \App\Models\Produk::orderBy('stok', 'asc')->get();
+        $semuaProduk = Produk::orderBy('stok', 'asc')->get();
         return view('dashboard.staff_stok', compact('semuaProduk'));
     }
 
@@ -488,7 +488,7 @@ public function staff()
     // Menu Riwayat Belanja Produk
     public function riwayatPesananAdmin(Request $request)
     {
-        $search = $request->get('search');
+        $search = $request->input('search');
 
         $pembelianProduk = Transaksi::with('user') // Pakai with user biar tau ini punya siapa
             ->when($search, function($query, $search) {
@@ -504,7 +504,7 @@ public function staff()
     // Menu Riwayat Reservasi Klinik/Layanan
     public function riwayatLayananAdmin(Request $request)
     {
-        $search = $request->get('search');
+        $search = $request->input('search');
 
         // Kita ambil data reservasi beserta data user-nya (eager loading)
         $reservasiLayanan = reservasi::with('user')
@@ -537,7 +537,7 @@ public function staff()
 
 public function pesananGrooming()
 {
-    $grooming = \App\Models\reservasi::with(['user', 'hewan'])
+    $grooming = reservasi::with(['user', 'hewan'])
         ->where('nama_layanan', 'LIKE', '%grooming%')
         ->orderBy('id', 'desc')
         ->paginate(5);
@@ -547,7 +547,7 @@ public function pesananGrooming()
 
 public function pesananHotel()
 {
-    $petHotel = \App\Models\reservasi::with(['user', 'hewan'])
+    $petHotel = reservasi::with(['user', 'hewan'])
         ->where(function($query) {
             $query->where('nama_layanan', 'LIKE', '%hotel%')
                   ->orWhere('nama_layanan', 'LIKE', '%penitipan%');

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\reservasi; // Sesuaikan dengan model yang kamu pakai
+
 
 class DokterController extends Controller
 {
@@ -19,7 +21,7 @@ class DokterController extends Controller
 
         // Ambil semua data pemeriksaan medis gabungan dengan pagination
         // Diurutkan agar status Diproses & Dikonfirmasi muncul paling atas, baru yang Selesai
-        $semuaPemeriksaan = \App\Models\reservasi::where($excludeStaff)
+        $semuaPemeriksaan = reservasi::where($excludeStaff)
             ->orderByRaw("FIELD(status, 'Diproses', 'Dikonfirmasi', 'Menunggu Jadwal', 'Selesai') ASC")
             ->orderBy('tanggal', 'asc')
             ->orderBy('waktu', 'asc')
@@ -44,7 +46,7 @@ public function simpanRM(Request $request)
             'catatan'      => 'nullable',
         ]);
 
-        $reservasi = \App\Models\reservasi::findOrFail($request->reservasi_id);
+        $reservasi = reservasi::findOrFail($request->reservasi_id);
 
         // Cari data hewan_id asli biar nggak N/A
         $hewan = \App\Models\hewan::where('nama_hewan', $reservasi->pet_name)
@@ -54,7 +56,7 @@ public function simpanRM(Request $request)
         // 2. Simpan ke tabel rekam_medis
         \App\Models\RekamMedis::create([
             'reservasi_id'    => $reservasi->id,
-            'user_id'         => \Auth::id(), // Akun yang login
+            'user_id'         => Auth::id(), // Akun yang login
             'nama_dokter'     => $request->nama_dokter, // 🔥 TARIK NAMA DARI DROPDOWN
             'hewan_id'        => $hewan->id ?? null,
             'diagnosa'        => $request->diagnosa,
