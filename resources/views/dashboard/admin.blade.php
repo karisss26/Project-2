@@ -66,9 +66,10 @@
                                     <input type="hidden" name="tipe" value="reservasi">
                                     <button type="submit" class="btn-sm btn-acc" style="background: #28a745; color: white;">Setujui</button>
                                 </form>
-                                <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST">
+                                <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST" onsubmit="return mintaAlasanTolak(this)">
                                     @csrf
                                     <input type="hidden" name="tipe" value="reservasi">
+                                    <input type="hidden" name="alasan_tolak" class="input-alasan">
                                     <button type="submit" class="btn-sm btn-tolak">Tolak</button>
                                 </form>
                             </div>
@@ -130,9 +131,10 @@
                                     <input type="hidden" name="tipe" value="transaksi">
                                     <button type="submit" class="btn-sm btn-acc" style="background: #28a745; color: white;">Setujui</button>
                                 </form>
-                                <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST">
+                                <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST" onsubmit="return mintaAlasanTolak(this)">
                                     @csrf
                                     <input type="hidden" name="tipe" value="transaksi">
+                                    <input type="hidden" name="alasan_tolak" class="input-alasan">
                                     <button type="submit" class="btn-sm btn-tolak">Tolak</button>
                                 </form>
                             </div>
@@ -166,4 +168,24 @@
         </div>
     </div>
 </div>
+<script>
+    function mintaAlasanTolak(form) {
+        let alasan = prompt("⚠️ Pesanan akan ditolak!\nSilakan masukkan alasan penolakan:");
+        
+        // Jika admin klik Cancel pada popup prompt
+        if (alasan === null) {
+            return false; // Batalkan submit
+        }
+        
+        // Jika alasan kosong tapi di-Ok, kasih peringatan (opsional)
+        if (alasan.trim() === "") {
+            alert("Alasan tolak harus diisi!");
+            return false;
+        }
+
+        // Masukkan alasan ke input hidden dan lanjutkan submit form
+        form.querySelector('.input-alasan').value = alasan;
+        return true;
+    }
+</script>
 @endsection

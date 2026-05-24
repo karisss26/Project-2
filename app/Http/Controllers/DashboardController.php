@@ -309,6 +309,12 @@ class DashboardController extends Controller
         if ($request->tipe == 'transaksi') {
             $updateData['stok_dikurangi'] = false;
         }
+        
+        // --- TAMBAHAN: Tangkap alasan tolak dari prompt JS ---
+        if ($request->has('alasan_tolak')) {
+            $updateData['alasan_tolak'] = $request->alasan_tolak;
+        }
+        
         $pesanan->update($updateData);
 
         // Kirim notifikasi penolakan

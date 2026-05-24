@@ -50,10 +50,19 @@
                             <div style="margin-top: 8px; font-size: 11px; background: #e0f2fe; padding: 6px; border-radius: 6px; color: #0369a1; font-weight: bold; display: inline-block;">
                                 @if(isset($pesanan->metode_pengiriman) && $pesanan->metode_pengiriman == 'pickup')
                                     📍 Ambil di Toko: {{ !empty($pesanan->tanggal_ambil) ? \Carbon\Carbon::parse($pesanan->tanggal_ambil)->format('d M Y') : '-' }}
+                                @elseif(isset($pesanan->metode_pengiriman) && $pesanan->metode_pengiriman == 'Transaksi Offline')
+                                    🏪 Pembelian Langsung (Kasir)
                                 @else
                                     🚚 Dikirim Kurir (Delivery)
                                 @endif
                             </div>
+                            {{-- Notif Alasan Batal --}}
+                            @if($pesanan->status == 'Dibatalkan' && !empty($pesanan->alasan_tolak))
+                                <div style="margin-top: 8px; font-size: 11px; background: #fee2e2; border-left: 3px solid #ef4444; padding: 6px; border-radius: 0 6px 6px 0; color: #b91c1c;">
+                                    <strong>❌ Dibatalkan:</strong><br>
+                                    {{ $pesanan->alasan_tolak }}
+                                </div>
+                            @endif
                         </td>
                         <td>
                             <form action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}" method="POST" style="display: flex; gap: 5px;">

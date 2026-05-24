@@ -117,6 +117,7 @@ class PosKasirController extends Controller
                     'status' => $statusAwal,
                     'bukti_pembayaran' => $buktiPath,
                     'metode_pembayaran' => $request->payment_method,
+                    'metode_pengiriman' => 'Transaksi Offline',
                 ]);
 
                 $transaksiId = $transaksi->id;

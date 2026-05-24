@@ -87,6 +87,13 @@
                             ">
                                 {{ $r->status }}
                             </span>
+                            
+                            {{-- Notif Alasan Batal --}}
+                            @if($r->status == 'Dibatalkan' && !empty($r->alasan_tolak))
+                                <div style="margin-top: 8px; font-size: 11px; background: #fee2e2; padding: 6px; border-radius: 6px; color: #b91c1c; line-height: 1.4;">
+                                    <strong>Info:</strong> {{ $r->alasan_tolak }}
+                                </div>
+                            @endif
                         </td>
                         <td>
                             @if($r->status === 'Menunggu Jadwal')
@@ -171,6 +178,13 @@
                             ">
                                 {{ $t->status == 'Menunggu Jadwal' ? 'Menunggu Diambil' : $t->status }}
                             </span>
+
+                            {{-- Notif Alasan Batal --}}
+                            @if($t->status == 'Dibatalkan' && !empty($t->alasan_tolak))
+                                <div style="margin-top: 8px; font-size: 11px; background: #fee2e2; padding: 6px; border-radius: 6px; color: #b91c1c; line-height: 1.4;">
+                                    <strong>Info:</strong> {{ $t->alasan_tolak }}
+                                </div>
+                            @endif
                         </td>
                         <td>
                             @if($t->bukti_pembayaran)

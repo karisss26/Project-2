@@ -1,5 +1,11 @@
-    /* Override card styling on receipt page */
-    .card {
+@extends('layouts.app')
+
+@section('title', 'Struk Penjualan')
+
+@section('content')
+<style>
+    /* Menghilangkan style default card bawaan dashboard khusus halaman ini agar tidak double border */
+    .card, .main-card, .dashboard-card {
         background: transparent !important;
         box-shadow: none !important;
         border: none !important;
@@ -7,42 +13,23 @@
         margin: 0 !important;
     }
 
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        background-color: #f5f5f5;
-    }
-
-    /* Ensure proper layout context */
-    @supports (display: grid) {
-        body {
-            display: block !important;
-        }
-    }
-
-    #receipt-page {
+    /* Wrapper khusus untuk menaruh kertas struk di tengah-tengah area panel admin */
+    .receipt-dashboard-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         padding: 20px;
-        margin: 0;
-    }
-
-    .content {
-        background: transparent !important;
-        padding: 0 !important;
+        width: 100%;
+        background-color: transparent;
     }
 
     .receipt-container {
         max-width: 80mm;
         width: 80mm;
-        margin: 0;
-        padding: 0;
         background-color: white;
-        border-radius: 0;
-        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         overflow: hidden;
         display: block;
     }
@@ -271,8 +258,8 @@
     .action-buttons {
         display: flex;
         gap: 10px;
-        margin-top: 15px;
-        padding: 15px;
+        margin-top: 20px;
+        width: 80mm; /* Menyeimbangkan dengan lebar struk */
     }
 
     .btn {
@@ -284,6 +271,8 @@
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
+        text-align: center;
+        text-decoration: none;
     }
 
     .btn-print {
@@ -306,188 +295,36 @@
         background-color: #e0e0e0;
     }
 
+    /* CSS PRINT TRICK: Menyembunyikan sidebar panel admin HANYA pas tombol print di-klik */
     @media print {
-        html, body {
-            width: 80mm !important;
-            height: auto !important;
+        /* Sembunyikan elemen sidebar/navbar bawaan template app.blade.php */
+        .sidebar, .sidebar-header, .menu-items, .logout-btn-sidebar,
+        .header, [class*="topbar"], [class*="navbar"], nav, .action-buttons, .top-nav {
+            display: none !important;
+        }
+
+        /* Paksa area pembungkus layout menjadi full-width pas nge-print */
+        .main-content, .content, .wrapper, .receipt-dashboard-wrapper {
             margin: 0 !important;
             padding: 0 !important;
+            width: 80mm !important;
+            max-width: 80mm !important;
+            box-shadow: none !important;
             background: white !important;
-            line-height: 1.4 !important;
         }
 
         body {
             background-color: white !important;
-        }
-
-        /* Hide sidebar */
-        .sidebar, .sidebar-header, .menu-items, .logout-btn-sidebar {
-            display: none !important;
-        }
-
-        /* Hide header with user greeting */
-        .header, [class*="topbar"], [class*="navbar"], nav {
-            display: none !important;
-        }
-
-        /* Show main content but remove card styling */
-        .main-content {
             margin: 0 !important;
             padding: 0 !important;
-            max-width: 100% !important;
-            width: 80mm !important;
-        }
-
-        .content {
-            margin: 0 !important;
-            padding: 0 !important;
-            max-width: 100% !important;
-            width: 80mm !important;
-            background: transparent !important;
-        }
-
-        /* Hide card wrapper if present */
-        .card {
-            border: none !important;
-            box-shadow: none !important;
-            background: transparent !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            max-width: 100% !important;
-            width: 80mm !important;
-        }
-
-        /* Hide action buttons */
-        .action-buttons, .buttons, .controls {
-            display: none !important;
-        }
-
-        #receipt-page {
-            padding: 0 !important;
-            margin: 0 !important;
-            width: 80mm !important;
-            max-width: 80mm !important;
         }
 
         .receipt-container {
             max-width: 80mm !important;
             width: 80mm !important;
-            margin: 0 !important;
-            padding: 12px !important;
             box-shadow: none !important;
             border: none !important;
             border-radius: 0 !important;
-            page-break-after: avoid;
-        }
-
-        .receipt-header {
-            padding: 10px !important;
-            margin: 0 0 12px 0 !important;
-            line-height: 1.3 !important;
-        }
-
-        .receipt-header h1 {
-            margin: 0 0 4px 0 !important;
-            line-height: 1.2 !important;
-        }
-
-        .receipt-header p {
-            margin: 2px 0 !important;
-            line-height: 1.2 !important;
-        }
-
-        .receipt-body {
-            padding: 0 !important;
-            margin: 0 !important;
-            line-height: 1.4 !important;
-        }
-
-        .receipt-section {
-            margin-bottom: 10px !important;
-            padding: 0 !important;
-        }
-
-        .receipt-section-title {
-            margin: 8px 0 6px 0 !important;
-            padding: 0 0 4px 0 !important;
-            line-height: 1.2 !important;
-        }
-
-        .receipt-info-row {
-            margin-bottom: 4px !important;
-            padding: 2px 0 !important;
-            line-height: 1.3 !important;
-        }
-
-        .receipt-items-table {
-            margin-bottom: 10px !important;
-            border-collapse: collapse;
-        }
-
-        .receipt-items-table th {
-            padding: 4px 0 !important;
-            line-height: 1.2 !important;
-        }
-
-        .receipt-items-table td {
-            padding: 3px 0 !important;
-            line-height: 1.2 !important;
-        }
-
-        .receipt-summary {
-            padding: 8px !important;
-            margin: 0 0 10px 0 !important;
-        }
-
-        .summary-row {
-            margin-bottom: 4px !important;
-            padding: 2px 0 !important;
-            line-height: 1.2 !important;
-        }
-
-        .summary-row.total {
-            margin: 6px 0 !important;
-            padding: 6px 0 !important;
-            line-height: 1.3 !important;
-        }
-
-        .payment-method {
-            padding: 6px !important;
-            margin: 8px 0 !important;
-            line-height: 1.3 !important;
-        }
-
-        .payment-method label {
-            margin: 0 0 2px 0 !important;
-        }
-
-        .kembalian-section {
-            padding: 6px !important;
-            margin: 6px 0 !important;
-            line-height: 1.3 !important;
-        }
-
-        .receipt-footer {
-            padding: 10px !important;
-            margin: 12px 0 0 0 !important;
-            line-height: 1.3 !important;
-        }
-
-        .receipt-footer p {
-            margin: 4px 0 !important;
-            line-height: 1.2 !important;
-        }
-
-        .receipt-footer-text {
-            padding: 6px !important;
-            margin: 6px 0 !important;
-            line-height: 1.3 !important;
-        }
-
-        .receipt-header,
-        .receipt-body,
-        .receipt-footer {
-            page-break-inside: avoid;
         }
 
         @page {
@@ -497,119 +334,105 @@
     }
 </style>
 
-<div id="receipt-page">
-<!-- Receipt Container -->
-<div class="receipt-container">
-    <!-- Header -->
-    <div class="receipt-header">
-        <h1>🧾 STRUK PENJUALAN</h1>
-        <p>D&F Pet Shop</p>
-        <p>Struk #{{ str_pad($transaksi->id, 6, '0', STR_PAD_LEFT) }}</p>
-    </div>
-
-    <!-- Body -->
-    <div class="receipt-body">
-        <!-- Info Transaksi -->
-        <div class="receipt-section">
-            <div class="receipt-section-title">Informasi Transaksi</div>
-            <div class="receipt-info-row">
-                <label>No. Struk</label>
-                <span class="value">#{{ str_pad($transaksi->id, 6, '0', STR_PAD_LEFT) }}</span>
-            </div>
-            <div class="receipt-info-row">
-                <label>Tanggal & Jam</label>
-                <span class="value">{{ $transaksi->created_at->format('d/m/Y H:i') }}</span>
-            </div>
-            <div class="receipt-info-row">
-                <label>Kasir</label>
-                <span class="value">{{ $transaksi->user->name ?? 'Admin' }}</span>
-            </div>
+<div class="receipt-dashboard-wrapper">
+    <div class="receipt-container">
+        <div class="receipt-header">
+            <h1>🧾 STRUK PENJUALAN</h1>
+            <p>D&F Pet Shop</p>
+            <p>Struk #{{ str_pad($transaksi->id, 6, '0', STR_PAD_LEFT) }}</p>
         </div>
 
-        <!-- Items -->
-        <div class="receipt-section">
-            <div class="receipt-section-title">Detail Barang</div>
-            <table class="receipt-items-table">
-                <thead>
-                    <tr>
-                        <th>Produk</th>
-                        <th>Qty</th>
-                        <th>Harga</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($transaksi->detilProduk as $detail)
-                    <tr>
-                        <td class="product-name">{{ $detail->produk->nama_produk ?? 'N/A' }}</td>
-                        <td>{{ $detail->jumlah }}</td>
-                        <td>Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
-                        <td>Rp {{ number_format($detail->harga_satuan * $detail->jumlah, 0, ',', '.') }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Summary -->
-        <div class="receipt-section">
-            <div class="receipt-summary">
-                <div class="summary-row">
-                    <label>Subtotal</label>
-                    <span class="value">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span>
+        <div class="receipt-body">
+            <div class="receipt-section">
+                <div class="receipt-section-title">Informasi Transaksi</div>
+                <div class="receipt-info-row">
+                    <label>No. Struk</label>
+                    <span class="value">#{{ str_pad($transaksi->id, 6, '0', STR_PAD_LEFT) }}</span>
                 </div>
-                <div class="summary-row total">
-                    <label>Total Pembayaran</label>
-                    <span class="value">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span>
+                <div class="receipt-info-row">
+                    <label>Tanggal & Jam</label>
+                    <span class="value">{{ $transaksi->created_at->format('d/m/Y H:i') }}</span>
                 </div>
-            </div>
-        </div>
-
-        <!-- Payment Method -->
-        <div class="receipt-section">
-            <div class="payment-method">
-                <label>💳 Metode Pembayaran</label>
-                <div class="value">
-                    @if($transaksi->metode_pembayaran === 'cash')
-                        💵 Tunai / COD
-                    @elseif($transaksi->metode_pembayaran === 'transfer')
-                        💳 Transfer / QRIS
-                    @else
-                        {{ ucfirst($transaksi->metode_pembayaran) }}
-                    @endif
+                <div class="receipt-info-row">
+                    <label>Kasir</label>
+                    <span class="value">{{ $transaksi->user->name ?? 'Admin' }}</span>
                 </div>
             </div>
 
-            @if($transaksi->metode_pembayaran === 'cash' && $transaksi->kembalian)
-            <div class="kembalian-section">
-                <label>💰 Kembalian</label>
-                <div class="value">Rp {{ number_format($transaksi->kembalian, 0, ',', '.') }}</div>
+            <div class="receipt-section">
+                <div class="receipt-section-title">Detail Barang</div>
+                <table class="receipt-items-table">
+                    <thead>
+                        <tr>
+                            <th>Produk</th>
+                            <th>Qty</th>
+                            <th>Harga</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($transaksi->detilProduk as $detail)
+                        <tr>
+                            <td class="product-name">{{ $detail->produk->nama_produk ?? 'N/A' }}</td>
+                            <td>{{ $detail->jumlah }}</td>
+                            <td>Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
+                            <td>Rp {{ number_format($detail->harga_satuan * $detail->jumlah, 0, ',', '.') }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-            @endif
+
+            <div class="receipt-section">
+                <div class="receipt-summary">
+                    <div class="summary-row">
+                        <label>Subtotal</label>
+                        <span class="value">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="summary-row total">
+                        <label>Total Pembayaran</label>
+                        <span class="value">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="receipt-section">
+                <div class="payment-method">
+                    <label>💳 Metode Pembayaran</label>
+                    <div class="value">
+                        @if($transaksi->metode_pembayaran === 'cash')
+                            💵 Tunai / COD
+                        @elseif($transaksi->metode_pembayaran === 'transfer')
+                            💳 Transfer / QRIS
+                        @else
+                            {{ ucfirst($transaksi->metode_pembayaran) }}
+                        @endif
+                    </div>
+                </div>
+
+                @if($transaksi->metode_pembayaran === 'cash' && $transaksi->kembalian)
+                <div class="kembalian-section">
+                    <label>💰 Kembalian</label>
+                    <div class="value">Rp {{ number_format($transaksi->kembalian, 0, ',', '.') }}</div>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="receipt-footer">
+            <p>✨ Terima kasih sudah berbelanja di D&F ✨</p>
+            <div class="receipt-footer-text">
+                Semoga hewan kesayangan Anda sehat dan bahagia!
+            </div>
+            <p style="margin-top: 15px; font-size: 11px; color: #999;">
+                {{ now()->format('d/m/Y H:i:s') }}
+            </p>
         </div>
     </div>
 
-    <!-- Footer -->
-    <div class="receipt-footer">
-        <p>✨ Terima kasih sudah berbelanja di D&F ✨</p>
-        <div class="receipt-footer-text">
-            Semoga hewan kesayangan Anda sehat dan bahagia!
-        </div>
-        <p style="margin-top: 15px; font-size: 11px; color: #999;">
-            {{ now()->format('d/m/Y H:i:s') }}
-        </p>
+    <div class="action-buttons">
+        <button type="button" class="btn btn-print" onclick="window.print()">🖨️ Cetak Struk</button>
+        <a href="{{ route('admin.transaksi.index') }}" class="btn btn-next">Kelola Transaksi →</a>
     </div>
 </div>
-</div>
-
-<!-- Action Buttons -->
-<div class="action-buttons">
-    <button type="button" class="btn btn-print" onclick="window.print()">🖨️ Cetak Struk</button>
-    <a href="{{ route('admin.transaksi.index') }}" class="btn btn-next">Kelola Transaksi →</a>
-</div>
-
-<script>
-    // Auto print on page load (optional)
-    // window.print();
-</script>
 @endsection
