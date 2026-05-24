@@ -79,6 +79,7 @@
         </button>
 
         <div id="notifMenu" class="hidden absolute right-0 mt-2 w-80 origin-top-right rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden z-50 transform transition-all duration-200 opacity-0 scale-95">
+<<<<<<< HEAD
             <div class="bg-gray-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
                 <h3 class="text-sm font-bold text-gray-800">Notifikasi Kamu</h3>
                 @if(auth()->user()->unreadNotifications->count() > 0)
@@ -103,6 +104,24 @@
                         @endif
                         <div class="pl-3">
                             <p class="text-sm leading-snug {{ !$notification->read_at ? 'text-gray-800 font-semibold' : 'text-gray-600' }}">{{ $notification->data['pesan'] }}</p>
+=======
+
+            <div class="bg-gray-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-sm font-bold text-gray-800">Notifikasi Kamu</h3>
+                @if(auth()->user()->unreadNotifications->count() > 0)
+                    <span class="text-xs bg-ungu-terang text-ungu px-2 py-1 rounded-md font-semibold">
+                        {{ auth()->user()->unreadNotifications->count() }} Baru
+                    </span>
+                @endif
+            </div>
+
+            <div class="max-h-80 overflow-y-auto">
+                @forelse(auth()->user()->unreadNotifications as $notification)
+                    <a href="{{ route('notif.read', $notification->id) }}" class="block px-4 py-3 hover:bg-ungu-terang/50 transition-colors border-b border-gray-50 last:border-0 relative">
+                        <span class="absolute left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-ungu rounded-full"></span>
+                        <div class="pl-3">
+                            <p class="text-sm text-gray-700 leading-snug">{{ $notification->data['pesan'] }}</p>
+>>>>>>> teman/update
                             <p class="text-xs text-gray-400 mt-1"><i class="far fa-clock mr-1"></i>{{ $notification->created_at->diffForHumans() }}</p>
                         </div>
                     </a>
@@ -112,6 +131,7 @@
                             <i class="far fa-bell-slash text-gray-300 text-xl"></i>
                         </div>
                         <p class="text-sm text-gray-500 font-medium">Kosong nih!</p>
+<<<<<<< HEAD
                         <p class="text-xs text-gray-400">Belum ada riwayat notifikasi untukmu.</p>
                     </div>
                 @endforelse
@@ -125,12 +145,31 @@
                     </button>
                 </div>
             @endif
+=======
+                        <p class="text-xs text-gray-400">Belum ada notifikasi baru untukmu.</p>
+                    </div>
+                @endforelse
+            </div>
+>>>>>>> teman/update
         </div>
     </div>
 @endauth
 
                         @auth
+<<<<<<< HEAD
                             <a href="{{ route('dashboard.pelanggan') }}" class="p-2 hover:bg-ungu-terang rounded-full transition-colors group" title="Dashboard Saya">
+=======
+                            @php
+                                $profileRoute = match(auth()->user()->role) {
+                                    'admin', 'kasir' => route('dashboard.admin'),
+                                    'owner' => route('dashboard.owner'),
+                                    'dokter' => route('dashboard.dokter'),
+                                    'staff' => route('dashboard.staff'),
+                                    default => route('dashboard.pelanggan'),
+                                };
+                            @endphp
+                            <a href="{{ $profileRoute }}" class="p-2 hover:bg-ungu-terang rounded-full transition-colors group" title="Dashboard Saya">
+>>>>>>> teman/update
                                 <i class="fas fa-user-circle text-ungu text-2xl group-hover:scale-110 transition-transform"></i>
                             </a>
                         @else
@@ -344,7 +383,11 @@
                                 <li><strong>Check-out:</strong> Maksimal pukul 12:00 WIB</li>
                             </ul>
                         </div>
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> teman/update
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Check-out <span class="text-red-500">*</span></label>
                             <input type="date" name="tanggal_keluar" id="input_tgl_checkout" min="{{ date('Y-m-d') }}" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-ungu focus:outline-none focus:ring-2 focus:ring-ungu-muda">
@@ -646,6 +689,7 @@
         const step2 = document.getElementById('step-2');
         const btnNext = document.getElementById('btnNext');
         const btnBack = document.getElementById('btnBack');
+<<<<<<< HEAD
 
         const inputHewan = document.getElementById('input_hewan');
         const namaLayananInput = document.getElementById('modalNamaLayananInput');
@@ -654,6 +698,16 @@
         const inputWaktu = document.getElementById('input_waktu');
         const optHotel = document.getElementById('opt_hotel');
 
+=======
+        
+        const inputHewan = document.getElementById('input_hewan');
+        const namaLayananInput = document.getElementById('modalNamaLayananInput');
+        
+        const wrapWaktu = document.getElementById('wrap_waktu');
+        const inputWaktu = document.getElementById('input_waktu');
+        const optHotel = document.getElementById('opt_hotel');
+        
+>>>>>>> teman/update
         const wrapHotelInfo = document.getElementById('wrap_hotel_info');
         const inputTglCheckout = document.getElementById('input_tgl_checkout');
 
@@ -674,16 +728,26 @@
                 // Tampilan Khusus Pet Hotel
                 wrapHotelInfo.style.display = 'block';
                 inputTglCheckout.required = true;
+<<<<<<< HEAD
 
                 wrapWaktu.style.display = 'none';
                 inputWaktu.required = false;
+=======
+                
+                wrapWaktu.style.display = 'none';
+                inputWaktu.required = false; 
+>>>>>>> teman/update
                 optHotel.style.display = 'block'; // Aktifkan opsi jam 14
                 inputWaktu.value = '14:00:00'; // Otomatis set jam check-in ke DB
             } else {
                 // Tampilan Layanan Biasa (Grooming / Klinik)
                 wrapHotelInfo.style.display = 'none';
                 inputTglCheckout.required = false;
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> teman/update
                 wrapWaktu.style.display = 'block';
                 inputWaktu.required = true;
                 optHotel.style.display = 'none';
@@ -702,6 +766,7 @@
         const tanggalInput = document.getElementById('input_tanggal');
 
         tanggalInput.addEventListener('change', function() {
+<<<<<<< HEAD
             let selectedDate = this.value;
             let timeOptions = inputWaktu.querySelectorAll('option');
             const namaLayanan = namaLayananInput.value.toLowerCase();
@@ -709,6 +774,15 @@
 
             // Set minimal tanggal checkout = tanggal check-in
             inputTglCheckout.min = selectedDate;
+=======
+            let selectedDate = this.value; 
+            let timeOptions = inputWaktu.querySelectorAll('option');
+            const namaLayanan = namaLayananInput.value.toLowerCase();
+            const isHotel = namaLayanan.includes('penitipan') || namaLayanan.includes('hotel');
+            
+            // Set minimal tanggal checkout = tanggal check-in
+            inputTglCheckout.min = selectedDate; 
+>>>>>>> teman/update
 
             // Reset opsi jam
             timeOptions.forEach(opt => {
@@ -720,7 +794,11 @@
 
             // Kunci jadwal klinik HANYA JIKA BUKAN LAYANAN HOTEL (karena hotel kandangnya banyak)
             if (bookedSlots[selectedDate] && !isHotel) {
+<<<<<<< HEAD
                 let takenTimes = bookedSlots[selectedDate];
+=======
+                let takenTimes = bookedSlots[selectedDate]; 
+>>>>>>> teman/update
                 timeOptions.forEach(opt => {
                     if (opt.value && opt.value !== '14:00:00') {
                         let isBooked = takenTimes.some(time => time.startsWith(opt.value.substring(0, 5)));
@@ -734,6 +812,7 @@
         });
     });
 </script>
+<<<<<<< HEAD
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -763,5 +842,7 @@
     });
 </script>
 
+=======
+>>>>>>> teman/update
 </body>
 </html>

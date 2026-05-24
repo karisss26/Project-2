@@ -3,6 +3,7 @@
 @section('title', 'Dashboard Owner - Paw Center')
 
 @section('content')
+<<<<<<< HEAD
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <div class="container-fluid py-4" id="area-dashboard">
@@ -34,6 +35,12 @@
                 📄 Download PDF
             </button>
         </div>
+=======
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: #4A148C; font-weight: 700;">Dashboard Owner 🐾</h2>
+        <span class="badge bg-purple" style="background: #8E24AA; padding: 10px;">Filter: {{ $modeDisplay }}</span>
+>>>>>>> teman/update
     </div>
 
     <div class="row mb-4">
@@ -105,7 +112,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+<<<<<<< HEAD
     // --- 1. Line Chart Pendapatan ---
+=======
+    // 1. Line Chart Pendapatan
+>>>>>>> teman/update
     const ctxRev = document.getElementById('revenueChart').getContext('2d');
     new Chart(ctxRev, {
         type: 'line',
@@ -122,7 +133,11 @@
         }
     });
 
+<<<<<<< HEAD
     // --- 2. Pie Chart Produk Terlaris ---
+=======
+    // 2. Pie Chart Produk Terlaris
+>>>>>>> teman/update
     const ctxProd = document.getElementById('produkChart').getContext('2d');
     new Chart(ctxProd, {
         type: 'doughnut',
@@ -130,13 +145,21 @@
             labels: {!! json_encode($pieLabels) !!},
             datasets: [{
                 data: {!! json_encode($pieData) !!},
+<<<<<<< HEAD
                 backgroundColor: ['#4A148C', '#8E24AA', '#AB47BC', '#CE93D8', '#F3E5F5'],
                 borderWidth: 0
+=======
+                backgroundColor: ['#4A148C', '#8E24AA', '#AB47BC', '#CE93D8', '#F3E5F5']
+>>>>>>> teman/update
             }]
         }
     });
 
+<<<<<<< HEAD
     // --- 3. Pie Chart Layanan Terlaris ---
+=======
+    // 3. Pie Chart Layanan Terlaris
+>>>>>>> teman/update
     const ctxLay = document.getElementById('layananChart').getContext('2d');
     new Chart(ctxLay, {
         type: 'doughnut',
@@ -144,6 +167,7 @@
             labels: {!! json_encode($topLayananPieLabels) !!},
             datasets: [{
                 data: {!! json_encode($topLayananPieData) !!},
+<<<<<<< HEAD
                 backgroundColor: ['#1B5E20', '#388E3C', '#4CAF50', '#81C784', '#C8E6C9'],
                 borderWidth: 0
             }]
@@ -194,5 +218,11 @@
             document.body.style.overflow = originalBodyOverflow;
         });
     }
+=======
+                backgroundColor: ['#1B5E20', '#388E3C', '#4CAF50', '#81C784', '#C8E6C9']
+            }]
+        }
+    });
+>>>>>>> teman/update
 </script>
 @endsection

@@ -1,5 +1,6 @@
 @extends('layouts.app')
 
+<<<<<<< HEAD
 @section('title', 'Laporan Penjualan')
 
 @section('content')
@@ -90,6 +91,19 @@
     </div>
 
     <div class="admin-card d-print-none">
+=======
+@section('title', 'Laporan Penjualan - Admin')
+
+@section('content')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="content">
+    <div class="admin-header">
+        <h2>Laporan Penjualan - Admin</h2>
+    </div>
+
+    <div class="admin-card">
+>>>>>>> teman/update
         <h3>Filter Periode</h3>
         <form method="GET" action="{{ route('admin.laporan') }}">
             <div class="filter-row">
@@ -132,6 +146,7 @@
             <span class="title">Top Produk</span>
             <span class="angka" style="font-size:20px;">{{ $topProductName ?? '-' }}</span>
         </div>
+<<<<<<< HEAD
         <div class="stat-card">
             <span class="title">Total Layanan Terjual</span>
             <span class="angka">{{ $totalLayananTerjual }} Layanan</span>
@@ -152,6 +167,12 @@
 
     <div class="grid-2">
         <div class="admin-card pdf-section">
+=======
+    </div>
+
+    <div class="grid-2">
+        <div class="admin-card">
+>>>>>>> teman/update
             <h3>Grafik Pendapatan (Roll Up: {{ $modeDisplay }})</h3>
             <canvas id="revenueChart" height="120"></canvas>
         </div>
@@ -161,6 +182,7 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <div class="grid-2">
         <div class="admin-card">
             <h3>Perbandingan Pemasukan: Produk vs Layanan</h3>
@@ -172,6 +194,8 @@
         </div>
     </div>
 
+=======
+>>>>>>> teman/update
     <div class="admin-card">
         <h3>Top Produk</h3>
         <div style="overflow-x:auto;">
@@ -201,11 +225,16 @@
     </div>
 
     <div class="admin-card">
+<<<<<<< HEAD
         <h3>Top Layanan</h3>
+=======
+        <h3>Transaksi Selesai Terbaru</h3>
+>>>>>>> teman/update
         <div style="overflow-x:auto;">
             <table class="admin-table">
                 <thead>
                     <tr>
+<<<<<<< HEAD
                         <th>Layanan</th>
                         <th class="text-end">Qty Terjual</th>
                         <th class="text-end">Pendapatan Layanan (perkiraan)</th>
@@ -221,12 +250,32 @@
                     @empty
                         <tr>
                             <td colspan="3" class="muted" style="text-align:center;">Belum ada data layanan.</td>
+=======
+                        <th>ID</th>
+                        <th>Tanggal</th>
+                        <th>Pelanggan</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($transactionsTable as $trx)
+                        <tr>
+                            <td><strong>#TRX-{{ $trx->id }}</strong></td>
+                            <td>{{ $trx->created_at->format('d M Y') }}</td>
+                            <td>{{ $trx->user->name ?? 'Anonim' }}</td>
+                            <td>Rp {{ number_format($trx->total_harga ?? 0, 0, ',', '.') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="muted" style="text-align:center;">Belum ada transaksi.</td>
+>>>>>>> teman/update
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
+<<<<<<< HEAD
 
     <div class="admin-card">
         <h3>Ringkasan Pemasukan</h3>
@@ -259,6 +308,11 @@
 
 <script>
     // --- SETUP CHART.JS ---
+=======
+</div>
+
+<script>
+>>>>>>> teman/update
     const revenueLabels = {!! json_encode($revenueLabels) !!};
     const revenueSeries = {!! json_encode($revenueData) !!};
 
@@ -270,7 +324,11 @@
             datasets: [{
                 label: 'Pendapatan (Rp)',
                 data: revenueSeries,
+<<<<<<< HEAD
                 borderColor: '#36005E',
+=======
+                borderColor: '#36005E', // Warna ungu utama Paw Center
+>>>>>>> teman/update
                 backgroundColor: 'rgba(54, 0, 94, 0.12)',
                 borderWidth: 2,
                 fill: true,
@@ -279,7 +337,10 @@
         },
         options: {
             responsive: true,
+<<<<<<< HEAD
             maintainAspectRatio: false,
+=======
+>>>>>>> teman/update
             scales: {
                 y: { beginAtZero: true }
             }
@@ -309,6 +370,7 @@
             responsive: true
         }
     });
+<<<<<<< HEAD
 
     const comparisonLabels = {!! json_encode($comparisonLabels) !!};
     const comparisonData = {!! json_encode($comparisonData) !!};
@@ -451,5 +513,7 @@ function downloadLaporanPDF() {
 
     }, 1200);
 }
+=======
+>>>>>>> teman/update
 </script>
 @endsection
