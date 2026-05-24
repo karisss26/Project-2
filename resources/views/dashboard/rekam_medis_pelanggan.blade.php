@@ -12,7 +12,6 @@
     <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
         @forelse($riwayatMedis as $rm)
             @php
-                // Kita coba ambil data dari tabel RekamMedis (punya dokter)
                 $catatanDokter = \App\Models\RekamMedis::where('reservasi_id', $rm->id)->first();
             @endphp
             <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
@@ -63,7 +62,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                         </div> {{-- Penutup background white (Card Utama) --}}
                         @elseif($rm->status == 'Selesai')
                             <p style="margin: 0; font-size: 14px; color: #64748b; font-style: italic;">Data rekam medis sedang diproses untuk diarsipkan.</p>

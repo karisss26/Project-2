@@ -15,6 +15,14 @@
             </a>
             <span class="angka">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</span>
         </div>
+        <div class="stat-card">
+            <span class="title">Pemasukan Produk</span>
+            <span class="angka">Rp {{ number_format($totalPemasukanProduk, 0, ',', '.') }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="title">Pemasukan Layanan</span>
+            <span class="angka">Rp {{ number_format($totalPemasukanLayanan, 0, ',', '.') }}</span>
+        </div>
         <div class="stat-card"><span class="title">Menunggu Konfirmasi</span><span class="angka" style="color: #e67e22;">{{ $menungguKonfirmasi }}</span></div>
         <div class="stat-card"><span class="title">Pesanan Aktif</span><span class="angka" style="color: #3498db;">{{ $pesananDiproses }}</span></div>
         <div class="stat-card"><span class="title">Total Pengguna</span><span class="angka">{{ $totalPengguna }}</span></div>

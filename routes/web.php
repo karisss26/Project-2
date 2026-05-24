@@ -242,7 +242,8 @@ Route::middleware(['auth'])->group(function () {
 
     // --- RUTE OWNER ---
     Route::middleware(['role:owner'])->group(function () {
-        Route::get('/owner/dashboard', [\App\Http\Controllers\DashboardSalesReportController::class, 'adminLaporanPenjualan'])->name('dashboard.owner');
+        Route::get('/owner/dashboard', [\App\Http\Controllers\DashboardSalesReportController::class, 'ownerLaporanPenjualan'])->name('dashboard.owner');
+        Route::get('/owner/laporan/print', [\App\Http\Controllers\DashboardSalesReportController::class, 'ownerLaporanPrint'])->name('owner.laporan.print');
 
         // Pengaturan Profil untuk Owner (pakai view & controller yang sama)
         Route::get('/owner/profil', [DashboardController::class, 'profil'])->name('owner.profil');

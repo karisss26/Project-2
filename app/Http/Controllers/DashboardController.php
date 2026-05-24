@@ -266,6 +266,8 @@ $totalPemasukanLayanan = reservasi::where('status', 'Selesai')->sum('harga_total
             'pesananAktif',
             'riwayatAktivitas',
             'totalPemasukan',
+            'totalPemasukanProduk',
+            'totalPemasukanLayanan',
             'antreanLayanan',
             'antreanProduk',
             'aktifLayanan',
