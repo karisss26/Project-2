@@ -5,7 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\KatalogController;
-
+use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
 use App\Http\Controllers\Admin\PosKasirController;
 use App\Http\Controllers\ReservasiTicketController;
 use App\Models\Produk;
@@ -68,7 +68,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profil-saya', [DashboardController::class, 'profil'])->name('profil.umum');
     Route::post('/profil-saya/update', [DashboardController::class, 'updateProfil'])->name('profil.umum.update');
 
-    // Rute untuk menandai notifikasi sudah dibaca
+    // Rute untuk menandai notifikasi sudah dibaca (Satu per satu)
     Route::get('/notifikasi/read/{id}', function($id) {
         // Cari notifikasi berdasarkan ID
         $notif = auth()->user()->notifications()->find($id);
@@ -80,6 +80,12 @@ Route::middleware(['auth'])->group(function () {
         // Redirect ke dashboard pelanggan supaya mereka bisa lihat status pesanannya
         return redirect()->route('dashboard.pelanggan');
     })->name('notif.read');
+
+    // Tambahkan Rute INI untuk menandai SEMUA notifikasi dibaca
+    Route::get('/notifikasi/read-all', function() {
+        auth()->user()->unreadNotifications->markAsRead();
+        return back(); // Redirect kembali ke halaman saat ini (Katalog)
+    })->name('notif.read_all');;
 
     // --- GRUP PELANGGAN ---
     Route::middleware(['role:pelanggan'])->group(function () {
@@ -110,14 +116,14 @@ Route::middleware(['auth'])->group(function () {
 
         // Group Prefix Dokter
         Route::prefix('dokter')->name('dokter.')->group(function () {
-            
+
             // Pemeriksaan
             Route::get('/pemeriksaan', [DokterController::class, 'pemeriksaanIndex'])->name('pemeriksaan.index');
             Route::get('/pemeriksaan/{id}', [DokterController::class, 'pemeriksaanDetail'])->name('pemeriksaan.show');
-            
+
             // --- INI RUTE SATU-SATUNYA UNTUK SIMPAN RM ---
             Route::post('/simpan-rm', [DashboardController::class, 'simpanRM'])->name('simpanRM');
-            
+
             // --- INI RUTE SATU-SATUNYA UNTUK MULAI PERIKSA ---
             Route::post('/mulai-periksa/{id}', [DashboardController::class, 'mulaiPeriksa'])->name('mulaiPeriksa');
 
@@ -125,17 +131,17 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/rekam-medis', [DokterController::class, 'rekamMedisIndex'])->name('rekam-medis.index');
             Route::get('/rekam-medis/{id}', [DokterController::class, 'rekamMedisDetail'])->name('rekam-medis.detail');
             Route::get('/rekam-medis/{id}/pdf', [DokterController::class, 'rekamMedisPdf'])->name('rekam-medis.pdf');
-            
+
             // Laporan
             Route::get('/laporan', [DokterController::class, 'laporanIndex'])->name('laporan.index');
             Route::get('/laporan/print', [DokterController::class, 'laporanPrint'])->name('laporan.print');
-            
+
             // Opsi Rekam Medis (Dropdown Dinamis)
             Route::get('/opsi-rekam-medis', [DokterController::class, 'opsiRmIndex'])->name('opsi-rm.index');
             Route::post('/opsi-rekam-medis', [DokterController::class, 'opsiRmStore'])->name('opsi-rm.store');
             Route::put('/opsi-rekam-medis/{id}', [DokterController::class, 'opsiRmUpdate'])->name('opsi-rm.update');
             Route::delete('/opsi-rekam-medis/{id}', [DokterController::class, 'opsiRmDestroy'])->name('opsi-rm.destroy');
-            
+
             // API Endpoint buat TomSelect dan Live Polling
             Route::get('/api/opsi-rm', [DokterController::class, 'opsiRmApi'])->name('opsi-rm.api');
         });
@@ -153,7 +159,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/dashboard/pesanan/grooming', [DashboardController::class, 'pesananGrooming'])
          ->name('dashboard.pesanan.grooming');
-         
+
         Route::get('/dashboard/pesanan/hotel', [DashboardController::class, 'pesananHotel'])
          ->name('dashboard.pesanan.hotel');
 
@@ -188,7 +194,6 @@ Route::middleware(['auth'])->group(function () {
         // POS Kasir (Admin)
         Route::get('/admin/pos', [PosKasirController::class, 'index'])->name('admin.pos.index');
         Route::post('/admin/pos/checkout', [PosKasirController::class, 'checkout'])->name('admin.pos.checkout');
-        Route::get('/admin/pos/receipt/{id}', [PosKasirController::class, 'receipt'])->name('admin.pos.receipt');
 
         Route::get('/admin/riwayat-pesanan', [DashboardController::class, 'riwayatPesananAdmin'])->name('admin.riwayat_pesanan');
         Route::get('/admin/riwayat-layanan', [DashboardController::class, 'riwayatLayananAdmin'])->name('admin.riwayat_layanan');
@@ -225,7 +230,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/profil', [DashboardController::class, 'profil'])->name('admin.profil');
         Route::post('/admin/profil/update', [DashboardController::class, 'updateProfil'])->name('admin.profil.update');
 
-
+        // Rute Kelola Pesanan Produk (Admin)
+        Route::get('/admin/transaksi', [AdminTransaksiController::class, 'index'])->name('admin.transaksi.index');
+        Route::post('/admin/transaksi/{id}/status', [AdminTransaksiController::class, 'updateStatus'])->name('admin.transaksi.update');
 
         Route::post('/admin/pesanan/{id}/update-status', [App\Http\Controllers\DashboardController::class, 'updateStatus'])->name('admin.pesanan.updateStatus');
 
@@ -235,7 +242,8 @@ Route::middleware(['auth'])->group(function () {
 
     // --- RUTE OWNER ---
     Route::middleware(['role:owner'])->group(function () {
-        Route::get('/owner/dashboard', [\App\Http\Controllers\DashboardSalesReportController::class, 'adminLaporanPenjualan'])->name('dashboard.owner');
+        Route::get('/owner/dashboard', [\App\Http\Controllers\DashboardSalesReportController::class, 'ownerLaporanPenjualan'])->name('dashboard.owner');
+        Route::get('/owner/laporan/print', [\App\Http\Controllers\DashboardSalesReportController::class, 'ownerLaporanPrint'])->name('owner.laporan.print');
 
         // Pengaturan Profil untuk Owner (pakai view & controller yang sama)
         Route::get('/owner/profil', [DashboardController::class, 'profil'])->name('owner.profil');

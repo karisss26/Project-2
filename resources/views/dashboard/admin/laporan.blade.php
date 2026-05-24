@@ -53,6 +53,22 @@
             <span class="title">Top Produk</span>
             <span class="angka" style="font-size:20px;">{{ $topProductName ?? '-' }}</span>
         </div>
+        <div class="stat-card">
+            <span class="title">Total Layanan Terjual</span>
+            <span class="angka">{{ $totalLayananTerjual }} Layanan</span>
+        </div>
+        <div class="stat-card">
+            <span class="title">Top Layanan</span>
+            <span class="angka" style="font-size:20px;">{{ $topServiceName ?? '-' }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="title">Pemasukan Produk</span>
+            <span class="angka">Rp {{ number_format($pemasukkanProduk, 0, ',', '.') }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="title">Pemasukan Layanan</span>
+            <span class="angka">Rp {{ number_format($pemasukkanLayanan, 0, ',', '.') }}</span>
+        </div>
     </div>
 
     <div class="grid-2">
@@ -63,6 +79,17 @@
         <div class="admin-card">
             <h3>Pie Produk Terjual (Top 10)</h3>
             <canvas id="productPie" height="120"></canvas>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="admin-card">
+            <h3>Perbandingan Pemasukan: Produk vs Layanan</h3>
+            <canvas id="comparisonChart" height="120"></canvas>
+        </div>
+        <div class="admin-card">
+            <h3>Pie Layanan Terpopuler (Top 10)</h3>
+            <canvas id="servicePie" height="120"></canvas>
         </div>
     </div>
 
@@ -95,30 +122,56 @@
     </div>
 
     <div class="admin-card">
-        <h3>Transaksi Selesai Terbaru</h3>
+        <h3>Top Layanan</h3>
         <div style="overflow-x:auto;">
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Tanggal</th>
-                        <th>Pelanggan</th>
-                        <th>Total</th>
+                        <th>Layanan</th>
+                        <th class="text-end">Qty Terjual</th>
+                        <th class="text-end">Pendapatan Layanan (perkiraan)</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($transactionsTable as $trx)
+                    @forelse($topServices as $row)
                         <tr>
-                            <td><strong>#TRX-{{ $trx->id }}</strong></td>
-                            <td>{{ $trx->created_at->format('d M Y') }}</td>
-                            <td>{{ $trx->user->name ?? 'Anonim' }}</td>
-                            <td>Rp {{ number_format($trx->total_harga ?? 0, 0, ',', '.') }}</td>
+                            <td><strong>{{ $row->nama_layanan }}</strong></td>
+                            <td class="text-end">{{ $row->qty_sold }}</td>
+                            <td class="text-end">Rp {{ number_format($row->revenue_est ?? 0, 0, ',', '.') }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="muted" style="text-align:center;">Belum ada transaksi.</td>
+                            <td colspan="3" class="muted" style="text-align:center;">Belum ada data layanan.</td>
                         </tr>
                     @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <h3>Ringkasan Pemasukan</h3>
+        <div style="overflow-x:auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Tipe Pemasukan</th>
+                        <th class="text-end">Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Pemasukan Produk</strong></td>
+                        <td class="text-end">Rp {{ number_format($pemasukkanProduk, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pemasukan Layanan</strong></td>
+                        <td class="text-end">Rp {{ number_format($pemasukkanLayanan, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr style="background-color: rgba(54, 0, 94, 0.1);">
+                        <td><strong>Total Pemasukan</strong></td>
+                        <td class="text-end"><strong>Rp {{ number_format($pemasukkanProduk + $pemasukkanLayanan, 0, ',', '.') }}</strong></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -168,6 +221,55 @@
             datasets: [{
                 data: pieData,
                 backgroundColor: colors.slice(0, pieLabels.length),
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    // Grafik Perbandingan Produk vs Layanan
+    const comparisonLabels = {!! json_encode($comparisonLabels) !!};
+    const comparisonData = {!! json_encode($comparisonData) !!};
+    const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+
+    new Chart(comparisonCtx, {
+        type: 'bar',
+        data: {
+            labels: comparisonLabels,
+            datasets: [{
+                label: 'Pemasukan (Rp)',
+                data: comparisonData,
+                backgroundColor: ['#7f2fff', '#06b6d4'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Pie Chart Layanan Terpopuler
+    const serviceLabels = {!! json_encode($serviceLabels) !!};
+    const serviceData = {!! json_encode($serviceData) !!};
+    const serviceCtx = document.getElementById('servicePie').getContext('2d');
+
+    const serviceColors = [
+        '#06b6d4','#0891b2','#0e7490','#164e63','#155e75',
+        '#1e3a8a','#1e40af','#1e3a8a','#0369a1','#0c4a6e'
+    ];
+
+    new Chart(serviceCtx, {
+        type: 'pie',
+        data: {
+            labels: serviceLabels,
+            datasets: [{
+                data: serviceData,
+                backgroundColor: serviceColors.slice(0, serviceLabels.length),
                 borderWidth: 0
             }]
         },
