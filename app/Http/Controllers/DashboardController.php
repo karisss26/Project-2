@@ -349,18 +349,63 @@ class DashboardController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        // Ngecek tipe request dari hidden input di blade
-        // Kalau tipenya 'transaksi' (dari POS/Kasir) panggil model Transaksi
-        // Kalau bukan (atau dari Pet Hotel/Staff), panggil model reservasi
-        $pesanan = ($request->tipe == 'transaksi')
-                    ? Transaksi::findOrFail($id)
-                    : reservasi::findOrFail($id);
+        // 1. JIKA TIPENYA TRANSAKSI (Produk dari Riwayat Pesanan)
+        if ($request->tipe == 'transaksi') {
+            $pesanan = Transaksi::findOrFail($id);
+            $oldStatus = $pesanan->status;
+            $newStatus = $request->status;
+            
+            // Logika otomatisasi update sirkulasi stok barang jika status berubah
+            if ($oldStatus !== 'Dikonfirmasi' && $newStatus === 'Dikonfirmasi') {
+                foreach ($pesanan->detilProduk as $detail) {
+                    $produk = Produk::find($detail->produk_id);
+                    if ($produk) {
+                        $produk->stok -= $detail->jumlah;
+                        $produk->save();
+                    }
+                }
+            }
+            
+            if ($oldStatus === 'Dikonfirmasi' && $newStatus !== 'Dikonfirmasi') {
+                foreach ($pesanan->detilProduk as $detail) {
+                    $produk = Produk::find($detail->produk_id);
+                    if ($produk) {
+                        $produk->stok += $detail->jumlah;
+                        $produk->save();
+                    }
+                }
+            }
+            
+            // Simpan status baru
+            $pesanan->status = $newStatus;
+            
+            // Tangkap alasan pembatalan dari form blade (alasan_tolak)
+            if ($newStatus === 'Dibatalkan') {
+                $pesanan->alasan_tolak = $request->alasan_tolak;
+            } else {
+                // Bersihkan alasan kalau admin mengubah kembali ke status selain batal
+                $pesanan->alasan_tolak = null;
+            }
 
-        // Update statusnya (Diproses / Selesai)
-        $pesanan->status = $request->status;
+        } else {
+            // 2. JIKA TIPENYA LAYANAN/RESERVASI (Grooming / Pet Hotel)
+            $pesanan = reservasi::findOrFail($id);
+            $newStatus = $request->status;
+            
+            $pesanan->status = $newStatus;
+            
+            if ($newStatus === 'Dibatalkan') {
+                // Model reservasi menggunakan penamaan kolom 'alasan_batal'
+                $pesanan->alasan_batal = $request->alasan_tolak ?? $request->alasan_batal;
+            } else {
+                $pesanan->alasan_batal = null;
+            }
+        }
+
+        // Simpan perubahan ke database
         $pesanan->save();
 
-        return redirect()->back()->with('success', 'Status berhasil diperbarui menjadi: ' . $request->status);
+        return redirect()->back()->with('success', 'Status pesanan #' . $id . ' berhasil diperbarui!');
     }
 
     public function uploadBukti(Request $request, $id)

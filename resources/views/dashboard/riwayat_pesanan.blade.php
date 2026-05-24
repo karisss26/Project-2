@@ -22,7 +22,8 @@
                         <th>ID Transaksi</th>
                         <th>Tgl Dibuat</th>
                         <th>Pelanggan</th>
-                        <th>Rincian Belanja</th>
+                        <th>Rincian Produk</th>
+                        <th>Pengambilan</th>
                         <th>Bukti Bayar</th>
                         <th>Update Status</th>
                     </tr>
@@ -47,7 +48,8 @@
                                     <li>Tidak ada detail produk</li>
                                 @endforelse
                             </ul>
-                            
+                        </td>
+                        <td>
                             <div style="margin-top: 8px; font-size: 11px; background: #e0f2fe; padding: 6px; border-radius: 6px; color: #0369a1; font-weight: bold; display: inline-block;">
                                 @if(isset($pesanan->metode_pengiriman) && $pesanan->metode_pengiriman == 'pickup')
                                     📍 Ambil di Toko: {{ !empty($pesanan->tanggal_ambil) ? \Carbon\Carbon::parse($pesanan->tanggal_ambil)->format('d M Y') : '-' }}
@@ -74,7 +76,7 @@
 
                         <td>
                             @if($pesanan->bukti_pembayaran)
-                                <a href="{{ asset('storage/' . $pesanan->bukti_pembayaran) }}" target="_blank" class="btn btn-sm text-white" style="background-color: #2e1065;">Lihat Struk</a>
+                                <a href="{{ asset('storage/' . $pesanan->bukti_pembayaran) }}" target="_blank" class="btn btn-sm text-white" style="background-color: #2    e1065;">Lihat Struk</a>
                             @elseif($pesanan->status == 'Menunggu Pembayaran')
                                 <span class="badge bg-warning text-dark">Cash/Belum Bayar</span>
                             @else
