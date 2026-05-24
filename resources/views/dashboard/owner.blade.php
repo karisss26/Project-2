@@ -5,31 +5,8 @@
 @section('content')
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 style="color: #4A148C; font-weight: 700;">📊 Dashboard Owner - Laporan Operasional</h2>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <form method="GET" action="{{ route('dashboard.owner') }}" style="display: flex; gap: 10px;">
-                <select name="mode" class="form-select" style="width: auto;" onchange="this.form.submit()">
-                    <option value="day" {{ $mode === 'day' ? 'selected' : '' }}>Harian</option>
-                    <option value="month" {{ $mode === 'month' ? 'selected' : '' }}>Bulanan</option>
-                    <option value="year" {{ $mode === 'year' ? 'selected' : '' }}>Tahunan</option>
-                </select>
-                <select name="count" class="form-select" style="width: auto;" onchange="this.form.submit()">
-                    @if($mode === 'day')
-                        <option value="7" {{ (int)$count === 7 ? 'selected' : '' }}>7 Hari</option>
-                        <option value="14" {{ (int)$count === 14 ? 'selected' : '' }}>14 Hari</option>
-                        <option value="30" {{ (int)$count === 30 ? 'selected' : '' }}>30 Hari</option>
-                    @elseif($mode === 'month')
-                        <option value="6" {{ (int)$count === 6 ? 'selected' : '' }}>6 Bulan</option>
-                        <option value="12" {{ (int)$count === 12 ? 'selected' : '' }}>12 Bulan</option>
-                    @else
-                        <option value="5" {{ (int)$count === 5 ? 'selected' : '' }}>5 Tahun</option>
-                    @endif
-                </select>
-            </form>
-            <a href="{{ route('owner.laporan.print', ['mode' => $mode, 'count' => $count]) }}" target="_blank" class="btn btn-primary" style="background: #8E24AA; border: none; font-weight: 600;">
-                🖨️ Print Laporan
-            </a>
-        </div>
+        <h2 style="color: #4A148C; font-weight: 700;">Dashboard Owner 🐾</h2>
+        <span class="badge bg-purple" style="background: #8E24AA; padding: 10px;">Filter: {{ $modeDisplay }}</span>
     </div>
 
     <div class="row mb-4">

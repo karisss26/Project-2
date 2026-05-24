@@ -5,15 +5,19 @@
 @section('content')
 <div class="dashboard-header">
     <h2 class="page-title">Dashboard Staff - Operasional</h2>
+    <div style="display: flex; gap: 10px;">
+        <a href="{{ route('admin.katalog.index') }}" class="btn-profile">📦 Kelola Katalog Produk</a>
+        <a href="{{ route('admin.layanan.index') }}" class="btn-profile">🩺 Kelola Layanan Klinik</a>
+    </div>
 </div>
 
 <div class="grid-stats" style="margin-bottom: 25px; display: flex; gap: 15px; flex-wrap: wrap;">
     <div class="stat-card" style="flex: 1; min-width: 200px;">
-        <div class="title">Total Jenis Produk Tersedia</div>
+        <div class="title">Total Produk Tersedia</div>
         <div class="angka">{{ $totalProduk }}</div>
     </div>
     <div class="stat-card" style="flex: 1; min-width: 200px;">
-        <div class="title">Total Jenis Layanan Tersedia</div>
+        <div class="title">Total Layanan Aktif</div>
         <div class="angka">{{ $totalLayanan }}</div>
     </div>
     <div class="stat-card" style="flex: 1; min-width: 200px;">
@@ -22,7 +26,7 @@
 
     <div class="stat-card" style="flex: 1; min-width: 200px;">
         <div class="title">Antrean Grooming</div>
-        <div class="angka">{{ $jumlahGroomingAktif }}</div>
+        <div class="angka">{{ $jumlahGroomingAktif }}</div> 
     </div>
 </div>
 
@@ -89,7 +93,7 @@
                         <td>RES-{{ $groom->id }}</td>
                         <td>{{ $groom->user->name ?? 'User' }}</td>
                         <td>
-                            <strong>{{ $groom->pet_name }}</strong>
+                            <strong>{{ $groom->pet_name }}</strong> 
                         </td>
                         <td>{{ \Carbon\Carbon::parse($groom->tanggal . ' ' . $groom->waktu)->format('d M Y, H:i') }}</td>
                         <td>
@@ -157,7 +161,7 @@
                         <td>RES-{{ $hotel->id }}</td>
                         <td>{{ $hotel->user->name ?? 'User' }}</td>
                         <td>
-                            <strong>{{ $hotel->pet_name }}</strong>
+                            <strong>{{ $hotel->pet_name }}</strong> 
                         </td>
                         <td>{{ \Carbon\Carbon::parse($hotel->tanggal . ' ' . $hotel->waktu)->format('d M Y, H:i') }}</td>
                         <td>

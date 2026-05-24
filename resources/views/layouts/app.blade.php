@@ -94,6 +94,9 @@
                     <a href="{{ route('dashboard.admin') }}">
                         <span class="menu-icon">🏠</span><span class="menu-text">Dashboard</span>
                     </a>
+                    <a href="{{ route('dashboard.katalog') }}">
+                        <span class="menu-icon">🛍️</span><span class="menu-text">Katalog</span>
+                    </a>
                     <a href="{{ route('admin.users.index') }}">
                         <span class="menu-icon">👥</span><span class="menu-text">Kelola Akun</span>
                     </a>

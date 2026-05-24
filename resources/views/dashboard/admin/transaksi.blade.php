@@ -46,18 +46,24 @@
                             </td>
 
                             <td class="px-4">
-                                <form action="{{ route('admin.transaksi.update', $item->id) }}" method="POST" class="d-flex gap-2 justify-content-center">
+                                <form action="{{ route('admin.transaksi.update', $item->id) }}" method="POST" class="d-flex flex-column gap-2 align-items-center">
                                     @csrf
-                                    <select name="status" class="form-select form-select-sm" style="width: 200px; border-color: #800080;">
-                                        <option value="Menunggu Pembayaran" {{ $item->status == 'Menunggu Pembayaran' ? 'selected' : '' }}>Menunggu Pembayaran</option>
-                                        <option value="Menunggu Konfirmasi Admin" {{ $item->status == 'Menunggu Konfirmasi Admin' ? 'selected' : '' }}>Menunggu Konfirmasi (Dicek)</option>
-                                        <option value="Dikonfirmasi" {{ $item->status == 'Dikonfirmasi' ? 'selected' : '' }}>Dikonfirmasi / Diproses</option>
-                                        <option value="Menunggu Kurir" {{ $item->status == 'Menunggu Kurir' ? 'selected' : '' }}>Menunggu Kurir</option>
-                                        <option value="Pesanan Diantar" {{ $item->status == 'Pesanan Diantar' ? 'selected' : '' }}>Pesanan Diantar</option>
-                                        <option value="Selesai" {{ $item->status == 'Selesai' ? 'selected' : '' }}>✅ Selesai</option>
-                                        <option value="Dibatalkan" {{ $item->status == 'Dibatalkan' ? 'selected' : '' }}>❌ Dibatalkan</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-sm btn-success">Ubah</button>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <select name="status" class="form-select form-select-sm" style="width: 200px; border-color: #800080;" onchange="cekStatusBatal(this)">
+                                            <option value="Menunggu Pembayaran" {{ $item->status == 'Menunggu Pembayaran' ? 'selected' : '' }}>Menunggu Pembayaran</option>
+                                            <option value="Menunggu Konfirmasi Admin" {{ $item->status == 'Menunggu Konfirmasi Admin' ? 'selected' : '' }}>Menunggu Konfirmasi (Dicek)</option>
+                                            <option value="Dikonfirmasi" {{ $item->status == 'Dikonfirmasi' ? 'selected' : '' }}>Dikonfirmasi / Diproses</option>
+                                            <option value="Menunggu Kurir" {{ $item->status == 'Menunggu Kurir' ? 'selected' : '' }}>Menunggu Kurir</option>
+                                            <option value="Pesanan Diantar" {{ $item->status == 'Pesanan Diantar' ? 'selected' : '' }}>Pesanan Diantar</option>
+                                            <option value="Selesai" {{ $item->status == 'Selesai' ? 'selected' : '' }}>✅ Selesai</option>
+                                            <option value="Dibatalkan" {{ $item->status == 'Dibatalkan' ? 'selected' : '' }}>❌ Dibatalkan</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-success">Ubah</button>
+                                    </div>
+                                    
+                                    <div class="alasan-tolak-container" style="display: {{ $item->status == 'Dibatalkan' ? 'block' : 'none' }}; width: 100%;">
+                                        <input type="text" name="alasan_tolak" class="form-control form-control-sm" placeholder="Tulis alasan dibatalkan..." value="{{ $item->alasan_tolak ?? '' }}" style="border-color: #dc3545;">
+                                    </div>
                                 </form>
                             </td>
                         </tr>
@@ -72,4 +78,19 @@
         </div>
     </div>
 </div>
+<script>
+    function cekStatusBatal(selectElement) {
+        // Cari elemen container alasan_tolak di dalam form yang sama
+        let alasanContainer = selectElement.closest('form').querySelector('.alasan-tolak-container');
+        
+        // Cek jika valuenya 'Dibatalkan'
+        if (selectElement.value === 'Dibatalkan') {
+            alasanContainer.style.display = 'block';
+            alasanContainer.querySelector('input').setAttribute('required', 'required'); // Wajib isi
+        } else {
+            alasanContainer.style.display = 'none';
+            alasanContainer.querySelector('input').removeAttribute('required');
+        }
+    }
+</script>
 @endsection

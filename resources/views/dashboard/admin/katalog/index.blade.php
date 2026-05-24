@@ -39,7 +39,7 @@
                 @forelse($produk as $index => $item)
                 <tr>
                     <td>{{ $produk->firstItem() + $index }}</td>
-                    <td><img src="{{ $item->gambar }}" width="50" style="border-radius: 6px; border: 1px solid var(--purple-100);" alt="{{ $item->nama_produk }}"></td>
+                    <td><img src="{{ asset('storage/' . $item->gambar) }}" width="50" style="border-radius: 6px; border: 1px solid var(--purple-100);" alt="{{ $item->nama_produk }}"></td>
                     <td><strong>{{ $item->nama_produk }}</strong></td>
                     <td><span class="badge" style="background: var(--purple-50); color: var(--purple-800);">{{ $item->kategori }}</span></td>
                     <td>Rp {{ number_format($item->harga, 0, ',', '.') }}</td>

@@ -15,18 +15,19 @@ class reservasi extends Model
     // Kasih tahu Laravel kalau nama tabelnya adalah 'reservasi'
     protected $table = 'reservasi';
 
+    protected $guarded = [];
+
 protected $fillable = [
         'user_id',
         'nama_layanan',
         'tanggal',
-        'tanggal_keluar',
+        'tanggal_keluar', // <-- Wajib ada buat Hotel
         'waktu',
         'pet_name',
         'keluhan',
-        'harga_total',
-        'biaya_tambahan',
-        'dp',             
-        'sisa_bayar',     
+        'harga_total',    // <-- Wajib ada biar nggak 0
+        'dp',             // <-- Wajib ada biar nggak 0
+        'sisa_bayar',     // <-- Wajib ada biar nggak 0
         'status',
         'alasan_batal',
         'bukti_pembayaran_dp'
