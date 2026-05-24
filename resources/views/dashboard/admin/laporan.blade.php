@@ -1,16 +1,95 @@
 @extends('layouts.app')
 
-@section('title', 'Laporan Penjualan - Admin')
+@section('title', 'Laporan Penjualan')
 
 @section('content')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-<div class="content">
+<style>
+    #area-laporan {
+    height: auto !important;
+    overflow: visible !important;
+    }
+    .pdf-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    }
+    @media print {
+        /* 1. Sembunyikan SEMUA kemungkinan sidebar, navbar, dan header */
+        aside, nav, header, footer, .sidebar, #sidebar, .main-sidebar, .sidenav, .navbar, .topbar, .d-print-none, form {
+            display: none !important;
+        }
+        
+        /* 2. Reset paksa margin & padding yang nahan content ke tengah/kanan */
+        html, body, #app, main, .main-content, .content-wrapper, .content, .container, .container-fluid {
+            background-color: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            position: relative !important;
+            left: 0 !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* 3. Biar layout grid natural tapi card ga kepotong pas ganti halaman */
+        .admin-card, .stat-card, tr {
+            page-break-inside: avoid !important; 
+            break-inside: avoid !important;
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+        }
+
+        /* 4. Pastikan warna chart & background badge solid */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+    }
+
+    .pdf-mode .grid-2 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+}
+
+.pdf-mode .grid-2 > .admin-card {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+}
+
+.pdf-mode canvas {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.pdf-mode table {
+    width: 100% !important;
+}
+
+.pdf-mode .admin-card {
+    overflow: visible !important;
+}
+</style>
+
+<div class="content" id="area-laporan">
     <div class="admin-header">
-        <h2>Laporan Penjualan - Admin</h2>
+        <h2>Laporan Penjualan</h2>
+        <button 
+            id="btn-download-pdf"
+            onclick="downloadLaporanPDF()" 
+            class="d-print-none"
+            style="background: #36005E; color: white; border: none; font-weight: 600; padding: 10px 20px; border-radius: 8px; cursor: pointer;"
+        >
+            📄 Download PDF
+        </button>
     </div>
 
-    <div class="admin-card">
+    <div class="admin-card d-print-none">
         <h3>Filter Periode</h3>
         <form method="GET" action="{{ route('admin.laporan') }}">
             <div class="filter-row">
@@ -72,7 +151,7 @@
     </div>
 
     <div class="grid-2">
-        <div class="admin-card">
+        <div class="admin-card pdf-section">
             <h3>Grafik Pendapatan (Roll Up: {{ $modeDisplay }})</h3>
             <canvas id="revenueChart" height="120"></canvas>
         </div>
@@ -179,6 +258,7 @@
 </div>
 
 <script>
+    // --- SETUP CHART.JS ---
     const revenueLabels = {!! json_encode($revenueLabels) !!};
     const revenueSeries = {!! json_encode($revenueData) !!};
 
@@ -190,7 +270,7 @@
             datasets: [{
                 label: 'Pendapatan (Rp)',
                 data: revenueSeries,
-                borderColor: '#36005E', // Warna ungu utama Paw Center
+                borderColor: '#36005E',
                 backgroundColor: 'rgba(54, 0, 94, 0.12)',
                 borderWidth: 2,
                 fill: true,
@@ -199,6 +279,7 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: { beginAtZero: true }
             }
@@ -229,7 +310,6 @@
         }
     });
 
-    // Grafik Perbandingan Produk vs Layanan
     const comparisonLabels = {!! json_encode($comparisonLabels) !!};
     const comparisonData = {!! json_encode($comparisonData) !!};
     const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
@@ -247,13 +327,13 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: { beginAtZero: true }
             }
         }
     });
 
-    // Pie Chart Layanan Terpopuler
     const serviceLabels = {!! json_encode($serviceLabels) !!};
     const serviceData = {!! json_encode($serviceData) !!};
     const serviceCtx = document.getElementById('servicePie').getContext('2d');
@@ -274,8 +354,102 @@
             }]
         },
         options: {
-            responsive: true
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
+
+// --- SETUP HTML2PDF ---
+function downloadLaporanPDF() {
+
+    const element = document.getElementById('area-laporan');
+
+    // HIDE BUTTON
+    const btn = document.getElementById('btn-download-pdf');
+    btn.style.display = 'none';
+
+    document.body.classList.add('pdf-mode');
+
+    const chartConfigs = [
+        { id: 'revenueChart', height: '220px' },
+        { id: 'productPie', height: '180px' },
+        { id: 'comparisonChart', height: '220px' },
+        { id: 'servicePie', height: '180px' }
+    ];
+
+    chartConfigs.forEach(item => {
+
+        const canvas = document.getElementById(item.id);
+
+        if (canvas) {
+
+            canvas.style.height = item.height;
+            canvas.style.maxHeight = item.height;
+
+            const chart = Chart.getChart(canvas);
+
+            if (chart) {
+                chart.resize();
+            }
+        }
+    });
+
+    setTimeout(() => {
+
+        html2pdf().set({
+
+            margin: [5, 5, 5, 5],
+
+            filename: 'Laporan-Penjualan.pdf',
+
+            image: {
+                type: 'jpeg',
+                quality: 0.95
+            },
+
+            html2canvas: {
+                scale: 1,
+                useCORS: true,
+                scrollY: 0
+            },
+
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            },
+
+            pagebreak: {
+                mode: ['css', 'legacy']
+            }
+
+        }).from(element).save().then(() => {
+
+            document.body.classList.remove('pdf-mode');
+
+            // MUNCULIN LAGI BUTTON
+            btn.style.display = '';
+
+            chartConfigs.forEach(item => {
+
+                const canvas = document.getElementById(item.id);
+
+                if (canvas) {
+
+                    canvas.style.height = '';
+                    canvas.style.maxHeight = '';
+
+                    const chart = Chart.getChart(canvas);
+
+                    if (chart) {
+                        chart.resize();
+                    }
+                }
+            });
+
+        });
+
+    }, 1200);
+}
 </script>
 @endsection
