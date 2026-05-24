@@ -84,6 +84,68 @@
     </div>
 
     <div class="admin-card" style="margin-top: 25px;">
+        <h3 style="color: #6d28d9;">🏨 Jadwal Checkout Penitipan (Pet Hotel)</h3>
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID Reservasi</th>
+                        <th>Tgl Dibuat</th>
+                        <th>Nama Pelanggan</th>
+                        <th>Nama Anabul</th>
+                        <th>Layanan Dipilih</th>
+                        <th>Jadwal Check-in/out</th>
+                        <th>Bukti DP</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($antreanCheckout as $checkout)
+                    <tr>
+                        <td><strong>#RES-{{ $checkout->id }}</strong></td>
+                        <td><small>{{ \Carbon\Carbon::parse($checkout->created_at)->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</small></td>
+                        <td>{{ $checkout->user->name ?? 'User' }}</td>
+                        <td><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-weight:600; color: #4c1d95;">🐶 {{ $checkout->pet_name ?? '-' }}</span></td>
+                        <td><strong>🏨 {{ $checkout->nama_layanan }}</strong></td>
+                        <td>
+                            <div style="margin-top: 8px; font-size: 11px; background: #f3e8ff; padding: 6px; border-radius: 6px; color: #4c1d95; font-weight: bold; display: inline-block;">
+                                🚪 Check-in: {{ \Carbon\Carbon::parse($checkout->tanggal)->timezone('Asia/Jakarta')->format('d M Y') }}<br>
+                                <span style="color: #dc2626;">🛎️ Check-out: {{ \Carbon\Carbon::parse($checkout->tanggal_keluar)->timezone('Asia/Jakarta')->format('d M Y') }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            @if($checkout->bukti_pembayaran_dp)
+                                <a href="{{ asset('storage/' . $checkout->bukti_pembayaran_dp) }}" target="_blank" style="background: var(--purple-900); color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px;">Lihat Bukti</a>
+                            @else
+                                <span style="color: red; font-size: 11px;">Belum Bayar DP</span>
+                            @endif
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <form action="{{ route('admin.pesanan.updateStatus', $checkout->id) }}" method="POST" onsubmit="return confirm('Apakah anabul ini sudah di-checkout dan dibawa pulang oleh owner?');">
+                                    @csrf
+                                    <input type="hidden" name="tipe" value="reservasi">
+                                    <input type="hidden" name="status" value="Selesai">
+                                    <button type="submit" class="btn-sm btn-acc" style="background: #28a745; color: white;">Selesaikan</button>
+                                </form>
+                                
+                                <form action="{{ route('admin.reservasi.tolak', $checkout->id) }}" method="POST" onsubmit="return mintaAlasanTolak(this)">
+                                    @csrf
+                                    <input type="hidden" name="tipe" value="reservasi">
+                                    <input type="hidden" name="alasan_tolak" class="input-alasan">
+                                    <button type="submit" class="btn-sm btn-tolak">Tolak</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="6" style="text-align: center; color: #888;">Tidak ada antrean checkout penitipan/pet hotel saat ini.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-card" style="margin-top: 25px;">
         <h3 style="color: #6d28d9;">🛍️ Antrean Konfirmasi Pesanan Produk</h3>
         <div style="overflow-x: auto;">
             <table class="admin-table">
@@ -120,6 +182,8 @@
                         <td>
                             @if($antrean->bukti_pembayaran)
                                 <a href="{{ asset('storage/' . $antrean->bukti_pembayaran) }}" target="_blank" style="background: var(--purple-900); color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px;">Lihat Struk</a>
+                            @elseif(isset($antrean->metode_pembayaran) && strtolower($antrean->metode_pembayaran) == 'cash')
+                                <span style="background: #f59e0b; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">💵 Cash / Tunai</span>
                             @else
                                 <span style="color: red; font-size: 11px;">Belum Transfer</span>
                             @endif

@@ -236,6 +236,24 @@ class DashboardController extends Controller
         // [PERBAIKAN] Mengubah take(10)->get() menjadi paginate(10)
         $riwayatAktivitas = LogAktivitas::with('user')->orderBy('created_at', 'desc')->paginate(10);
 
+        $aktifProduk = $pesananAktif->filter(function($item) {
+            return $item instanceof Transaksi;
+        });
+
+        // --- TAMBAHAN: Ambil data khusus Checkout Penitipan (Pet Hotel) ---
+        $antreanCheckout = reservasi::with(['user'])
+            ->where(function($query) {
+                $query->where('nama_layanan', 'LIKE', '%hotel%')
+                      ->orWhere('nama_layanan', 'LIKE', '%penitipan%');
+            })
+            ->whereNotNull('tanggal_keluar')
+            // Ambil yang sedang in-house atau sudah dikonfirmasi
+            ->whereIn('status', ['Dikonfirmasi', 'Diproses', 'Menunggu Jadwal']) 
+            ->orderBy('tanggal_keluar', 'asc')
+            ->get();
+        // -------------------------------------------------------------------
+
+        
         // Kirim variabel lama PLUS variabel baru hasil pemisahan kita
         return view('dashboard.admin', compact(
             'totalPengguna',
@@ -248,8 +266,10 @@ class DashboardController extends Controller
             'antreanLayanan',
             'antreanProduk',
             'aktifLayanan',
-            'aktifProduk'
+            'aktifProduk',
+            'antreanCheckout' // <--- TAMBAHKAN INI
         ));
+
     }
 
     public function setujuiReservasi(Request $request, $id)
