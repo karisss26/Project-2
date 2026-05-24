@@ -46,15 +46,6 @@ class TransaksiController extends Controller
         }
         
         $transaksi->status = $newStatus;
-        
-        // Cek jika statusnya ditolak, tangkap alasannya
-        if ($newStatus === 'Dibatalkan' && $request->has('alasan_tolak')) {
-            $transaksi->alasan_tolak = $request->alasan_tolak;
-        } else if ($newStatus !== 'Dibatalkan') {
-            // Bersihkan alasan tolak kalau admin mengubah lagi ke status lain
-            $transaksi->alasan_tolak = null;
-        }
-
         $transaksi->save();
 
         return redirect()->back()->with('success', 'Status pesanan #' . $id . ' berhasil diubah menjadi: ' . $newStatus);

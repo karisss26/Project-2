@@ -191,7 +191,7 @@ public function prosesReservasi(Request $request)
             'user_id' => Auth::id(),
             'nama_layanan' => $request->nama_layanan,
             'tanggal' => $request->tanggal_reservasi,
-            'tanggal_keluar' => $request->tanggal_keluar,
+            'tanggal_keluar' => isset($check_out) ? $check_out->format('Y-m-d') : null,
             'waktu' => $request->waktu_reservasi,
             'pet_name' => $request->nama_hewan,
             'keluhan' => $request->keluhan,
