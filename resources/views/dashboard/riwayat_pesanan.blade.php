@@ -23,6 +23,7 @@
                         <th>Tgl Dibuat</th>
                         <th>Pelanggan</th>
                         <th>Rincian Belanja</th>
+                        <th>Bukti Bayar</th>
                         <th>Update Status</th>
                     </tr>
                 </thead>
@@ -56,6 +57,12 @@
                                     🚚 Dikirim Kurir (Delivery)
                                 @endif
                             </div>
+                            
+                            {{-- Menampilkan total harga --}}
+                            <div style="margin-top: 8px; font-size: 12px; color: #16a34a; font-weight: bold;">
+                                Total: Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}
+                            </div>
+                            
                             {{-- Notif Alasan Batal --}}
                             @if($pesanan->status == 'Dibatalkan' && !empty($pesanan->alasan_tolak))
                                 <div style="margin-top: 8px; font-size: 11px; background: #fee2e2; border-left: 3px solid #ef4444; padding: 6px; border-radius: 0 6px 6px 0; color: #b91c1c;">
@@ -64,23 +71,43 @@
                                 </div>
                             @endif
                         </td>
+
                         <td>
-                            <form action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}" method="POST" style="display: flex; gap: 5px;">
+                            @if($pesanan->bukti_pembayaran)
+                                <a href="{{ asset('storage/' . $pesanan->bukti_pembayaran) }}" target="_blank" class="btn btn-sm text-white" style="background-color: #2e1065;">Lihat Struk</a>
+                            @elseif($pesanan->status == 'Menunggu Pembayaran')
+                                <span class="badge bg-warning text-dark">Cash/Belum Bayar</span>
+                            @else
+                                <span class="badge bg-secondary">Tidak Ada</span>
+                            @endif
+                        </td>
+
+                        <td>
+                            <form action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}" method="POST" style="display: flex; flex-direction: column; gap: 5px;">
                                 @csrf
                                 <input type="hidden" name="tipe" value="transaksi">
-                                <select name="status" class="status-select">
-                                    <option value="Dikonfirmasi" {{ $pesanan->status == 'Dikonfirmasi' ? 'selected' : '' }}>Dikonfirmasi</option>
-                                    <option value="Menunggu Jadwal" {{ $pesanan->status == 'Menunggu Jadwal' ? 'selected' : '' }}>Menunggu Diambil</option>
-                                    <option value="Menunggu Kurir" {{ $pesanan->status == 'Menunggu Kurir' ? 'selected' : '' }}>Menunggu Kurir</option>
-                                    <option value="Pesanan Diantar" {{ $pesanan->status == 'Pesanan Diantar' ? 'selected' : '' }}>Diantar</option>
-                                    <option value="Selesai" {{ $pesanan->status == 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                                </select>
-                                <button type="submit" class="btn-sm btn-acc">Update</button>
+                                <div style="display: flex; gap: 5px;">
+                                    <select name="status" class="status-select" onchange="toggleAlasanInput(this)">
+                                        <option value="Menunggu Pembayaran" {{ $pesanan->status == 'Menunggu Pembayaran' ? 'selected' : '' }}>Menunggu Pembayaran</option>
+                                        <option value="Menunggu Konfirmasi Admin" {{ $pesanan->status == 'Menunggu Konfirmasi Admin' ? 'selected' : '' }}>Menunggu Konfirmasi (Dicek)</option>
+                                        <option value="Dikonfirmasi" {{ $pesanan->status == 'Dikonfirmasi' ? 'selected' : '' }}>Dikonfirmasi / Diproses</option>
+                                        <option value="Menunggu Kurir" {{ $pesanan->status == 'Menunggu Kurir' ? 'selected' : '' }}>Menunggu Kurir</option>
+                                        <option value="Pesanan Diantar" {{ $pesanan->status == 'Pesanan Diantar' ? 'selected' : '' }}>Pesanan Diantar</option>
+                                        <option value="Selesai" {{ $pesanan->status == 'Selesai' ? 'selected' : '' }}>✅ Selesai</option>
+                                        <option value="Dibatalkan" {{ $pesanan->status == 'Dibatalkan' ? 'selected' : '' }}>❌ Dibatalkan</option>
+                                    </select>
+                                    <button type="submit" class="btn-sm btn-acc">Update</button>
+                                </div>
+
+                                {{-- Input alasan dibatalkan INSIDE the form --}}
+                                <div class="alasan-tolak-container" style="display: {{ $pesanan->status == 'Dibatalkan' ? 'block' : 'none' }};">
+                                    <input type="text" name="alasan_tolak" placeholder="Tulis alasan dibatalkan..." value="{{ $pesanan->alasan_tolak ?? '' }}" style="border: 1px solid #dc3545; padding: 6px; border-radius: 4px; width: 100%; font-size: 12px;">
+                                </div>
                             </form>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" style="text-align: center; color: #888;">Tidak ada pesanan produk.</td></tr>
+                    <tr><td colspan="6" style="text-align: center; color: #888;">Tidak ada pesanan produk.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -91,4 +118,25 @@
         </div>
     </div>
 </div>
+
+<script>
+    function toggleAlasanInput(selectElement) {
+        const form = selectElement.closest('form');
+        const alasanContainer = form.querySelector('.alasan-tolak-container');
+        const alasanInput = form.querySelector('input[name="alasan_tolak"]');
+        
+        if (selectElement.value === 'Dibatalkan') {
+            alasanContainer.style.display = 'block';
+            if (alasanInput) {
+                alasanInput.setAttribute('required', 'required');
+            }
+        } else {
+            alasanContainer.style.display = 'none';
+            if (alasanInput) {
+                alasanInput.removeAttribute('required');
+                alasanInput.value = '';
+            }
+        }
+    }
+</script>
 @endsection

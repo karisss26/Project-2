@@ -432,7 +432,7 @@
 
     <div class="action-buttons">
         <button type="button" class="btn btn-print" onclick="window.print()">🖨️ Cetak Struk</button>
-        <a href="{{ route('admin.transaksi.index') }}" class="btn btn-next">Kelola Transaksi →</a>
+        <a href="{{ route('admin.riwayat_pesanan') }}" class="btn btn-next">Kelola Transaksi →</a>
     </div>
 </div>
 @endsection

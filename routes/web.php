@@ -5,7 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\KatalogController;
-use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
+
 use App\Http\Controllers\Admin\PosKasirController;
 use App\Http\Controllers\ReservasiTicketController;
 use App\Models\Produk;
@@ -225,9 +225,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/profil', [DashboardController::class, 'profil'])->name('admin.profil');
         Route::post('/admin/profil/update', [DashboardController::class, 'updateProfil'])->name('admin.profil.update');
 
-        // Rute Kelola Pesanan Produk (Admin)
-        Route::get('/admin/transaksi', [AdminTransaksiController::class, 'index'])->name('admin.transaksi.index');
-        Route::post('/admin/transaksi/{id}/status', [AdminTransaksiController::class, 'updateStatus'])->name('admin.transaksi.update');
+
 
         Route::post('/admin/pesanan/{id}/update-status', [App\Http\Controllers\DashboardController::class, 'updateStatus'])->name('admin.pesanan.updateStatus');
 
