@@ -113,7 +113,16 @@
 @endauth
 
                         @auth
-                            <a href="{{ route('dashboard.pelanggan') }}" class="p-2 hover:bg-ungu-terang rounded-full transition-colors group" title="Dashboard Saya">
+                            @php
+                                $profileRoute = match(auth()->user()->role) {
+                                    'admin', 'kasir' => route('dashboard.admin'),
+                                    'owner' => route('dashboard.owner'),
+                                    'dokter' => route('dashboard.dokter'),
+                                    'staff' => route('dashboard.staff'),
+                                    default => route('dashboard.pelanggan'),
+                                };
+                            @endphp
+                            <a href="{{ $profileRoute }}" class="p-2 hover:bg-ungu-terang rounded-full transition-colors group" title="Dashboard Saya">
                                 <i class="fas fa-user-circle text-ungu text-2xl group-hover:scale-110 transition-transform"></i>
                             </a>
                         @else

@@ -188,6 +188,7 @@ Route::middleware(['auth'])->group(function () {
         // POS Kasir (Admin)
         Route::get('/admin/pos', [PosKasirController::class, 'index'])->name('admin.pos.index');
         Route::post('/admin/pos/checkout', [PosKasirController::class, 'checkout'])->name('admin.pos.checkout');
+        Route::get('/admin/pos/receipt/{id}', [PosKasirController::class, 'receipt'])->name('admin.pos.receipt');
 
         Route::get('/admin/riwayat-pesanan', [DashboardController::class, 'riwayatPesananAdmin'])->name('admin.riwayat_pesanan');
         Route::get('/admin/riwayat-layanan', [DashboardController::class, 'riwayatLayananAdmin'])->name('admin.riwayat_layanan');
