@@ -429,6 +429,32 @@ class DashboardController extends Controller
 
         // Simpan perubahan ke database
         $pesanan->save();
+        // Kirim notif otomatis ke pelanggan
+if ($request->tipe != 'transaksi') {
+
+    if ($newStatus == 'Dibatalkan') {
+        $pesanan->user->notify(
+            new ReservasiNotification($pesanan, 'Ditolak')
+        );
+    } else {
+        $pesanan->user->notify(
+            new ReservasiNotification($pesanan, $newStatus)
+        );
+    }
+
+} else {
+
+    if ($newStatus == 'Dibatalkan') {
+        $pesanan->user->notify(
+            new TransaksiNotification($pesanan, 'Ditolak')
+        );
+    } else {
+        $pesanan->user->notify(
+            new TransaksiNotification($pesanan, $newStatus)
+        );
+    }
+
+}
 
         return redirect()->back()->with('success', 'Status pesanan #' . $id . ' berhasil diperbarui!');
     }
