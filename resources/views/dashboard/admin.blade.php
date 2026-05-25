@@ -15,7 +15,7 @@
             </a>
             <span class="angka">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</span>
         </div>
-<<<<<<< HEAD
+
         <div class="stat-card">
             <span class="title">Pemasukan Produk</span>
             <span class="angka">Rp {{ number_format($totalPemasukanProduk, 0, ',', '.') }}</span>
@@ -24,8 +24,7 @@
             <span class="title">Pemasukan Layanan</span>
             <span class="angka">Rp {{ number_format($totalPemasukanLayanan, 0, ',', '.') }}</span>
         </div>
-=======
->>>>>>> teman/update
+
         <div class="stat-card"><span class="title">Menunggu Konfirmasi</span><span class="angka" style="color: #e67e22;">{{ $menungguKonfirmasi }}</span></div>
         <div class="stat-card"><span class="title">Pesanan Aktif</span><span class="angka" style="color: #3498db;">{{ $pesananDiproses }}</span></div>
         <div class="stat-card"><span class="title">Total Pengguna</span><span class="angka">{{ $totalPengguna }}</span></div>
@@ -77,16 +76,16 @@
                                     <input type="hidden" name="tipe" value="reservasi">
                                     <button type="submit" class="btn-sm btn-acc" style="background: #28a745; color: white;">Setujui</button>
                                 </form>
-<<<<<<< HEAD
+
                                 <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="tipe" value="reservasi">
-=======
+
                                 <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST" onsubmit="return mintaAlasanTolak(this)">
                                     @csrf
                                     <input type="hidden" name="tipe" value="reservasi">
                                     <input type="hidden" name="alasan_tolak" class="input-alasan">
->>>>>>> teman/update
+
                                     <button type="submit" class="btn-sm btn-tolak">Tolak</button>
                                 </form>
                             </div>
@@ -101,8 +100,6 @@
     </div>
 
     <div class="admin-card" style="margin-top: 25px;">
-<<<<<<< HEAD
-=======
         <h3 style="color: #6d28d9;">🏨 Jadwal Checkout Penitipan (Pet Hotel)</h3>
         <div style="overflow-x: auto;">
             <table class="admin-table">
@@ -146,7 +143,7 @@
                                     <input type="hidden" name="status" value="Selesai">
                                     <button type="submit" class="btn-sm btn-acc" style="background: #28a745; color: white;">Selesaikan</button>
                                 </form>
-                                
+
                                 <form action="{{ route('admin.reservasi.tolak', $checkout->id) }}" method="POST" onsubmit="return mintaAlasanTolak(this)">
                                     @csrf
                                     <input type="hidden" name="tipe" value="reservasi">
@@ -165,7 +162,7 @@
     </div>
 
     <div class="admin-card" style="margin-top: 25px;">
->>>>>>> teman/update
+
         <h3 style="color: #6d28d9;">🛍️ Antrean Konfirmasi Pesanan Produk</h3>
         <div style="overflow-x: auto;">
             <table class="admin-table">
@@ -202,11 +199,10 @@
                         <td>
                             @if($antrean->bukti_pembayaran)
                                 <a href="{{ asset('storage/' . $antrean->bukti_pembayaran) }}" target="_blank" style="background: var(--purple-900); color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px;">Lihat Struk</a>
-<<<<<<< HEAD
-=======
+
                             @elseif(isset($antrean->metode_pembayaran) && strtolower($antrean->metode_pembayaran) == 'cash')
                                 <span style="background: #f59e0b; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">💵 Cash / Tunai</span>
->>>>>>> teman/update
+
                             @else
                                 <span style="color: red; font-size: 11px;">Belum Transfer</span>
                             @endif
@@ -218,16 +214,16 @@
                                     <input type="hidden" name="tipe" value="transaksi">
                                     <button type="submit" class="btn-sm btn-acc" style="background: #28a745; color: white;">Setujui</button>
                                 </form>
-<<<<<<< HEAD
+
                                 <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="tipe" value="transaksi">
-=======
+
                                 <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST" onsubmit="return mintaAlasanTolak(this)">
                                     @csrf
                                     <input type="hidden" name="tipe" value="transaksi">
                                     <input type="hidden" name="alasan_tolak" class="input-alasan">
->>>>>>> teman/update
+
                                     <button type="submit" class="btn-sm btn-tolak">Tolak</button>
                                 </form>
                             </div>
@@ -240,7 +236,7 @@
             </table>
         </div>
     </div>
-    
+
     <div class="admin-card" style="margin-top: 25px;">
         <h3>Riwayat Aktivitas Sistem</h3>
         <ul class="activity-list">
@@ -255,23 +251,22 @@
                 <li class="activity-desc">Belum ada catatan aktivitas.</li>
             @endforelse
         </ul>
-        
+
         <div style="margin-top: 20px; display: flex; justify-content: center;">
             {{ $riwayatAktivitas->links() }}
         </div>
     </div>
 </div>
-<<<<<<< HEAD
-=======
+
 <script>
     function mintaAlasanTolak(form) {
         let alasan = prompt("⚠️ Pesanan akan ditolak!\nSilakan masukkan alasan penolakan:");
-        
+
         // Jika admin klik Cancel pada popup prompt
         if (alasan === null) {
             return false; // Batalkan submit
         }
-        
+
         // Jika alasan kosong tapi di-Ok, kasih peringatan (opsional)
         if (alasan.trim() === "") {
             alert("Alasan tolak harus diisi!");
@@ -283,5 +278,4 @@
         return true;
     }
 </script>
->>>>>>> teman/update
 @endsection

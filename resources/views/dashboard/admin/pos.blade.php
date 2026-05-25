@@ -3,11 +3,6 @@
 @section('title', 'POS Kasir')
 
 @section('content')
-<<<<<<< HEAD
-=======
-<div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
-
->>>>>>> teman/update
 <div class="pos-layout">
     <div class="pos-section">
         <h3>🧾 Produk</h3>
@@ -103,8 +98,6 @@
 <script>
     const cart = new Map(); // produk_id => {produk_id,nama,harga,qty}
 
-<<<<<<< HEAD
-=======
     // Notification animations
     const style = document.createElement('style');
     style.textContent = `
@@ -131,7 +124,6 @@
     `;
     document.head.appendChild(style);
 
->>>>>>> teman/update
     function formatIDR(n) {
         return new Intl.NumberFormat('id-ID', { style:'currency', currency:'IDR', maximumFractionDigits:0 }).format(n);
     }
@@ -142,8 +134,6 @@
         transferArea.style.display = method === 'transfer' ? 'block' : 'none';
     }
 
-<<<<<<< HEAD
-=======
     function showNotification(message) {
         const container = document.getElementById('notification-container');
         const notification = document.createElement('div');
@@ -166,7 +156,6 @@
         }, 3000);
     }
 
->>>>>>> teman/update
     function addItem(produkId, nama, harga) {
         if (cart.has(produkId)) {
             cart.get(produkId).qty += 1;
@@ -174,11 +163,7 @@
             cart.set(produkId, { produk_id: produkId, nama: nama, harga: harga, qty: 1 });
         }
         renderCart();
-<<<<<<< HEAD
-=======
         showNotification(`✅ ${nama} ditambahkan ke keranjang`);
->>>>>>> teman/update
-    }
 
     function changeQty(produkId, delta) {
         if (!cart.has(produkId)) return;

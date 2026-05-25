@@ -77,11 +77,7 @@
                 <div class="form-group" style="flex: 1;">
                     <label>Umur</label>
                     <div style="display: flex; gap: 5px;">
-<<<<<<< HEAD
-                        <input type="number" name="umur_angka" required min="1" max="50" placeholder="Angka" style="width: 50%;">
-=======
-                        <input type="number" name="umur_angka" required min="1" placeholder="Angka" style="width: 50%;">
->>>>>>> teman/update
+                <input type="number" name="umur_angka" required min="1" max="50" placeholder="Angka" style="width: 50%;">
                         <select name="umur_satuan" required style="width: 50%;">
                             <option value="Bulan">Bulan</option>
                             <option value="Tahun">Tahun</option>
@@ -149,11 +145,7 @@
                 <div class="form-group" style="flex: 1;">
                     <label>Umur</label>
                     <div style="display: flex; gap: 5px;">
-<<<<<<< HEAD
                         <input type="number" name="umur_angka" id="edit_umur_angka" required min="1" max="50" style="width: 50%;">
-=======
-                        <input type="number" name="umur_angka" id="edit_umur_angka" required min="1" style="width: 50%;">
->>>>>>> teman/update
                         <select name="umur_satuan" id="edit_umur_satuan" required style="width: 50%;">
                             <option value="Bulan">Bulan</option>
                             <option value="Tahun">Tahun</option>

@@ -21,28 +21,45 @@ class DashboardController extends Controller
     public function pelanggan()
     {
         $userId = Auth::id();
-        $petCount = hewan::where('user_id', $userId)->count();
+        $petCount = \App\Models\hewan::where('user_id', $userId)->count();
         $cartCount = count(session('cart', []));
 
-        // Data untuk tabel 1: Reservasi Layanan
-        $reservasiLayanan = reservasi::where('user_id', $userId)
-                                                  ->orderBy('created_at', 'desc')
-                                                  ->paginate(5);;
+        // 1. Query khusus untuk Pet Hotel & Penitipan
+        $petHotel = \App\Models\reservasi::where('user_id', $userId)
+            ->where(function($query) {
+                $query->where('nama_layanan', 'LIKE', '%hotel%')
+                      ->orWhere('nama_layanan', 'LIKE', '%penitipan%');
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(5, ['*'], 'hotel_page');
 
-        // Data untuk tabel 2: Pembelian Produk
-        $pembelianProduk = Transaksi::where('user_id', $userId)
-                                                ->with('detilProduk')
-                                                ->orderBy('created_at', 'desc')
-                                                ->paginate(5);;
+        // 2. Query khusus untuk Layanan Lain (Klinik / Grooming)
+        $layananLain = \App\Models\reservasi::where('user_id', $userId)
+            ->where(function($query) {
+                $query->where('nama_layanan', 'NOT LIKE', '%hotel%')
+                      ->where('nama_layanan', 'NOT LIKE', '%penitipan%');
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(5, ['*'], 'layanan_page');
 
-        // Hitung reservasi aktif (dicek admin atau disetujui)
-        $activeReservationsCount = $reservasiLayanan->whereIn('status', ['Menunggu Konfirmasi Admin', 'Dikonfirmasi'])->count();
+        // 3. Query untuk Pembelian Produk
+        $pembelianProduk = \App\Models\Transaksi::where('user_id', $userId)
+            ->with('detilProduk')
+            ->orderBy('created_at', 'desc')
+            ->paginate(5, ['*'], 'produk_page');
 
+        // 4. Hitung reservasi aktif (dicek admin atau disetujui) dari semua reservasi
+        $activeReservationsCount = \App\Models\reservasi::where('user_id', $userId)
+            ->whereIn('status', ['Menunggu Konfirmasi Admin', 'Dikonfirmasi', 'Diproses', 'Menunggu Jadwal'])
+            ->count();
+
+        // 5. Lempar semua variabel ke View
         return view('dashboard.pelanggan', compact(
             'petCount',
             'activeReservationsCount',
             'cartCount',
-            'reservasiLayanan',
+            'petHotel',
+            'layananLain',
             'pembelianProduk'
         ));
     }
@@ -251,7 +268,6 @@ class DashboardController extends Controller
             ->whereIn('status', ['Dikonfirmasi', 'Diproses', 'Menunggu Jadwal'])
             ->orderBy('tanggal_keluar', 'asc')
             ->get();
-        // -------------------------------------------------------------------
 
 
         // Kirim variabel lama PLUS variabel baru hasil pemisahan kita
@@ -263,11 +279,13 @@ class DashboardController extends Controller
             'pesananAktif',
             'riwayatAktivitas',
             'totalPemasukan',
+            'totalPemasukanProduk',
+            'totalPemasukanLayanan',
             'antreanLayanan',
             'antreanProduk',
             'aktifLayanan',
             'aktifProduk',
-            'antreanCheckout' // <--- TAMBAHKAN INI
+            'antreanCheckout'
         ));
 
     }
@@ -634,7 +652,7 @@ public function staff()
         $riwayatMedis = reservasi::where('user_id', Auth::id())
             ->whereIn('status', ['Dikonfirmasi', 'Menunggu Jadwal', 'Diproses', 'Selesai'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(5);
 
         return view('dashboard.rekam_medis_pelanggan', compact('riwayatMedis'));
     }

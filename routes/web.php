@@ -97,7 +97,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/cart/remove', [CheckoutController::class, 'removeFromCart'])->name('cart.remove');
 
         Route::get('/pelanggan/rekam-medis', [App\Http\Controllers\DashboardController::class, 'rekamMedisPelanggan'])->name('pelanggan.rekam_medis');
-
+        Route::get('/transaksi/{id}/struk', [\App\Http\Controllers\ReservasiTicketController::class, 'downloadStruk'])->name('transaksi.struk.download');
         Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
 
         Route::post('/dashboard/reservasi/{id}/batal', [DashboardController::class, 'batalkan'])->name('reservasi.batal');
