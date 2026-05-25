@@ -350,8 +350,15 @@ class DashboardController extends Controller
 
         // --- TAMBAHAN: Tangkap alasan tolak dari prompt JS ---
         if ($request->has('alasan_tolak')) {
-            $updateData['alasan_tolak'] = $request->alasan_tolak;
+            // PENTING: Beda tabel, beda nama kolom sayang!
+            if ($request->tipe == 'transaksi') {
+                $updateData['alasan_tolak'] = $request->alasan_tolak; // Tabel transaksi produk
+            } else {
+                $updateData['alasan_batal'] = $request->alasan_tolak; // Tabel reservasi layanan
+            }
         }
+
+        $pesanan->update($updateData);
 
         $pesanan->update($updateData);
 
@@ -480,28 +487,50 @@ class DashboardController extends Controller
 // 1. Tampilan Dashboard Dokter
 public function dokter()
     {
+        // Filter untuk membuang layanan staff (grooming & hotel)
         $excludeStaff = function($query) {
             $query->where('nama_layanan', 'NOT LIKE', '%grooming%')
                   ->where('nama_layanan', 'NOT LIKE', '%hotel%')
                   ->where('nama_layanan', 'NOT LIKE', '%penitipan%');
         };
 
-        // Ambil data pasien medis yang belum selesai
-        $antrean = reservasi::with(['user', 'hewan'])
+        // 1. Ambil SEMUA data pasien medis yang belum selesai
+        $antreanAktif = reservasi::with(['user', 'hewan'])
             ->whereIn('status', ['Menunggu Jadwal', 'Dikonfirmasi', 'Diproses'])
             ->where($excludeStaff)
             ->orderBy('tanggal', 'asc')
             ->orderBy('waktu', 'asc')
             ->get();
 
-        // Cuma butuh 2 metrik ini aja
-        $totalPemeriksaan = $antrean->count();
+        // 2. PISAHKAN antrean untuk tabel Konsultasi dan Vaksinasi
+        // (Asumsi jika nama layanannya mengandung kata "vaksin", masuk ke tabel vaksinasi)
+        $antreanKonsultasi = $antreanAktif->filter(function($item) {
+            return stripos($item->nama_layanan, 'vaksin') === false;
+        });
+
+        $antreanVaksinasi = $antreanAktif->filter(function($item) {
+            return stripos($item->nama_layanan, 'vaksin') !== false;
+        });
+
+        // 3. HITUNG Statistik / Metrik untuk kotak-kotak di atas
+        $totalPemeriksaan = $antreanAktif->count();
+        $totalVaksinasi = $antreanVaksinasi->count(); // INI SOLUSI ERROR KAMU
         $totalRekamMedis = reservasi::where('status', 'Selesai')->where($excludeStaff)->count();
 
+        // (Opsional: Tetap ambil data lama untuk jaga-jaga kalau dibutuhkan)
         $jadwalLayanan = reservasi::with(['user', 'hewan'])->where($excludeStaff)->orderBy('created_at', 'desc')->take(10)->get();
         $rekamMedis = reservasi::with(['user', 'hewan', 'rekamMedis'])->where('status', 'Selesai')->where($excludeStaff)->orderBy('updated_at', 'desc')->take(5)->get();
 
-        return view('dokter.dashboard', compact('antrean', 'totalPemeriksaan', 'totalRekamMedis', 'jadwalLayanan', 'rekamMedis'));
+        // 4. KIRIM SEMUA datanya ke view
+        return view('dokter.dashboard', compact(
+            'totalPemeriksaan',
+            'totalVaksinasi',
+            'totalRekamMedis',
+            'antreanKonsultasi',
+            'antreanVaksinasi',
+            'jadwalLayanan', // bawaan kode lama
+            'rekamMedis'     // bawaan kode lama
+        ));
     }
 
     // --- TAMBAHIN DUA FUNGSI INI ---
@@ -525,6 +554,7 @@ public function simpanRM(Request $request)
             'tindakan'     => 'required',
             'nama_dokter'  => 'required', // Wajib pilih dokter dari dropdown
             'catatan'      => 'nullable',
+            'biaya_tambahan' => 'nullable|numeric',
         ]);
 
         $reservasi = reservasi::findOrFail($request->reservasi_id);
@@ -543,10 +573,13 @@ public function simpanRM(Request $request)
             'diagnosa'        => $request->diagnosa,
             'tindakan'        => $request->tindakan,
             'catatan'         => $request->catatan,
+            'biaya_tambahan'  => $request->biaya_tambahan,
             'tanggal_periksa' => now(),
         ]);
 
-        // 3. Update status reservasi jadi Selesai
+        // 3. Update status reservasi jadi Selesai & Update Sisa Bayar
+        $biayaTambahan = $request->biaya_tambahan ?? 0;
+        $reservasi->sisa_bayar = $reservasi->harga_total + $biayaTambahan - $reservasi->dp;
         $reservasi->status = 'Selesai';
         $reservasi->save();
 

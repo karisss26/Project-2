@@ -77,10 +77,6 @@
                                     <button type="submit" class="btn-sm btn-acc" style="background: #28a745; color: white;">Setujui</button>
                                 </form>
 
-                                <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="tipe" value="reservasi">
-
                                 <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST" onsubmit="return mintaAlasanTolak(this)">
                                     @csrf
                                     <input type="hidden" name="tipe" value="reservasi">
@@ -214,10 +210,6 @@
                                     <input type="hidden" name="tipe" value="transaksi">
                                     <button type="submit" class="btn-sm btn-acc" style="background: #28a745; color: white;">Setujui</button>
                                 </form>
-
-                                <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="tipe" value="transaksi">
 
                                 <form action="{{ route('admin.reservasi.tolak', $antrean->id) }}" method="POST" onsubmit="return mintaAlasanTolak(this)">
                                     @csrf

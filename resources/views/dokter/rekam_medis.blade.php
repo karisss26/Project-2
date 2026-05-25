@@ -115,7 +115,6 @@
                             $tindakan = $rm->tindakan ?? '';
                         @endphp
                         <tr class="rm-row"
-                        <tr class="rm-row"
                             data-q="{{ strtolower($hewanNama.' '.$pemilikNama.' '.$diagnosa) }}"
                             data-dokter-id="{{ $dokterId }}"
                             data-tahun="{{ $tahun }}"

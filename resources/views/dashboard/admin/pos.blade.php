@@ -135,7 +135,20 @@
     }
 
     function showNotification(message) {
-        const container = document.getElementById('notification-container');
+        let container = document.getElementById('notification-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'notification-container';
+            container.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                max-width: 400px;
+            `;
+            document.body.appendChild(container);
+        }
+        
         const notification = document.createElement('div');
         notification.style.cssText = `
             background: #28a745;
@@ -164,6 +177,7 @@
         }
         renderCart();
         showNotification(`✅ ${nama} ditambahkan ke keranjang`);
+    }
 
     function changeQty(produkId, delta) {
         if (!cart.has(produkId)) return;

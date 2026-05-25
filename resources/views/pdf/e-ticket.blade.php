@@ -34,7 +34,7 @@
         <div class="header">
             <div class="title">E-Ticket Reservasi</div>
             <div class="brand">Paw Center - D&F Pet Shop & Clinic</div>
-            
+
             {{-- Badge Status Reservasi --}}
             <div class="badge">Status: {{ strtoupper($reservasi->status) }}</div>
 
@@ -73,7 +73,7 @@
                             {{ \Carbon\Carbon::parse($reservasi->tanggal)->format('d M Y') }}<br>
                             {{ substr($reservasi->waktu, 0, 5) }} WIB
                         </div>
-                        
+
                         @if(!empty($reservasi->tanggal_keluar))
                             <div class="k" style="margin-top: 10px; border-top: 1px dashed #e5e7eb; padding-top: 5px;">Tanggal Checkout</div>
                             <div class="v" style="color: #008080;">{{ \Carbon\Carbon::parse($reservasi->tanggal_keluar)->format('d M Y') }}</div>
@@ -101,7 +101,10 @@
         {{-- Logic Perhitungan Biaya --}}
         @php
             $harga_base = $reservasi->harga_total ?? 0;
-            $biaya_tambahan = $reservasi->biaya_tambahan ?? 0;
+            // Tembak data biaya tambahan lewat relasi rekamMedis
+            // Pakai fungsi optional() biar sistem nggak error/crash kalau e-tiketnya dicetak sebelum dokter ngisi rekam medis
+            $biaya_tambahan = optional($reservasi->rekamMedis)->biaya_tambahan ?? 0;
+
             $grand_total = $harga_base + $biaya_tambahan;
             $dp = $reservasi->harga_dp > 0 ? $reservasi->harga_dp : ($harga_base * 0.2);
             $sisa_bayar = $grand_total - $dp;
@@ -131,7 +134,7 @@
                     <td>Uang Muka / DP (Sudah Bayar)</td>
                     <td style="text-align:right; font-weight:700; color: #16a34a;">- Rp {{ number_format($dp, 0, ',', '.') }}</td>
                 </tr>
-                
+
                 <tr style="background: #f9fafb;">
                     <td style="font-weight: bold;">Sisa Bayar (Di Kasir Klinik)</td>
                     <td style="text-align:right; font-weight:800; color: #36005E; font-size: 16px;">

@@ -82,6 +82,9 @@
                         <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #d4edda; color: #155724;">✅ {{ $hotel->status }}</span>
                     @elseif($hotel->status == 'Dibatalkan')
                         <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #f8d7da; color: #721c24;">❌ {{ $hotel->status }}</span>
+                        @if($hotel->alasan_batal)
+                            <br><small style="color: #666; margin-top: 4px; display: block; font-style: italic;">💬 {{ $hotel->alasan_batal }}</small>
+                        @endif
                     @else
                         <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #e2e8f0; color: #475569;">🔔 {{ $hotel->status }}</span>
                     @endif
@@ -147,6 +150,9 @@
                         <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #d4edda; color: #155724;">✅ {{ $layanan->status }}</span>
                     @elseif($layanan->status == 'Dibatalkan')
                         <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #f8d7da; color: #721c24;">❌ {{ $layanan->status }}</span>
+                        @if($layanan->alasan_batal)
+                            <br><small style="color: #666; margin-top: 4px; display: block; font-style: italic;">💬 {{ $layanan->alasan_batal }}</small>
+                        @endif
                     @else
                         <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #e2e8f0; color: #475569;">🔔 {{ $layanan->status }}</span>
                     @endif
@@ -220,6 +226,9 @@
                         <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #d4edda; color: #155724;">✅ {{ $trx->status }}</span>
                     @elseif($trx->status == 'Dibatalkan')
                         <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #f8d7da; color: #721c24;">❌ {{ $trx->status }}</span>
+                        @if($trx->alasan_tolak)
+                            <br><small style="color: #666; margin-top: 4px; display: block; font-style: italic;">💬 {{ $trx->alasan_tolak }}</small>
+                        @endif
                     @else
                         <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #fff3cd; color: #856404;">📦 {{ $trx->status }}</span>
                     @endif

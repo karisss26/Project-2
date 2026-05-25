@@ -20,7 +20,7 @@
         aside, nav, header, footer, .sidebar, #sidebar, .main-sidebar, .sidenav, .navbar, .topbar, .d-print-none, form {
             display: none !important;
         }
-        
+
         /* 2. Reset paksa margin & padding yang nahan content ke tengah/kanan */
         html, body, #app, main, .main-content, .content-wrapper, .content, .container, .container-fluid {
             background-color: white !important;
@@ -33,10 +33,10 @@
             left: 0 !important;
             box-sizing: border-box !important;
         }
-        
+
         /* 3. Biar layout grid natural tapi card ga kepotong pas ganti halaman */
         .admin-card, .stat-card, tr {
-            page-break-inside: avoid !important; 
+            page-break-inside: avoid !important;
             break-inside: avoid !important;
             box-shadow: none !important;
             border: 1px solid #ddd !important;
@@ -79,9 +79,9 @@
 <div class="content" id="area-laporan">
     <div class="admin-header">
         <h2>Laporan Penjualan</h2>
-        <button 
+        <button
             id="btn-download-pdf"
-            onclick="downloadLaporanPDF()" 
+            onclick="downloadLaporanPDF()"
             class="d-print-none"
             style="background: #36005E; color: white; border: none; font-weight: 600; padding: 10px 20px; border-radius: 8px; cursor: pointer;"
         >
@@ -265,6 +265,112 @@
     </div>
 </div>
 
+{{-- ======================================================== --}}
+    {{-- AREA KHUSUS CETAK PDF (Tersembunyi di web, Muncul di PDF) --}}
+    {{-- ======================================================== --}}
+    <div id="cetak-pdf" style="display: none; padding: 20px; font-family: Helvetica, Arial, sans-serif; color: #333; background: #fff;">
+        <div style="text-align: center; border-bottom: 2px solid #36005E; padding-bottom: 15px; margin-bottom: 20px;">
+            <h1 style="color: #36005E; margin: 0; font-size: 24px; text-transform: uppercase;">Laporan Penjualan Paw Center</h1>
+            <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Periode: <strong>{{ $modeDisplay }} (Last {{ $count }})</strong></p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #999;">Dicetak pada: {{ \Carbon\Carbon::now()->format('d M Y H:i') }} WIB</p>
+        </div>
+
+        {{-- 1. KOTAK RINGKASAN PENDAPATAN --}}
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr>
+                <td style="padding: 15px; border: 1px solid #ddd; background: #faf5ff; text-align: center; width: 33%;">
+                    <div style="font-size: 11px; color: #666; text-transform: uppercase; font-weight: bold;">Total Pendapatan</div>
+                    <div style="font-size: 18px; font-weight: bold; color: #36005E; margin-top: 5px;">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</div>
+                </td>
+                <td style="padding: 15px; border: 1px solid #ddd; background: #f0fdf4; text-align: center; width: 33%;">
+                    <div style="font-size: 11px; color: #666; text-transform: uppercase; font-weight: bold;">Pemasukan Produk ({{ $totalQtySold }} Item)</div>
+                    <div style="font-size: 18px; font-weight: bold; color: #16a34a; margin-top: 5px;">Rp {{ number_format($pemasukkanProduk, 0, ',', '.') }}</div>
+                </td>
+                <td style="padding: 15px; border: 1px solid #ddd; background: #eff6ff; text-align: center; width: 33%;">
+                    <div style="font-size: 11px; color: #666; text-transform: uppercase; font-weight: bold;">Pemasukan Layanan ({{ $totalLayananTerjual }} Trx)</div>
+                    <div style="font-size: 18px; font-weight: bold; color: #2563eb; margin-top: 5px;">Rp {{ number_format($pemasukkanLayanan, 0, ',', '.') }}</div>
+                </td>
+            </tr>
+        </table>
+
+        {{-- 2. GRAFIK CHART (Dikonversi otomatis jadi gambar saat cetak) --}}
+        <div style="page-break-inside: avoid; margin-bottom: 20px;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 50%; padding: 10px; text-align: center; border: 1px solid #eee;">
+                        <h3 style="font-size: 13px; color: #36005E; margin-bottom: 10px;">📈 Grafik Pendapatan</h3>
+                        <img id="pdf-revenueChart" style="width: 100%; max-height: 180px; object-fit: contain;" />
+                    </td>
+                    <td style="width: 50%; padding: 10px; text-align: center; border: 1px solid #eee;">
+                        <h3 style="font-size: 13px; color: #36005E; margin-bottom: 10px;">📊 Perbandingan Produk vs Layanan</h3>
+                        <img id="pdf-comparisonChart" style="width: 100%; max-height: 180px; object-fit: contain;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%; padding: 10px; text-align: center; border: 1px solid #eee;">
+                        <h3 style="font-size: 13px; color: #36005E; margin-bottom: 10px;">🍩 Pie Produk Terjual</h3>
+                        <img id="pdf-productPie" style="width: 100%; max-height: 200px; object-fit: contain;" />
+                    </td>
+                    <td style="width: 50%; padding: 10px; text-align: center; border: 1px solid #eee;">
+                        <h3 style="font-size: 13px; color: #36005E; margin-bottom: 10px;">🍩 Pie Layanan Terpopuler</h3>
+                        <img id="pdf-servicePie" style="width: 100%; max-height: 200px; object-fit: contain;" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        {{-- 3. TABEL TOP PRODUK & LAYANAN --}}
+        <div style="page-break-inside: avoid;">
+            <table style="width: 100%; border-collapse: collapse;" border="0">
+                <tr>
+                    <td style="width: 48%; vertical-align: top; padding-right: 10px;">
+                        <h3 style="font-size: 14px; color: #36005E; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">📦 Top 10 Produk Terjual</h3>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Nama Produk</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($topProducts as $row)
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px;">{{ $row->nama_produk }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">{{ $row->qty_sold }}</td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="2" style="border: 1px solid #ddd; padding: 8px; text-align: center;">Belum ada data</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </td>
+                    <td style="width: 4%;"></td> {{-- Spacer --}}
+                    <td style="width: 48%; vertical-align: top; padding-left: 10px;">
+                        <h3 style="font-size: 14px; color: #36005E; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">🩺 Top 10 Layanan Klinik/Hotel</h3>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Nama Layanan</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($topServices as $row)
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px;">{{ $row->nama_layanan }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">{{ $row->qty_sold }}</td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="2" style="border: 1px solid #ddd; padding: 8px; text-align: center;">Belum ada data</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
 <script>
     // --- SETUP CHART.JS ---
     const revenueLabels = {!! json_encode($revenueLabels) !!};
@@ -369,95 +475,46 @@
 
 // --- SETUP HTML2PDF ---
 function downloadLaporanPDF() {
-
-    const element = document.getElementById('area-laporan');
-
-    // HIDE BUTTON
+    const element = document.getElementById('cetak-pdf');
     const btn = document.getElementById('btn-download-pdf');
-    btn.style.display = 'none';
 
-    document.body.classList.add('pdf-mode');
-
-    const chartConfigs = [
-        { id: 'revenueChart', height: '220px' },
-        { id: 'productPie', height: '180px' },
-        { id: 'comparisonChart', height: '220px' },
-        { id: 'servicePie', height: '180px' }
-    ];
-
-    chartConfigs.forEach(item => {
-
-        const canvas = document.getElementById(item.id);
-
-        if (canvas) {
-
-            canvas.style.height = item.height;
-            canvas.style.maxHeight = item.height;
-
-            const chart = Chart.getChart(canvas);
-
-            if (chart) {
-                chart.resize();
-            }
+    // 1. FOTO SEMUA GRAFIK (CANVAS -> IMAGE)
+    const chartIds = ['revenueChart', 'comparisonChart', 'productPie', 'servicePie'];
+    chartIds.forEach(id => {
+        const canvas = document.getElementById(id);
+        const img = document.getElementById('pdf-' + id);
+        
+        // Kalau grafiknya ada, ubah jadi base64 image dan masukin ke src
+        if (canvas && img) {
+            img.src = canvas.toDataURL('image/png');
         }
     });
 
+    // 2. MUNCULIN AREA CETAK SEMENTARA
+    element.style.display = 'block';
+    btn.innerHTML = '⏳ Sedang menyiapkan PDF...';
+    btn.disabled = true;
+
+    // 3. PROSES BIKIN PDF
     setTimeout(() => {
-
         html2pdf().set({
-
-            margin: [5, 5, 5, 5],
-
-            filename: 'Laporan-Penjualan.pdf',
-
-            image: {
-                type: 'jpeg',
-                quality: 0.95
+            margin: [10, 10, 10, 10],
+            filename: 'Laporan-Penjualan-PawCenter.pdf',
+            image: { type: 'jpeg', quality: 1.0 },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true, 
+                scrollY: 0 
             },
-
-            html2canvas: {
-                scale: 1,
-                useCORS: true,
-                scrollY: 0
-            },
-
-            jsPDF: {
-                unit: 'mm',
-                format: 'a4',
-                orientation: 'portrait'
-            },
-
-            pagebreak: {
-                mode: ['css', 'legacy']
-            }
-
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         }).from(element).save().then(() => {
-
-            document.body.classList.remove('pdf-mode');
-
-            // MUNCULIN LAGI BUTTON
-            btn.style.display = '';
-
-            chartConfigs.forEach(item => {
-
-                const canvas = document.getElementById(item.id);
-
-                if (canvas) {
-
-                    canvas.style.height = '';
-                    canvas.style.maxHeight = '';
-
-                    const chart = Chart.getChart(canvas);
-
-                    if (chart) {
-                        chart.resize();
-                    }
-                }
-            });
-
+            
+            // 4. KEMBALIKAN KE KONDISI AWAL (SEMBUNYIKAN LAGI)
+            element.style.display = 'none';
+            btn.innerHTML = '📄 Download PDF';
+            btn.disabled = false;
         });
-
-    }, 1200);
+    }, 500); // Tunggu setengah detik biar gambarnya ke-load sempurna
 }
 </script>
 @endsection

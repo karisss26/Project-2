@@ -23,7 +23,7 @@
                     <span class="menu-icon">🏠</span><span class="menu-text">Dashboard</span>
                 </a>
                 <a href="{{ route('dashboard.katalog') }}">
-                    <span class="menu-icon">🛍️</span><span class="menu-text">Layanan & Produk</span>
+                    <span class="menu-icon">🛍️</span><span class="menu-text">Lihat Katalog</span>
                 </a>
                 <a href="{{ route('pelanggan.hewan') }}">
                     <span class="menu-icon">🐶</span><span class="menu-text">Data Hewan</span>
