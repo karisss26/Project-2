@@ -116,11 +116,10 @@
 
         let kategoriInput = document.getElementById('edit_kategori');
         if(kategoriInput) kategoriInput.value = item.kategori;
-
         document.getElementById('edit_harga').value = item.harga;
         document.getElementById('edit_stok').value = item.stok;
         document.getElementById('edit_deskripsi').value = item.deskripsi;
-        document.getElementById('formEdit').action = `/admin/katalog/update/${item.id}`;
+        document.getElementById('formEdit').action = `/kelola/katalog/update/${item.id}`;
     }
 
     // Tutup modal kalau user klik di luar area kotak putih

@@ -211,22 +211,6 @@ Route::middleware(['auth'])->group(function () {
             Route::patch('/unblock/{id}', [App\Http\Controllers\Admin\UserController::class, 'unblock'])->name('unblock');
         });
 
-        // 2. Kelola Katalog Produk (CRUD)
-        Route::prefix('admin/katalog')->name('admin.katalog.')->group(function() {
-            Route::get('/', [App\Http\Controllers\Admin\ProdukController::class, 'index'])->name('index');
-            Route::post('/store', [App\Http\Controllers\Admin\ProdukController::class, 'store'])->name('store');
-            Route::put('/update/{id}', [App\Http\Controllers\Admin\ProdukController::class, 'update'])->name('update');
-            Route::delete('/delete/{id}', [App\Http\Controllers\Admin\ProdukController::class, 'destroy'])->name('destroy');
-        });
-
-        // 3. Kelola Layanan Klinik (CRUD)
-        Route::prefix('admin/layanan')->name('admin.layanan.')->group(function() {
-            Route::get('/', [App\Http\Controllers\Admin\LayananController::class, 'index'])->name('index');
-            Route::post('/store', [App\Http\Controllers\Admin\LayananController::class, 'store'])->name('store');
-            Route::put('/update/{id}', [App\Http\Controllers\Admin\LayananController::class, 'update'])->name('update');
-            Route::delete('/delete/{id}', [App\Http\Controllers\Admin\LayananController::class, 'destroy'])->name('destroy');
-        });
-
         // 4. Pengaturan Profil Admin
         Route::get('/admin/profil', [DashboardController::class, 'profil'])->name('admin.profil');
         Route::post('/admin/profil/update', [DashboardController::class, 'updateProfil'])->name('admin.profil.update');
